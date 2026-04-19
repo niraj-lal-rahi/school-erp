@@ -17,7 +17,7 @@ class TenantResolutionTest extends TestCase
         $token = app(JwtManager::class)->issueAccessToken($user);
 
         $this->withHeader('Authorization', 'Bearer '.$token)
-            ->getJson('/api/v1/sis/students')
+            ->getJson('/api/v1/students')
             ->assertOk();
     }
 }

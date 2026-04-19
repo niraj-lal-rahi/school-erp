@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\DataTransferObjects\SIS\StudentData;
 use App\Models\Student;
+use App\Models\StudentDocument;
 use App\Repositories\Contracts\StudentRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -12,7 +13,7 @@ class StudentRepository implements StudentRepositoryInterface
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return Student::query()
-            ->with(['guardians', 'enrollments.schoolClass', 'enrollments.section'])
+            ->with(['guardians', 'enrollments.schoolClass', 'enrollments.section', 'admissions', 'documents'])
             ->when($filters['search'] ?? null, function ($query, string $search): void {
                 $query->where(function ($studentQuery) use ($search): void {
                     $studentQuery->where('first_name', 'like', "%{$search}%")
@@ -32,7 +33,7 @@ class StudentRepository implements StudentRepositoryInterface
         $student->enrollments()->create($data->enrollmentAttributes($student->school_id));
         $student->admissions()->create($data->admissionAttributes($student->school_id));
 
-        return $student->load(['guardians', 'enrollments.schoolClass', 'enrollments.section', 'admissions']);
+        return $student->load(['guardians', 'enrollments.schoolClass', 'enrollments.section', 'admissions', 'documents']);
     }
 
     public function update(Student $student, StudentData $data): Student
@@ -50,11 +51,16 @@ class StudentRepository implements StudentRepositoryInterface
             $admission->update($data->admissionAttributes($student->school_id));
         }
 
-        return $student->refresh()->load(['guardians', 'enrollments.schoolClass', 'enrollments.section', 'admissions']);
+        return $student->refresh()->load(['guardians', 'enrollments.schoolClass', 'enrollments.section', 'admissions', 'documents']);
     }
 
     public function delete(Student $student): void
     {
         $student->delete();
+    }
+
+    public function createDocument(Student $student, array $attributes): StudentDocument
+    {
+        return $student->documents()->create($attributes);
     }
 }

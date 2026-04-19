@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\V1\SIS;
 
 use App\DataTransferObjects\SIS\StudentData;
+use App\DataTransferObjects\SIS\StudentDocumentData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SIS\StoreStudentRequest;
 use App\Http\Requests\SIS\UpdateStudentRequest;
+use App\Http\Requests\SIS\UploadStudentDocumentRequest;
 use App\Models\Student;
 use App\Services\SIS\StudentService;
 use Illuminate\Http\JsonResponse;
@@ -63,5 +65,19 @@ class StudentController extends Controller
         $this->students->delete($student);
 
         return response()->json(null, 204);
+    }
+
+    public function uploadDocument(UploadStudentDocumentRequest $request, Student $student): JsonResponse
+    {
+        $document = $this->students->uploadDocument(
+            student: $student,
+            data: StudentDocumentData::fromArray($request->validated()),
+            uploadedBy: $request->user()->id,
+        );
+
+        return response()->json([
+            'message' => 'Student document uploaded successfully.',
+            'data' => $document,
+        ], 201);
     }
 }

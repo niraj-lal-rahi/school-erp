@@ -12,12 +12,11 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
 
-        Route::prefix('sis')->group(function (): void {
-            Route::get('/students', [StudentController::class, 'index'])->middleware('permission:students.view');
-            Route::post('/students', [StudentController::class, 'store'])->middleware('permission:students.create');
-            Route::get('/students/{student}', [StudentController::class, 'show'])->middleware('permission:students.view');
-            Route::put('/students/{student}', [StudentController::class, 'update'])->middleware('permission:students.update');
-            Route::delete('/students/{student}', [StudentController::class, 'destroy'])->middleware('permission:students.delete');
-        });
+        Route::get('/students', [StudentController::class, 'index'])->middleware('permission:students.view');
+        Route::post('/students', [StudentController::class, 'store'])->middleware('permission:students.create');
+        Route::get('/students/{student}', [StudentController::class, 'show'])->middleware('permission:students.view');
+        Route::put('/students/{student}', [StudentController::class, 'update'])->middleware('permission:students.update');
+        Route::delete('/students/{student}', [StudentController::class, 'destroy'])->middleware('permission:students.delete');
+        Route::post('/students/{student}/documents', [StudentController::class, 'uploadDocument'])->middleware('permission:students.documents.upload');
     });
 });

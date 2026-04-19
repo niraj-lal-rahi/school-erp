@@ -19,6 +19,7 @@ readonly class StudentData
         $student = $payload;
         unset($student['guardians'], $student['enrollment'], $student['admission']);
         $student['uuid'] ??= (string) Str::uuid();
+        $student['status'] ??= 'active';
 
         return new self(
             student: $student,

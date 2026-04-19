@@ -8,7 +8,9 @@ use App\Models\SchoolClass;
 use App\Models\Section;
 use App\Models\User;
 use App\Support\Auth\JwtManager;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class StudentApiTest extends TestCase
@@ -29,7 +31,7 @@ class StudentApiTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$token,
             'X-Tenant-Code' => 'greenwood',
-        ])->postJson('/api/v1/sis/students', [
+        ])->postJson('/api/v1/students', [
             'admission_no' => 'ADM-2026-0002',
             'first_name' => 'Kabir',
             'last_name' => 'Verma',
@@ -81,6 +83,41 @@ class StudentApiTest extends TestCase
         $this->assertDatabaseHas('students', [
             'school_id' => $user->school_id,
             'admission_no' => 'ADM-2026-0002',
+        ]);
+    }
+
+    public function test_authorized_user_can_upload_student_document(): void
+    {
+        Storage::fake('local');
+        config()->set('filesystems.default', 'local');
+
+        $this->seed();
+
+        $user = User::withoutGlobalScopes()->where('email', 'admin@greenwood.edu')->firstOrFail();
+        $student = \App\Models\Student::withoutGlobalScopes()->where('school_id', $user->school_id)->firstOrFail();
+        $token = app(JwtManager::class)->issueAccessToken($user);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$token,
+            'X-Tenant-Code' => 'greenwood',
+        ])->postJson('/api/v1/students/'.$student->id.'/documents', [
+            'document_type' => 'birth_certificate',
+            'title' => 'Birth Certificate',
+            'file' => UploadedFile::fake()->create('birth-certificate.pdf', 120, 'application/pdf'),
+            'metadata' => [
+                'issued_by' => 'Municipal Office',
+            ],
+        ]);
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('data.student_id', $student->id)
+            ->assertJsonPath('data.document_type', 'birth_certificate');
+
+        $this->assertDatabaseHas('student_documents', [
+            'school_id' => $user->school_id,
+            'student_id' => $student->id,
+            'document_type' => 'birth_certificate',
         ]);
     }
 }

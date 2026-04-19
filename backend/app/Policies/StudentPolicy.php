@@ -31,4 +31,9 @@ class StudentPolicy
     {
         return $user->school_id === $student->school_id && $user->hasPermission('students.delete');
     }
+
+    public function uploadDocument(User $user, Student $student): bool
+    {
+        return $user->school_id === $student->school_id && $user->hasPermission('students.documents.upload');
+    }
 }

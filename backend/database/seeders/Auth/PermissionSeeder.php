@@ -15,6 +15,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'Create Students', 'code' => 'students.create', 'module' => 'sis'],
             ['name' => 'Update Students', 'code' => 'students.update', 'module' => 'sis'],
             ['name' => 'Delete Students', 'code' => 'students.delete', 'module' => 'sis'],
+            ['name' => 'Upload Student Documents', 'code' => 'students.documents.upload', 'module' => 'sis'],
         ];
 
         foreach ($permissions as $permission) {
