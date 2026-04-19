@@ -2,6 +2,7 @@ import { CircularProgress, Stack } from '@mui/material';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux';
+import { fetchMasterData } from '../../masterData/store/masterDataSlice';
 import { StudentForm } from '../components/StudentForm';
 import { fetchStudentById, updateStudent } from '../store/studentSlice';
 
@@ -12,6 +13,7 @@ export function StudentEditPage() {
   const { currentStudent, loading, saving, error } = useAppSelector((state) => state.students);
 
   useEffect(() => {
+    dispatch(fetchMasterData());
     dispatch(fetchStudentById(studentId));
   }, [dispatch, studentId]);
 

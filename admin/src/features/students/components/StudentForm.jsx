@@ -1,6 +1,7 @@
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Divider,
@@ -13,6 +14,7 @@ import {
 } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { validateStudentForm } from '../../../utils/studentValidation';
+import { useAppSelector } from '../../../hooks/redux';
 
 const defaultStudent = {
   admission_no: '',
@@ -59,6 +61,7 @@ export function StudentForm({
   error,
   title,
 }) {
+  const { guardians: guardianOptions, academicYears, classes } = useAppSelector((state) => state.masterData);
   const [values, setValues] = useState(() => ({
     ...defaultStudent,
     ...initialValues,
@@ -70,12 +73,14 @@ export function StudentForm({
   const [validationErrors, setValidationErrors] = useState({});
 
   const guardianText = useMemo(
-    () =>
-      (values.guardians || [])
-        .map((guardian) => guardian.id)
-        .join(', '),
+    () => (values.guardians || []).map((guardian) => guardian.id),
     [values.guardians]
   );
+
+  const availableSections = useMemo(() => {
+    const selectedClass = classes.find((item) => Number(item.id) === Number(values.enrollment.school_class_id));
+    return selectedClass?.sections || [];
+  }, [classes, values.enrollment.school_class_id]);
 
   function handleChange(field, nextValue) {
     setValues((current) => ({ ...current, [field]: nextValue }));
@@ -91,18 +96,14 @@ export function StudentForm({
     }));
   }
 
-  function handleGuardianIds(value) {
-    const guardians = value
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .map((id, index) => ({
-        id: Number(id),
-        relationship: index === 0 ? 'Primary Guardian' : 'Guardian',
-        is_primary: index === 0,
-        is_emergency_contact: index === 0,
-        pickup_authorized: true,
-      }));
+  function handleGuardians(nextGuardians) {
+    const guardians = nextGuardians.map((guardian, index) => ({
+      id: guardian.id,
+      relationship: guardian.relationship_type || (index === 0 ? 'Primary Guardian' : 'Guardian'),
+      is_primary: index === 0,
+      is_emergency_contact: index === 0,
+      pickup_authorized: true,
+    }));
 
     setValues((current) => ({ ...current, guardians }));
   }
@@ -175,7 +176,21 @@ export function StudentForm({
             </TextField>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
-            <TextField fullWidth label="Guardian IDs" placeholder="1, 2" value={guardianText} onChange={(e) => handleGuardianIds(e.target.value)} error={Boolean(validationErrors.guardians)} helperText={validationErrors.guardians || 'Enter guardian ids separated by commas.'} />
+            <Autocomplete
+              multiple
+              options={guardianOptions}
+              getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
+              value={guardianOptions.filter((option) => guardianText.includes(option.id))}
+              onChange={(_, nextValue) => handleGuardians(nextValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Guardians"
+                  error={Boolean(validationErrors.guardians)}
+                  helperText={validationErrors.guardians || 'Choose one or more mapped guardians.'}
+                />
+              )}
+            />
           </Grid>
           <Grid size={12}>
             <TextField fullWidth multiline minRows={3} label="Medical Notes" value={values.medical_notes} onChange={(e) => handleChange('medical_notes', e.target.value)} />
@@ -205,13 +220,32 @@ export function StudentForm({
         <Typography variant="h6">Enrollment</Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 3 }}>
-            <TextField fullWidth label="Academic Year ID" value={values.enrollment.academic_year_id} onChange={(e) => handleNestedChange('enrollment', 'academic_year_id', e.target.value)} error={Boolean(validationErrors.enrollment_academic_year_id)} helperText={validationErrors.enrollment_academic_year_id} />
+            <TextField select fullWidth label="Academic Year" value={values.enrollment.academic_year_id} onChange={(e) => handleNestedChange('enrollment', 'academic_year_id', e.target.value)} error={Boolean(validationErrors.enrollment_academic_year_id)} helperText={validationErrors.enrollment_academic_year_id}>
+              {academicYears.map((year) => (
+                <MenuItem key={year.id} value={year.id}>
+                  {year.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
           <Grid size={{ xs: 12, md: 3 }}>
-            <TextField fullWidth label="Class ID" value={values.enrollment.school_class_id} onChange={(e) => handleNestedChange('enrollment', 'school_class_id', e.target.value)} error={Boolean(validationErrors.enrollment_school_class_id)} helperText={validationErrors.enrollment_school_class_id} />
+            <TextField select fullWidth label="Class" value={values.enrollment.school_class_id} onChange={(e) => handleNestedChange('enrollment', 'school_class_id', e.target.value)} error={Boolean(validationErrors.enrollment_school_class_id)} helperText={validationErrors.enrollment_school_class_id}>
+              {classes.map((schoolClass) => (
+                <MenuItem key={schoolClass.id} value={schoolClass.id}>
+                  {schoolClass.name} ({schoolClass.code})
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
           <Grid size={{ xs: 12, md: 2 }}>
-            <TextField fullWidth label="Section ID" value={values.enrollment.section_id} onChange={(e) => handleNestedChange('enrollment', 'section_id', e.target.value)} />
+            <TextField select fullWidth label="Section" value={values.enrollment.section_id} onChange={(e) => handleNestedChange('enrollment', 'section_id', e.target.value)}>
+              <MenuItem value="">None</MenuItem>
+              {availableSections.map((section) => (
+                <MenuItem key={section.id} value={section.id}>
+                  {section.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
           <Grid size={{ xs: 12, md: 2 }}>
             <TextField fullWidth label="Roll Number" value={values.enrollment.roll_number} onChange={(e) => handleNestedChange('enrollment', 'roll_number', e.target.value)} />
@@ -233,10 +267,22 @@ export function StudentForm({
         <Typography variant="h6">Admission Process</Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 3 }}>
-            <TextField fullWidth label="Academic Year ID" value={values.admission.academic_year_id} onChange={(e) => handleNestedChange('admission', 'academic_year_id', e.target.value)} />
+            <TextField select fullWidth label="Academic Year" value={values.admission.academic_year_id} onChange={(e) => handleNestedChange('admission', 'academic_year_id', e.target.value)}>
+              {academicYears.map((year) => (
+                <MenuItem key={year.id} value={year.id}>
+                  {year.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
           <Grid size={{ xs: 12, md: 3 }}>
-            <TextField fullWidth label="Applied Class ID" value={values.admission.applied_class_id} onChange={(e) => handleNestedChange('admission', 'applied_class_id', e.target.value)} />
+            <TextField select fullWidth label="Applied Class" value={values.admission.applied_class_id} onChange={(e) => handleNestedChange('admission', 'applied_class_id', e.target.value)}>
+              {classes.map((schoolClass) => (
+                <MenuItem key={schoolClass.id} value={schoolClass.id}>
+                  {schoolClass.name} ({schoolClass.code})
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
           <Grid size={{ xs: 12, md: 3 }}>
             <TextField select fullWidth label="Admission Status" value={values.admission.status} onChange={(e) => handleNestedChange('admission', 'status', e.target.value)} error={Boolean(validationErrors.admission_status)} helperText={validationErrors.admission_status}>

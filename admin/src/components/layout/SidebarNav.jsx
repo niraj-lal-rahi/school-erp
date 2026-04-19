@@ -1,4 +1,7 @@
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import SupervisedUserCircleOutlinedIcon from '@mui/icons-material/SupervisedUserCircleOutlined';
 import {
   List,
   ListItemButton,
@@ -9,12 +12,18 @@ import {
   Typography,
 } from '@mui/material';
 import { NavLink } from 'react-router-dom';
+import { useAppSelector } from '../../hooks/redux';
 
 const navItems = [
-  { label: 'Students', to: '/students', icon: <PeopleAltOutlinedIcon /> },
+  { label: 'Students', to: '/students', icon: <PeopleAltOutlinedIcon />, permission: 'students.view' },
+  { label: 'Guardians', to: '/guardians', icon: <SupervisedUserCircleOutlinedIcon />, permission: 'students.view' },
+  { label: 'Academic Years', to: '/academic-years', icon: <CalendarMonthOutlinedIcon />, permission: 'students.view' },
+  { label: 'Classes', to: '/classes', icon: <ClassOutlinedIcon />, permission: 'students.view' },
 ];
 
 export function SidebarNav() {
+  const permissions = useAppSelector((state) => state.auth.user?.permissions || []);
+
   return (
     <Paper
       elevation={0}
@@ -33,7 +42,7 @@ export function SidebarNav() {
       </Stack>
 
       <List sx={{ mt: 3 }}>
-        {navItems.map((item) => (
+        {navItems.filter((item) => permissions.includes(item.permission)).map((item) => (
           <ListItemButton
             key={item.to}
             component={NavLink}

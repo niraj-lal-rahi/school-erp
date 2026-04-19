@@ -1,7 +1,9 @@
 import SearchIcon from '@mui/icons-material/Search';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import {
   Avatar,
   Box,
+  Button,
   Chip,
   InputAdornment,
   Paper,
@@ -9,11 +11,24 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useAppSelector } from '../../hooks/redux';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { clearSession, logout } from '../../features/auth/authSlice';
 
 export function TopBar() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
   const tenantCode = useAppSelector((state) => state.auth.tenantCode);
+
+  async function handleLogout() {
+    await dispatch(logout());
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('tenant_code');
+    dispatch(clearSession());
+    navigate('/login');
+  }
 
   return (
     <Paper
@@ -45,6 +60,9 @@ export function TopBar() {
             }}
           />
           <Chip label={`Tenant: ${tenantCode || 'n/a'}`} color="secondary" variant="outlined" />
+          <Button variant="outlined" color="inherit" startIcon={<LogoutOutlinedIcon />} onClick={handleLogout}>
+            Logout
+          </Button>
           <Stack direction="row" spacing={1} alignItems="center">
             <Avatar>{user?.name?.[0] || 'A'}</Avatar>
             <Box>
