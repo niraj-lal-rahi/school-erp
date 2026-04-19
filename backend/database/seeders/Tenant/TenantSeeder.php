@@ -32,13 +32,16 @@ class TenantSeeder extends Seeder
         AcademicYear::withoutGlobalScopes()->updateOrCreate(
             [
                 'school_id' => $school->id,
-                'name' => '2026-2027',
+                'code' => 'AY-2026-27',
             ],
             [
                 'uuid' => (string) Str::uuid(),
+                'name' => 'Academic Year 2026-2027',
                 'start_date' => '2026-04-01',
                 'end_date' => '2027-03-31',
+                'is_active' => true,
                 'is_current' => true,
+                'status' => 'active',
             ]
         );
     }
