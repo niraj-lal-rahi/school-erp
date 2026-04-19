@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { login } from './authSlice';
+import { persistSession } from '../../utils/tokenStorage';
 
 export function LoginPage() {
   const dispatch = useAppDispatch();
@@ -35,9 +36,11 @@ export function LoginPage() {
     const result = await dispatch(login(form));
 
     if (!result.error) {
-      localStorage.setItem('access_token', result.payload.access_token);
-      localStorage.setItem('refresh_token', result.payload.refresh_token);
-      localStorage.setItem('tenant_code', result.payload.tenant.code);
+      persistSession({
+        accessToken: result.payload.access_token,
+        refreshToken: result.payload.refresh_token,
+        tenantCode: result.payload.tenant.code,
+      });
       navigate('/students', { replace: true });
     }
   }

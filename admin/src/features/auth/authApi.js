@@ -7,6 +7,9 @@ export const authApi = {
   me() {
     return axiosClient.get('/auth/me');
   },
+  refresh(payload) {
+    return axiosClient.post('/auth/refresh', payload);
+  },
   logout() {
     return axiosClient.post('/auth/logout');
   },

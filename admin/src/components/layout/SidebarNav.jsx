@@ -1,6 +1,7 @@
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import ViewKanbanOutlinedIcon from '@mui/icons-material/ViewKanbanOutlined';
 import SupervisedUserCircleOutlinedIcon from '@mui/icons-material/SupervisedUserCircleOutlined';
 import {
   List,
@@ -19,6 +20,7 @@ const navItems = [
   { label: 'Guardians', to: '/guardians', icon: <SupervisedUserCircleOutlinedIcon />, permission: 'students.view' },
   { label: 'Academic Years', to: '/academic-years', icon: <CalendarMonthOutlinedIcon />, permission: 'students.view' },
   { label: 'Classes', to: '/classes', icon: <ClassOutlinedIcon />, permission: 'students.view' },
+  { label: 'Sections', to: '/sections', icon: <ViewKanbanOutlinedIcon />, permission: 'students.view' },
 ];
 
 export function SidebarNav() {

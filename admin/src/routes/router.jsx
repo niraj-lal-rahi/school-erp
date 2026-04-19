@@ -12,6 +12,7 @@ const StudentProfilePage = lazy(() => import('../features/students/pages/Student
 const GuardiansPage = lazy(() => import('../features/masterData/pages/GuardiansPage').then((module) => ({ default: module.GuardiansPage })));
 const AcademicYearsPage = lazy(() => import('../features/masterData/pages/AcademicYearsPage').then((module) => ({ default: module.AcademicYearsPage })));
 const ClassesPage = lazy(() => import('../features/masterData/pages/ClassesPage').then((module) => ({ default: module.ClassesPage })));
+const SectionsPage = lazy(() => import('../features/masterData/pages/SectionsPage').then((module) => ({ default: module.SectionsPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -60,6 +61,10 @@ export const router = createBrowserRouter([
           {
             path: 'classes',
             element: withSuspense(<ClassesPage />),
+          },
+          {
+            path: 'sections',
+            element: withSuspense(<SectionsPage />),
           },
         ],
       },

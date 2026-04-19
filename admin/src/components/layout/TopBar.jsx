@@ -14,6 +14,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { clearSession, logout } from '../../features/auth/authSlice';
+import { clearStoredSession } from '../../utils/tokenStorage';
 
 export function TopBar() {
   const dispatch = useAppDispatch();
@@ -23,9 +24,7 @@ export function TopBar() {
 
   async function handleLogout() {
     await dispatch(logout());
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('tenant_code');
+    clearStoredSession();
     dispatch(clearSession());
     navigate('/login');
   }

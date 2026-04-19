@@ -19,4 +19,10 @@ export const masterDataApi = {
   createClass(payload) {
     return axiosClient.post('/classes', payload);
   },
+  getSections() {
+    return axiosClient.get('/sections');
+  },
+  createSection(payload) {
+    return axiosClient.post('/sections', payload);
+  },
 };

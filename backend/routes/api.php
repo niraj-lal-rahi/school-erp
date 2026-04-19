@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\MasterData\AcademicYearController;
 use App\Http\Controllers\Api\V1\MasterData\GuardianController;
+use App\Http\Controllers\Api\V1\MasterData\SectionController;
 use App\Http\Controllers\Api\V1\MasterData\SchoolClassController;
 use App\Http\Controllers\Api\V1\SIS\StudentController;
 use Illuminate\Support\Facades\Route;
@@ -30,5 +31,8 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/classes', [SchoolClassController::class, 'index'])->middleware('permission:students.view');
         Route::post('/classes', [SchoolClassController::class, 'store'])->middleware('permission:students.create');
+
+        Route::get('/sections', [SectionController::class, 'index'])->middleware('permission:students.view');
+        Route::post('/sections', [SectionController::class, 'store'])->middleware('permission:students.create');
     });
 });

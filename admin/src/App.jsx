@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './hooks/redux';
 import { bootstrapSession, clearSession } from './features/auth/authSlice';
 import { router } from './routes/router';
+import { clearStoredSession } from './utils/tokenStorage';
 
 export function App() {
   const dispatch = useAppDispatch();
@@ -15,9 +16,7 @@ export function App() {
     }
 
     dispatch(bootstrapSession()).unwrap().catch(() => {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('tenant_code');
+      clearStoredSession();
       dispatch(clearSession());
     });
   }, [accessToken, dispatch]);

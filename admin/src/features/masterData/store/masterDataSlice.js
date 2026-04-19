@@ -3,16 +3,18 @@ import { masterDataApi } from '../services/masterDataApi';
 
 export const fetchMasterData = createAsyncThunk('masterData/fetchMasterData', async (_, thunkApi) => {
   try {
-    const [guardians, academicYears, classes] = await Promise.all([
+    const [guardians, academicYears, classes, sections] = await Promise.all([
       masterDataApi.getGuardians(),
       masterDataApi.getAcademicYears(),
       masterDataApi.getClasses(),
+      masterDataApi.getSections(),
     ]);
 
     return {
       guardians: guardians.data.data || [],
       academicYears: academicYears.data.data || [],
       classes: classes.data.data || [],
+      sections: sections.data.data || [],
     };
   } catch (error) {
     return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to load master data.');
@@ -46,10 +48,20 @@ export const createSchoolClass = createAsyncThunk('masterData/createSchoolClass'
   }
 });
 
+export const createSection = createAsyncThunk('masterData/createSection', async (payload, thunkApi) => {
+  try {
+    const response = await masterDataApi.createSection(payload);
+    return response.data.data;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to create section.');
+  }
+});
+
 const initialState = {
   guardians: [],
   academicYears: [],
   classes: [],
+  sections: [],
   loading: false,
   saving: false,
   error: null,
@@ -70,6 +82,7 @@ const masterDataSlice = createSlice({
         state.guardians = action.payload.guardians;
         state.academicYears = action.payload.academicYears;
         state.classes = action.payload.classes;
+        state.sections = action.payload.sections;
       })
       .addCase(fetchMasterData.rejected, (state, action) => {
         state.loading = false;
@@ -111,6 +124,29 @@ const masterDataSlice = createSlice({
         state.classes.push(action.payload);
       })
       .addCase(createSchoolClass.rejected, (state, action) => {
+        state.saving = false;
+        state.error = action.payload;
+      })
+      .addCase(createSection.pending, (state) => {
+        state.saving = true;
+        state.error = null;
+      })
+      .addCase(createSection.fulfilled, (state, action) => {
+        state.saving = false;
+        state.sections.push(action.payload);
+
+        state.classes = state.classes.map((schoolClass) => {
+          if (schoolClass.id !== action.payload.school_class_id) {
+            return schoolClass;
+          }
+
+          return {
+            ...schoolClass,
+            sections: [...(schoolClass.sections || []), action.payload],
+          };
+        });
+      })
+      .addCase(createSection.rejected, (state, action) => {
         state.saving = false;
         state.error = action.payload;
       });
