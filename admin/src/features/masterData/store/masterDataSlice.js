@@ -30,6 +30,24 @@ export const createGuardian = createAsyncThunk('masterData/createGuardian', asyn
   }
 });
 
+export const updateGuardian = createAsyncThunk('masterData/updateGuardian', async ({ guardianId, payload }, thunkApi) => {
+  try {
+    const response = await masterDataApi.updateGuardian(guardianId, payload);
+    return response.data.data;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to update guardian.');
+  }
+});
+
+export const deleteGuardian = createAsyncThunk('masterData/deleteGuardian', async (guardianId, thunkApi) => {
+  try {
+    await masterDataApi.deleteGuardian(guardianId);
+    return guardianId;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to delete guardian.');
+  }
+});
+
 export const createAcademicYear = createAsyncThunk('masterData/createAcademicYear', async (payload, thunkApi) => {
   try {
     const response = await masterDataApi.createAcademicYear(payload);
@@ -54,6 +72,24 @@ export const createSection = createAsyncThunk('masterData/createSection', async 
     return response.data.data;
   } catch (error) {
     return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to create section.');
+  }
+});
+
+export const updateSection = createAsyncThunk('masterData/updateSection', async ({ sectionId, payload }, thunkApi) => {
+  try {
+    const response = await masterDataApi.updateSection(sectionId, payload);
+    return response.data.data;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to update section.');
+  }
+});
+
+export const deleteSection = createAsyncThunk('masterData/deleteSection', async (sectionId, thunkApi) => {
+  try {
+    await masterDataApi.deleteSection(sectionId);
+    return sectionId;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to delete section.');
   }
 });
 
@@ -99,6 +135,14 @@ const masterDataSlice = createSlice({
       .addCase(createGuardian.rejected, (state, action) => {
         state.saving = false;
         state.error = action.payload;
+      })
+      .addCase(updateGuardian.fulfilled, (state, action) => {
+        state.saving = false;
+        state.guardians = state.guardians.map((guardian) => guardian.id === action.payload.id ? action.payload : guardian);
+      })
+      .addCase(deleteGuardian.fulfilled, (state, action) => {
+        state.saving = false;
+        state.guardians = state.guardians.filter((guardian) => guardian.id !== action.payload);
       })
       .addCase(createAcademicYear.pending, (state) => {
         state.saving = true;
@@ -149,6 +193,29 @@ const masterDataSlice = createSlice({
       .addCase(createSection.rejected, (state, action) => {
         state.saving = false;
         state.error = action.payload;
+      })
+      .addCase(updateSection.fulfilled, (state, action) => {
+        state.saving = false;
+        state.sections = state.sections.map((section) => section.id === action.payload.id ? action.payload : section);
+        state.classes = state.classes.map((schoolClass) => {
+          if (schoolClass.id !== action.payload.school_class_id) {
+            return {
+              ...schoolClass,
+              sections: (schoolClass.sections || []).filter((section) => section.id !== action.payload.id),
+            };
+          }
+
+          const nextSections = (schoolClass.sections || []).filter((section) => section.id !== action.payload.id);
+          return { ...schoolClass, sections: [...nextSections, action.payload] };
+        });
+      })
+      .addCase(deleteSection.fulfilled, (state, action) => {
+        state.saving = false;
+        state.sections = state.sections.filter((section) => section.id !== action.payload);
+        state.classes = state.classes.map((schoolClass) => ({
+          ...schoolClass,
+          sections: (schoolClass.sections || []).filter((section) => section.id !== action.payload),
+        }));
       });
   },
 });

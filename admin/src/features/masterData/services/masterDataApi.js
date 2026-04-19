@@ -7,6 +7,12 @@ export const masterDataApi = {
   createGuardian(payload) {
     return axiosClient.post('/guardians', payload);
   },
+  updateGuardian(guardianId, payload) {
+    return axiosClient.put(`/guardians/${guardianId}`, payload);
+  },
+  deleteGuardian(guardianId) {
+    return axiosClient.delete(`/guardians/${guardianId}`);
+  },
   getAcademicYears() {
     return axiosClient.get('/academic-years');
   },
@@ -24,5 +30,11 @@ export const masterDataApi = {
   },
   createSection(payload) {
     return axiosClient.post('/sections', payload);
+  },
+  updateSection(sectionId, payload) {
+    return axiosClient.put(`/sections/${sectionId}`, payload);
+  },
+  deleteSection(sectionId) {
+    return axiosClient.delete(`/sections/${sectionId}`);
   },
 };

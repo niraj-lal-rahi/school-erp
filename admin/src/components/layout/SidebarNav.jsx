@@ -16,6 +16,7 @@ import { NavLink } from 'react-router-dom';
 import { useAppSelector } from '../../hooks/redux';
 
 const navItems = [
+  { label: 'Dashboard', to: '/dashboard', icon: <DashboardOutlinedIcon />, permission: 'students.view' },
   { label: 'Students', to: '/students', icon: <PeopleAltOutlinedIcon />, permission: 'students.view' },
   { label: 'Guardians', to: '/guardians', icon: <SupervisedUserCircleOutlinedIcon />, permission: 'students.view' },
   { label: 'Academic Years', to: '/academic-years', icon: <CalendarMonthOutlinedIcon />, permission: 'students.view' },
@@ -66,3 +67,4 @@ export function SidebarNav() {
     </Paper>
   );
 }
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';

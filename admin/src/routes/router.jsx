@@ -5,6 +5,7 @@ import { RequireAuth } from '../components/common/RequireAuth';
 
 const AdminLayout = lazy(() => import('../layouts/AdminLayout').then((module) => ({ default: module.AdminLayout })));
 const LoginPage = lazy(() => import('../features/auth/LoginPage').then((module) => ({ default: module.LoginPage })));
+const DashboardPage = lazy(() => import('../features/dashboard/DashboardPage').then((module) => ({ default: module.DashboardPage })));
 const StudentListPage = lazy(() => import('../features/students/pages/StudentListPage').then((module) => ({ default: module.StudentListPage })));
 const StudentCreatePage = lazy(() => import('../features/students/pages/StudentCreatePage').then((module) => ({ default: module.StudentCreatePage })));
 const StudentEditPage = lazy(() => import('../features/students/pages/StudentEditPage').then((module) => ({ default: module.StudentEditPage })));
@@ -32,7 +33,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="/students" replace />,
+            element: <Navigate to="/dashboard" replace />,
+          },
+          {
+            path: 'dashboard',
+            element: withSuspense(<DashboardPage />),
           },
           {
             path: 'students',
