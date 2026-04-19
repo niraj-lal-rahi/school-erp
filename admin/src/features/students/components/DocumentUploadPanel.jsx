@@ -14,6 +14,9 @@ export function DocumentUploadPanel({ onUpload, saving, error, disabled }) {
   const [documentType, setDocumentType] = useState('birth_certificate');
   const [title, setTitle] = useState('');
   const [file, setFile] = useState(null);
+  const [issuedBy, setIssuedBy] = useState('');
+  const [verificationStatus, setVerificationStatus] = useState('');
+  const [remarks, setRemarks] = useState('');
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -26,6 +29,15 @@ export function DocumentUploadPanel({ onUpload, saving, error, disabled }) {
     payload.append('document_type', documentType);
     payload.append('title', title);
     payload.append('file', file);
+    if (issuedBy) {
+      payload.append('issued_by', issuedBy);
+    }
+    if (verificationStatus) {
+      payload.append('verification_status', verificationStatus);
+    }
+    if (remarks) {
+      payload.append('remarks', remarks);
+    }
 
     onUpload(payload);
   }
@@ -48,6 +60,17 @@ export function DocumentUploadPanel({ onUpload, saving, error, disabled }) {
         </TextField>
 
         <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+
+        <TextField label="Issued By" value={issuedBy} onChange={(e) => setIssuedBy(e.target.value)} />
+
+        <TextField select label="Verification Status" value={verificationStatus} onChange={(e) => setVerificationStatus(e.target.value)}>
+          <MenuItem value="">Not Set</MenuItem>
+          <MenuItem value="pending">Pending</MenuItem>
+          <MenuItem value="verified">Verified</MenuItem>
+          <MenuItem value="rejected">Rejected</MenuItem>
+        </TextField>
+
+        <TextField label="Remarks" multiline minRows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} />
 
         <Button variant="outlined" component="label" disabled={disabled}>
           Choose File

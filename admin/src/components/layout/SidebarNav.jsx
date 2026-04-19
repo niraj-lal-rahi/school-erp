@@ -6,7 +6,10 @@ import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import LibraryBooksOutlinedIcon from '@mui/icons-material/LibraryBooksOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
+import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
+import RecentActorsOutlinedIcon from '@mui/icons-material/RecentActorsOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import SupervisedUserCircleOutlinedIcon from '@mui/icons-material/SupervisedUserCircleOutlined';
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
@@ -30,8 +33,15 @@ import { useAppSelector } from '../../hooks/redux';
 
 const coreItems = [
   { label: 'Dashboard', to: '/dashboard', icon: <DashboardOutlinedIcon />, permission: 'students.view' },
+];
+
+const sisStudentManagementChildren = [
   { label: 'Students', to: '/students', icon: <PeopleAltOutlinedIcon />, permission: 'students.view' },
+  { label: 'Admissions', to: '/student-admissions', icon: <PersonAddAltOutlinedIcon />, permission: 'students.view' },
+  { label: 'Enrollments', to: '/student-enrollments', icon: <RecentActorsOutlinedIcon />, permission: 'students.view' },
   { label: 'Guardians', to: '/guardians', icon: <SupervisedUserCircleOutlinedIcon />, permission: 'students.view' },
+  { label: 'Student Categories', to: '/student-categories', icon: <LibraryBooksOutlinedIcon />, permission: 'students.view' },
+  { label: 'Student Houses', to: '/student-houses', icon: <PaletteOutlinedIcon />, permission: 'students.view' },
   { label: 'Academic Years', to: '/academic-years', icon: <CalendarMonthOutlinedIcon />, permission: 'students.view' },
   { label: 'Classes', to: '/classes', icon: <ClassOutlinedIcon />, permission: 'students.view' },
   { label: 'Sections', to: '/sections', icon: <ViewKanbanOutlinedIcon />, permission: 'students.view' },
@@ -73,13 +83,38 @@ export function SidebarNav() {
     [permissions],
   );
 
+  const visibleSisStudentManagementChildren = useMemo(
+    () => sisStudentManagementChildren.filter((item) => permissions.includes(item.permission)),
+    [permissions],
+  );
+
   const visibleAcademicChildren = useMemo(
     () => academicManagementChildren.filter((item) => permissions.includes(item.permission)),
     [permissions],
   );
 
+  const sisRouteActive = [
+    '/students',
+    '/student-admissions',
+    '/student-enrollments',
+    '/guardians',
+    '/student-categories',
+    '/student-houses',
+    '/academic-years',
+    '/classes',
+    '/sections',
+  ].some((path) => location.pathname.startsWith(path));
   const academicRouteActive = location.pathname.startsWith('/academic-management');
+  const [sisOpen, setSisOpen] = useState(sisRouteActive);
+  const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
+
+  useEffect(() => {
+    if (sisRouteActive) {
+      setSisOpen(true);
+      setStudentManagementOpen(true);
+    }
+  }, [sisRouteActive]);
 
   useEffect(() => {
     if (academicRouteActive) {
@@ -104,32 +139,86 @@ export function SidebarNav() {
         </Typography>
       </Stack>
 
-      <Stack spacing={1} sx={{ mt: 3 }}>
-        <Typography variant="overline" color="text.secondary">
-          Core
-        </Typography>
-        <List disablePadding>
-          {visibleCoreItems.map((item) => (
-            <ListItemButton
-              key={item.to}
-              component={NavLink}
-              to={item.to}
-              sx={itemStyles()}
-            >
-              <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.label} />
-            </ListItemButton>
-          ))}
-        </List>
-      </Stack>
+      {visibleCoreItems.length ? (
+        <Stack spacing={1} sx={{ mt: 3 }}>
+          <Typography variant="overline" color="text.secondary">
+            Core
+          </Typography>
+          <List disablePadding>
+            {visibleCoreItems.map((item) => (
+              <ListItemButton
+                key={item.to}
+                component={NavLink}
+                to={item.to}
+                sx={itemStyles()}
+              >
+                <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            ))}
+          </List>
+        </Stack>
+      ) : null}
 
-      {visibleAcademicChildren.length ? (
+      {visibleSisStudentManagementChildren.length || visibleAcademicChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
             Modules
           </Typography>
           <List disablePadding>
+            {visibleSisStudentManagementChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setSisOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: sisRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <PeopleAltOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="SIS" />
+                  {sisOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={sisOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    <ListItemButton
+                      onClick={() => setStudentManagementOpen((current) => !current)}
+                      sx={{
+                        ...itemStyles(true),
+                        backgroundColor: sisRouteActive ? 'rgba(11, 110, 79, 0.04)' : 'transparent',
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <SchoolOutlinedIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Student Management" />
+                      {studentManagementOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                    </ListItemButton>
+
+                    <Collapse in={studentManagementOpen} timeout="auto" unmountOnExit>
+                      <List disablePadding sx={{ mt: 0.5 }}>
+                        {visibleSisStudentManagementChildren.map((item) => (
+                          <ListItemButton
+                            key={item.to}
+                            component={NavLink}
+                            to={item.to}
+                            sx={itemStyles(true)}
+                          >
+                            <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                            <ListItemText primary={item.label} />
+                          </ListItemButton>
+                        ))}
+                      </List>
+                    </Collapse>
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
             <ListItemButton
               onClick={() => setAcademicOpen((current) => !current)}
               sx={{

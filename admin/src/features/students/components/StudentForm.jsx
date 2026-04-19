@@ -18,7 +18,9 @@ import { useAppSelector } from '../../../hooks/redux';
 
 const defaultStudent = {
   admission_no: '',
+  roll_no: '',
   first_name: '',
+  middle_name: '',
   last_name: '',
   preferred_name: '',
   email: '',
@@ -26,9 +28,16 @@ const defaultStudent = {
   gender: 'male',
   date_of_birth: '',
   admission_date: '',
+  joining_date: '',
   blood_group: '',
-  status: 'active',
+  current_status: 'active',
+  category_id: '',
+  house_id: '',
   medical_notes: '',
+  religion: '',
+  aadhaar_no: '',
+  national_id: '',
+  notes: '',
   address: {
     line1: '',
     city: '',
@@ -61,7 +70,7 @@ export function StudentForm({
   error,
   title,
 }) {
-  const { guardians: guardianOptions, academicYears, classes } = useAppSelector((state) => state.masterData);
+  const { guardians: guardianOptions, studentCategories, studentHouses, academicYears, classes } = useAppSelector((state) => state.masterData);
   const [values, setValues] = useState(() => ({
     ...defaultStudent,
     ...initialValues,
@@ -100,6 +109,7 @@ export function StudentForm({
     const guardians = nextGuardians.map((guardian, index) => ({
       id: guardian.id,
       relationship: guardian.relationship_type || (index === 0 ? 'Primary Guardian' : 'Guardian'),
+      relationship_label: guardian.relationship_type || (index === 0 ? 'Primary Guardian' : 'Guardian'),
       is_primary: index === 0,
       is_emergency_contact: index === 0,
       pickup_authorized: true,
@@ -141,7 +151,13 @@ export function StudentForm({
             <TextField fullWidth label="First Name" value={values.first_name} onChange={(e) => handleChange('first_name', e.target.value)} error={Boolean(validationErrors.first_name)} helperText={validationErrors.first_name} />
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
+            <TextField fullWidth label="Middle Name" value={values.middle_name} onChange={(e) => handleChange('middle_name', e.target.value)} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
             <TextField fullWidth label="Last Name" value={values.last_name} onChange={(e) => handleChange('last_name', e.target.value)} error={Boolean(validationErrors.last_name)} helperText={validationErrors.last_name} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField fullWidth label="Roll No" value={values.roll_no} onChange={(e) => handleChange('roll_no', e.target.value)} />
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
             <TextField fullWidth label="Preferred Name" value={values.preferred_name} onChange={(e) => handleChange('preferred_name', e.target.value)} />
@@ -166,20 +182,57 @@ export function StudentForm({
             <TextField fullWidth type="date" label="Admission Date" value={values.admission_date} onChange={(e) => handleChange('admission_date', e.target.value)} InputLabelProps={{ shrink: true }} error={Boolean(validationErrors.admission_date)} helperText={validationErrors.admission_date} />
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
+            <TextField fullWidth type="date" label="Joining Date" value={values.joining_date} onChange={(e) => handleChange('joining_date', e.target.value)} InputLabelProps={{ shrink: true }} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
             <TextField fullWidth label="Blood Group" value={values.blood_group} onChange={(e) => handleChange('blood_group', e.target.value)} />
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
-            <TextField select fullWidth label="Lifecycle Status" value={values.status} onChange={(e) => handleChange('status', e.target.value)} error={Boolean(validationErrors.status)} helperText={validationErrors.status}>
+            <TextField fullWidth label="Religion" value={values.religion} onChange={(e) => handleChange('religion', e.target.value)} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField fullWidth label="Aadhaar No" value={values.aadhaar_no} onChange={(e) => handleChange('aadhaar_no', e.target.value)} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField fullWidth label="National ID" value={values.national_id} onChange={(e) => handleChange('national_id', e.target.value)} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField select fullWidth label="Lifecycle Status" value={values.current_status || values.status} onChange={(e) => handleChange('current_status', e.target.value)} error={Boolean(validationErrors.status)} helperText={validationErrors.status}>
+              <MenuItem value="applicant">Applicant</MenuItem>
               <MenuItem value="active">Active</MenuItem>
               <MenuItem value="inactive">Inactive</MenuItem>
+              <MenuItem value="transferred">Transferred</MenuItem>
+              <MenuItem value="withdrawn">Withdrawn</MenuItem>
               <MenuItem value="alumni">Alumni</MenuItem>
+              <MenuItem value="graduated">Graduated</MenuItem>
+              <MenuItem value="suspended">Suspended</MenuItem>
+            </TextField>
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField select fullWidth label="Category" value={values.category_id || ''} onChange={(e) => handleChange('category_id', e.target.value)}>
+              <MenuItem value="">None</MenuItem>
+              {studentCategories.map((category) => (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.name} ({category.code})
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField select fullWidth label="House" value={values.house_id || ''} onChange={(e) => handleChange('house_id', e.target.value)}>
+              <MenuItem value="">None</MenuItem>
+              {studentHouses.map((house) => (
+                <MenuItem key={house.id} value={house.id}>
+                  {house.name} ({house.code})
+                </MenuItem>
+              ))}
             </TextField>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
             <Autocomplete
               multiple
               options={guardianOptions}
-              getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
+              getOptionLabel={(option) => option.full_name || `${option.first_name || ''} ${option.last_name || ''}`.trim()}
               value={guardianOptions.filter((option) => guardianText.includes(option.id))}
               onChange={(_, nextValue) => handleGuardians(nextValue)}
               renderInput={(params) => (
@@ -212,6 +265,15 @@ export function StudentForm({
           </Grid>
           <Grid size={{ xs: 12, md: 2 }}>
             <TextField fullWidth label="Postal Code" value={values.address.postal_code} onChange={(e) => handleNestedChange('address', 'postal_code', e.target.value)} />
+          </Grid>
+        </Grid>
+
+        <Divider />
+
+        <Typography variant="h6">Internal Notes</Typography>
+        <Grid container spacing={2}>
+          <Grid size={12}>
+            <TextField fullWidth multiline minRows={3} label="Internal Notes" value={values.notes} onChange={(e) => handleChange('notes', e.target.value)} />
           </Grid>
         </Grid>
 

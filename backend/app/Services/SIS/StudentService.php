@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\StudentDocument;
 use App\Repositories\Contracts\StudentRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -24,19 +25,46 @@ class StudentService
         return $this->students->paginate($filters, $perPage);
     }
 
-    public function create(StudentData $data): Student
+    public function show(Student $student): Student
     {
-        return DB::transaction(function () use ($data): Student {
-            $student = $this->students->create($data);
+        return $this->students->findOrFail($student->id);
+    }
+
+    public function create(StudentData $data, int $performedBy): Student
+    {
+        return DB::transaction(function () use ($data, $performedBy): Student {
+            $student = $this->students->create(
+                StudentData::fromArray([
+                    ...$data->studentAttributes(),
+                    'created_by' => $performedBy,
+                    'updated_by' => $performedBy,
+                    'guardians' => $data->guardians,
+                    'enrollment' => $data->enrollment,
+                    'admission' => $data->admission,
+                ])
+            );
+
             event(new StudentCreated($student));
 
             return $student;
         });
     }
 
-    public function update(Student $student, StudentData $data): Student
+    public function update(Student $student, StudentData $data, int $performedBy): Student
     {
-        return DB::transaction(fn (): Student => $this->students->update($student, $data));
+        return DB::transaction(function () use ($student, $data, $performedBy): Student {
+            return $this->students->update(
+                $student,
+                StudentData::fromArray([
+                    ...$data->studentAttributes(),
+                    'created_by' => $student->created_by,
+                    'updated_by' => $performedBy,
+                    'guardians' => $data->guardians,
+                    'enrollment' => $data->enrollment,
+                    'admission' => $data->admission,
+                ])
+            );
+        });
     }
 
     public function delete(Student $student): void
@@ -44,6 +72,41 @@ class StudentService
         DB::transaction(function () use ($student): void {
             $this->students->delete($student);
         });
+    }
+
+    public function assignGuardian(Student $student, array $payload): Student
+    {
+        return DB::transaction(function () use ($student, $payload): Student {
+            if (($payload['is_primary'] ?? false) === true) {
+                $student->guardians()
+                    ->newPivotStatement()
+                    ->where('student_id', $student->id)
+                    ->update(['is_primary' => false]);
+            }
+
+            return $this->students->assignGuardians($student, [
+                $payload['guardian_id'] => [
+                    'school_id' => $student->school_id,
+                    'relationship' => $payload['relationship'] ?? null,
+                    'relationship_label' => $payload['relationship_label'] ?? $payload['relationship'] ?? null,
+                    'is_primary' => $payload['is_primary'] ?? false,
+                    'is_emergency_contact' => $payload['is_emergency_contact'] ?? false,
+                    'pickup_authorized' => $payload['pickup_authorized'] ?? true,
+                    'financial_responsibility_percentage' => $payload['financial_responsibility_percentage'] ?? null,
+                    'notes' => $payload['notes'] ?? null,
+                ],
+            ]);
+        });
+    }
+
+    public function removeGuardian(Student $student, int $guardianId): Student
+    {
+        return DB::transaction(fn (): Student => $this->students->removeGuardian($student, $guardianId));
+    }
+
+    public function guardians(Student $student): Collection
+    {
+        return $this->students->guardians($student);
     }
 
     public function uploadDocument(Student $student, StudentDocumentData $data, int $uploadedBy): StudentDocument

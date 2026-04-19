@@ -10,7 +10,12 @@ const StudentListPage = lazy(() => import('../features/students/pages/StudentLis
 const StudentCreatePage = lazy(() => import('../features/students/pages/StudentCreatePage').then((module) => ({ default: module.StudentCreatePage })));
 const StudentEditPage = lazy(() => import('../features/students/pages/StudentEditPage').then((module) => ({ default: module.StudentEditPage })));
 const StudentProfilePage = lazy(() => import('../features/students/pages/StudentProfilePage').then((module) => ({ default: module.StudentProfilePage })));
+const AdmissionsPage = lazy(() => import('../features/admissions/pages/AdmissionsPage').then((module) => ({ default: module.AdmissionsPage })));
+const AdmissionReviewPage = lazy(() => import('../features/admissions/pages/AdmissionReviewPage').then((module) => ({ default: module.AdmissionReviewPage })));
+const EnrollmentsPage = lazy(() => import('../features/enrollments/pages/EnrollmentsPage').then((module) => ({ default: module.EnrollmentsPage })));
 const GuardiansPage = lazy(() => import('../features/masterData/pages/GuardiansPage').then((module) => ({ default: module.GuardiansPage })));
+const StudentCategoriesPage = lazy(() => import('../features/masterData/pages/StudentCategoriesPage').then((module) => ({ default: module.StudentCategoriesPage })));
+const StudentHousesPage = lazy(() => import('../features/masterData/pages/StudentHousesPage').then((module) => ({ default: module.StudentHousesPage })));
 const AcademicYearsPage = lazy(() => import('../features/masterData/pages/AcademicYearsPage').then((module) => ({ default: module.AcademicYearsPage })));
 const ClassesPage = lazy(() => import('../features/masterData/pages/ClassesPage').then((module) => ({ default: module.ClassesPage })));
 const SectionsPage = lazy(() => import('../features/masterData/pages/SectionsPage').then((module) => ({ default: module.SectionsPage })));
@@ -68,8 +73,28 @@ export const router = createBrowserRouter([
             element: withSuspense(<StudentEditPage />),
           },
           {
+            path: 'student-admissions',
+            element: withSuspense(<AdmissionsPage />),
+          },
+          {
+            path: 'student-admissions/:admissionId/review',
+            element: withSuspense(<AdmissionReviewPage />),
+          },
+          {
+            path: 'student-enrollments',
+            element: withSuspense(<EnrollmentsPage />),
+          },
+          {
             path: 'guardians',
             element: withSuspense(<GuardiansPage />),
+          },
+          {
+            path: 'student-categories',
+            element: withSuspense(<StudentCategoriesPage />),
+          },
+          {
+            path: 'student-houses',
+            element: withSuspense(<StudentHousesPage />),
           },
           {
             path: 'academic-years',

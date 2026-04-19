@@ -1,9 +1,14 @@
 import { Chip } from '@mui/material';
 
 const statusMap = {
+  applicant: 'info',
   active: 'success',
   inactive: 'warning',
+  withdrawn: 'warning',
+  transferred: 'info',
   alumni: 'default',
+  graduated: 'success',
+  suspended: 'error',
 };
 
 export function StudentStatusChip({ status }) {

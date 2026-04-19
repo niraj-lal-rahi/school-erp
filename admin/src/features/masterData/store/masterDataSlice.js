@@ -3,8 +3,10 @@ import { masterDataApi } from '../services/masterDataApi';
 
 export const fetchMasterData = createAsyncThunk('masterData/fetchMasterData', async (_, thunkApi) => {
   try {
-    const [guardians, academicYears, classes, sections] = await Promise.all([
+    const [guardians, studentCategories, studentHouses, academicYears, classes, sections] = await Promise.all([
       masterDataApi.getGuardians(),
+      masterDataApi.getStudentCategories(),
+      masterDataApi.getStudentHouses(),
       masterDataApi.getAcademicYears(),
       masterDataApi.getClasses(),
       masterDataApi.getSections(),
@@ -12,6 +14,8 @@ export const fetchMasterData = createAsyncThunk('masterData/fetchMasterData', as
 
     return {
       guardians: guardians.data.data || [],
+      studentCategories: studentCategories.data.data || [],
+      studentHouses: studentHouses.data.data || [],
       academicYears: academicYears.data.data || [],
       classes: classes.data.data || [],
       sections: sections.data.data || [],
@@ -57,6 +61,60 @@ export const createAcademicYear = createAsyncThunk('masterData/createAcademicYea
   }
 });
 
+export const createStudentCategory = createAsyncThunk('masterData/createStudentCategory', async (payload, thunkApi) => {
+  try {
+    const response = await masterDataApi.createStudentCategory(payload);
+    return response.data.data;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to create student category.');
+  }
+});
+
+export const updateStudentCategory = createAsyncThunk('masterData/updateStudentCategory', async ({ categoryId, payload }, thunkApi) => {
+  try {
+    const response = await masterDataApi.updateStudentCategory(categoryId, payload);
+    return response.data.data;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to update student category.');
+  }
+});
+
+export const deleteStudentCategory = createAsyncThunk('masterData/deleteStudentCategory', async (categoryId, thunkApi) => {
+  try {
+    await masterDataApi.deleteStudentCategory(categoryId);
+    return categoryId;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to delete student category.');
+  }
+});
+
+export const createStudentHouse = createAsyncThunk('masterData/createStudentHouse', async (payload, thunkApi) => {
+  try {
+    const response = await masterDataApi.createStudentHouse(payload);
+    return response.data.data;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to create student house.');
+  }
+});
+
+export const updateStudentHouse = createAsyncThunk('masterData/updateStudentHouse', async ({ houseId, payload }, thunkApi) => {
+  try {
+    const response = await masterDataApi.updateStudentHouse(houseId, payload);
+    return response.data.data;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to update student house.');
+  }
+});
+
+export const deleteStudentHouse = createAsyncThunk('masterData/deleteStudentHouse', async (houseId, thunkApi) => {
+  try {
+    await masterDataApi.deleteStudentHouse(houseId);
+    return houseId;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Failed to delete student house.');
+  }
+});
+
 export const createSchoolClass = createAsyncThunk('masterData/createSchoolClass', async (payload, thunkApi) => {
   try {
     const response = await masterDataApi.createClass(payload);
@@ -95,6 +153,8 @@ export const deleteSection = createAsyncThunk('masterData/deleteSection', async 
 
 const initialState = {
   guardians: [],
+  studentCategories: [],
+  studentHouses: [],
   academicYears: [],
   classes: [],
   sections: [],
@@ -116,6 +176,8 @@ const masterDataSlice = createSlice({
       .addCase(fetchMasterData.fulfilled, (state, action) => {
         state.loading = false;
         state.guardians = action.payload.guardians;
+        state.studentCategories = action.payload.studentCategories;
+        state.studentHouses = action.payload.studentHouses;
         state.academicYears = action.payload.academicYears;
         state.classes = action.payload.classes;
         state.sections = action.payload.sections;
@@ -143,6 +205,46 @@ const masterDataSlice = createSlice({
       .addCase(deleteGuardian.fulfilled, (state, action) => {
         state.saving = false;
         state.guardians = state.guardians.filter((guardian) => guardian.id !== action.payload);
+      })
+      .addCase(createStudentCategory.pending, (state) => {
+        state.saving = true;
+        state.error = null;
+      })
+      .addCase(createStudentCategory.fulfilled, (state, action) => {
+        state.saving = false;
+        state.studentCategories.unshift(action.payload);
+      })
+      .addCase(createStudentCategory.rejected, (state, action) => {
+        state.saving = false;
+        state.error = action.payload;
+      })
+      .addCase(updateStudentCategory.fulfilled, (state, action) => {
+        state.saving = false;
+        state.studentCategories = state.studentCategories.map((category) => category.id === action.payload.id ? action.payload : category);
+      })
+      .addCase(deleteStudentCategory.fulfilled, (state, action) => {
+        state.saving = false;
+        state.studentCategories = state.studentCategories.filter((category) => category.id !== action.payload);
+      })
+      .addCase(createStudentHouse.pending, (state) => {
+        state.saving = true;
+        state.error = null;
+      })
+      .addCase(createStudentHouse.fulfilled, (state, action) => {
+        state.saving = false;
+        state.studentHouses.unshift(action.payload);
+      })
+      .addCase(createStudentHouse.rejected, (state, action) => {
+        state.saving = false;
+        state.error = action.payload;
+      })
+      .addCase(updateStudentHouse.fulfilled, (state, action) => {
+        state.saving = false;
+        state.studentHouses = state.studentHouses.map((house) => house.id === action.payload.id ? action.payload : house);
+      })
+      .addCase(deleteStudentHouse.fulfilled, (state, action) => {
+        state.saving = false;
+        state.studentHouses = state.studentHouses.filter((house) => house.id !== action.payload);
       })
       .addCase(createAcademicYear.pending, (state) => {
         state.saving = true;

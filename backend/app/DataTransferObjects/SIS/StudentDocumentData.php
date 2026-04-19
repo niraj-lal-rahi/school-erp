@@ -20,7 +20,14 @@ readonly class StudentDocumentData
             documentType: $payload['document_type'],
             title: $payload['title'],
             file: $payload['file'],
-            metadata: $payload['metadata'] ?? [],
+            metadata: [
+                ...($payload['metadata'] ?? []),
+                'issued_by' => $payload['issued_by'] ?? null,
+                'issued_date' => $payload['issued_date'] ?? null,
+                'expiry_date' => $payload['expiry_date'] ?? null,
+                'verification_status' => $payload['verification_status'] ?? null,
+                'remarks' => $payload['remarks'] ?? null,
+            ],
         );
     }
 }

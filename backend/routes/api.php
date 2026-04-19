@@ -1,6 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\SIS\AdmissionController;
+use App\Http\Controllers\Api\V1\SIS\StudentCategoryController;
+use App\Http\Controllers\Api\V1\SIS\StudentDocumentController;
+use App\Http\Controllers\Api\V1\SIS\StudentEnrollmentController;
+use App\Http\Controllers\Api\V1\SIS\StudentHouseController;
+use App\Http\Controllers\Api\V1\SIS\StudentMedicalRecordController;
 use App\Http\Controllers\Api\V1\AcademicManagement\AcademicCalendarEventController;
 use App\Http\Controllers\Api\V1\AcademicManagement\AcademicManagementOptionsController;
 use App\Http\Controllers\Api\V1\AcademicManagement\AcademicTermController;
@@ -20,6 +26,7 @@ use App\Http\Controllers\Api\V1\MasterData\GuardianController;
 use App\Http\Controllers\Api\V1\MasterData\SectionController as MasterDataSectionController;
 use App\Http\Controllers\Api\V1\MasterData\SchoolClassController as MasterDataSchoolClassController;
 use App\Http\Controllers\Api\V1\SIS\StudentController;
+use App\Http\Controllers\Api\V1\SIS\StudentNoteController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -36,12 +43,71 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/students/{student}', [StudentController::class, 'show'])->middleware('permission:students.view');
         Route::put('/students/{student}', [StudentController::class, 'update'])->middleware('permission:students.update');
         Route::delete('/students/{student}', [StudentController::class, 'destroy'])->middleware('permission:students.delete');
-        Route::post('/students/{student}/documents', [StudentController::class, 'uploadDocument'])->middleware('permission:students.documents.upload');
+        Route::get('/students/{student}/guardians', [StudentController::class, 'guardians'])->middleware('permission:students.view');
+        Route::get('/students/{student}/enrollments', [StudentEnrollmentController::class, 'studentEnrollments'])->middleware('permission:students.view');
+        Route::get('/students/{student}/documents', [StudentDocumentController::class, 'studentDocuments'])->middleware('permission:students.view');
+        Route::get('/students/{student}/medical', [StudentMedicalRecordController::class, 'studentMedical'])->middleware('permission:students.view');
+        Route::get('/students/{student}/status-history', [StudentController::class, 'statusHistory'])->middleware('permission:students.view');
+        Route::get('/students/{student}/notes', [StudentNoteController::class, 'studentNotes'])->middleware('permission:students.update');
+        Route::post('/students/{student}/notes', [StudentNoteController::class, 'store'])->middleware('permission:students.update');
+        Route::put('/students/{student}/medical', [StudentMedicalRecordController::class, 'upsertForStudent'])->middleware('permission:students.medical.manage');
+        Route::post('/students/{student}/promote', [StudentController::class, 'promote'])->middleware('permission:students.update');
+        Route::post('/students/{student}/transfer-section', [StudentController::class, 'transferSection'])->middleware('permission:students.update');
+        Route::post('/students/{student}/withdraw', [StudentController::class, 'withdraw'])->middleware('permission:students.update');
+        Route::post('/students/{student}/graduate', [StudentController::class, 'graduate'])->middleware('permission:students.update');
+        Route::post('/students/{student}/suspend', [StudentController::class, 'suspend'])->middleware('permission:students.update');
+        Route::post('/students/{student}/reactivate', [StudentController::class, 'reactivate'])->middleware('permission:students.update');
+        Route::post('/students/{student}/enroll', [StudentEnrollmentController::class, 'enroll'])->middleware('permission:students.create');
+        Route::post('/students/{student}/assign-guardian', [StudentController::class, 'assignGuardian'])->middleware('permission:students.update');
+        Route::delete('/students/{student}/remove-guardian/{guardianId}', [StudentController::class, 'removeGuardian'])->middleware('permission:students.update');
+        Route::post('/students/{student}/documents', [StudentDocumentController::class, 'store'])->middleware('permission:students.documents.upload');
+
+        Route::put('/student-notes/{studentNote}', [StudentNoteController::class, 'update'])->middleware('permission:students.update');
+        Route::delete('/student-notes/{studentNote}', [StudentNoteController::class, 'destroy'])->middleware('permission:students.update');
+
+        Route::get('/student-enrollments', [StudentEnrollmentController::class, 'index'])->middleware('permission:students.view');
+        Route::post('/student-enrollments', [StudentEnrollmentController::class, 'store'])->middleware('permission:students.create');
+        Route::get('/student-enrollments/{studentEnrollment}', [StudentEnrollmentController::class, 'show'])->middleware('permission:students.view');
+        Route::put('/student-enrollments/{studentEnrollment}', [StudentEnrollmentController::class, 'update'])->middleware('permission:students.update');
+        Route::delete('/student-enrollments/{studentEnrollment}', [StudentEnrollmentController::class, 'destroy'])->middleware('permission:students.delete');
+
+        Route::get('/student-documents', [StudentDocumentController::class, 'index'])->middleware('permission:students.view');
+        Route::get('/student-documents/{studentDocument}', [StudentDocumentController::class, 'show'])->middleware('permission:students.view');
+        Route::put('/student-documents/{studentDocument}', [StudentDocumentController::class, 'update'])->middleware('permission:students.documents.upload');
+        Route::delete('/student-documents/{studentDocument}', [StudentDocumentController::class, 'destroy'])->middleware('permission:students.documents.upload');
+
+        Route::get('/student-medical-records', [StudentMedicalRecordController::class, 'index'])->middleware('permission:students.view');
+        Route::post('/student-medical-records', [StudentMedicalRecordController::class, 'store'])->middleware('permission:students.medical.manage');
+        Route::get('/student-medical-records/{studentMedicalRecord}', [StudentMedicalRecordController::class, 'show'])->middleware('permission:students.view');
+        Route::put('/student-medical-records/{studentMedicalRecord}', [StudentMedicalRecordController::class, 'update'])->middleware('permission:students.medical.manage');
+        Route::delete('/student-medical-records/{studentMedicalRecord}', [StudentMedicalRecordController::class, 'destroy'])->middleware('permission:students.medical.manage');
+
+        Route::get('/student-admissions', [AdmissionController::class, 'index'])->middleware('permission:students.view');
+        Route::post('/student-admissions', [AdmissionController::class, 'store'])->middleware('permission:students.create');
+        Route::get('/student-admissions/{studentAdmission}', [AdmissionController::class, 'show'])->middleware('permission:students.view');
+        Route::put('/student-admissions/{studentAdmission}', [AdmissionController::class, 'update'])->middleware('permission:students.update');
+        Route::delete('/student-admissions/{studentAdmission}', [AdmissionController::class, 'destroy'])->middleware('permission:students.delete');
+        Route::post('/student-admissions/{studentAdmission}/submit', [AdmissionController::class, 'submit'])->middleware('permission:students.update');
+        Route::post('/student-admissions/{studentAdmission}/review', [AdmissionController::class, 'review'])->middleware('permission:students.update');
+        Route::post('/student-admissions/{studentAdmission}/approve', [AdmissionController::class, 'approve'])->middleware('permission:students.update');
+        Route::post('/student-admissions/{studentAdmission}/reject', [AdmissionController::class, 'reject'])->middleware('permission:students.update');
+        Route::post('/student-admissions/{studentAdmission}/waitlist', [AdmissionController::class, 'waitlist'])->middleware('permission:students.update');
+        Route::post('/student-admissions/{studentAdmission}/convert-to-student', [AdmissionController::class, 'convertToStudent'])->middleware('permission:students.create');
 
         Route::get('/guardians', [GuardianController::class, 'index'])->middleware('permission:students.view');
         Route::post('/guardians', [GuardianController::class, 'store'])->middleware('permission:students.create');
         Route::put('/guardians/{guardian}', [GuardianController::class, 'update'])->middleware('permission:students.update');
         Route::delete('/guardians/{guardian}', [GuardianController::class, 'destroy'])->middleware('permission:students.delete');
+
+        Route::get('/student-categories', [StudentCategoryController::class, 'index'])->middleware('permission:students.view');
+        Route::post('/student-categories', [StudentCategoryController::class, 'store'])->middleware('permission:students.create');
+        Route::put('/student-categories/{studentCategory}', [StudentCategoryController::class, 'update'])->middleware('permission:students.update');
+        Route::delete('/student-categories/{studentCategory}', [StudentCategoryController::class, 'destroy'])->middleware('permission:students.delete');
+
+        Route::get('/student-houses', [StudentHouseController::class, 'index'])->middleware('permission:students.view');
+        Route::post('/student-houses', [StudentHouseController::class, 'store'])->middleware('permission:students.create');
+        Route::put('/student-houses/{studentHouse}', [StudentHouseController::class, 'update'])->middleware('permission:students.update');
+        Route::delete('/student-houses/{studentHouse}', [StudentHouseController::class, 'destroy'])->middleware('permission:students.delete');
 
         Route::get('/academic-years', [MasterDataAcademicYearController::class, 'index'])->middleware('permission:students.view');
         Route::post('/academic-years', [MasterDataAcademicYearController::class, 'store'])->middleware('permission:students.create');

@@ -13,11 +13,18 @@ export function GuardiansPage() {
   const [form, setForm] = useState({
     id: null,
     first_name: '',
+    middle_name: '',
     last_name: '',
     email: '',
     phone: '',
+    alternate_phone: '',
     relationship_type: '',
     occupation: '',
+    address_line1: '',
+    city: '',
+    state: '',
+    postal_code: '',
+    status: 'active',
   });
 
   useEffect(() => {
@@ -36,11 +43,18 @@ export function GuardiansPage() {
       setForm({
         id: null,
         first_name: '',
+        middle_name: '',
         last_name: '',
         email: '',
         phone: '',
+        alternate_phone: '',
         relationship_type: '',
         occupation: '',
+        address_line1: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        status: 'active',
       });
     }
   }
@@ -50,7 +64,7 @@ export function GuardiansPage() {
     if (!query) return guardians;
 
     return guardians.filter((guardian) =>
-      `${guardian.first_name} ${guardian.last_name} ${guardian.email || ''} ${guardian.phone || ''}`
+      `${guardian.full_name || ''} ${guardian.first_name || ''} ${guardian.last_name || ''} ${guardian.email || ''} ${guardian.phone || ''} ${guardian.alternate_phone || ''}`
         .toLowerCase()
         .includes(query)
     );
@@ -69,11 +83,18 @@ export function GuardiansPage() {
         description="Create, search, edit, and maintain guardian records so student-parent mapping can be done from dropdowns instead of manual ids."
         fields={[
           { key: 'first_name', label: 'First Name' },
+          { key: 'middle_name', label: 'Middle Name' },
           { key: 'last_name', label: 'Last Name' },
           { key: 'email', label: 'Email' },
           { key: 'phone', label: 'Phone' },
+          { key: 'alternate_phone', label: 'Alt Phone' },
           { key: 'relationship_type', label: 'Relationship Type' },
           { key: 'occupation', label: 'Occupation' },
+          { key: 'address_line1', label: 'Address Line 1' },
+          { key: 'city', label: 'City' },
+          { key: 'state', label: 'State' },
+          { key: 'postal_code', label: 'Postal Code' },
+          { key: 'status', label: 'Status' },
         ]}
         formState={form}
         onFieldChange={(key, value) => setForm((current) => ({ ...current, [key]: value }))}
@@ -82,10 +103,11 @@ export function GuardiansPage() {
         saving={saving}
         error={error}
         columns={[
-          { key: 'name', header: 'Guardian', render: (row) => `${row.first_name} ${row.last_name}` },
+          { key: 'name', header: 'Guardian', render: (row) => row.full_name || `${row.first_name} ${row.last_name}` },
           { key: 'relationship_type', header: 'Relationship' },
           { key: 'email', header: 'Email' },
           { key: 'phone', header: 'Phone' },
+          { key: 'status', header: 'Status' },
           {
             key: 'actions',
             header: 'Actions',

@@ -8,38 +8,50 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
     use BelongsToSchool;
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'school_id',
         'user_id',
         'uuid',
         'admission_no',
+        'roll_no',
         'first_name',
+        'middle_name',
         'last_name',
+        'full_name',
         'preferred_name',
         'email',
         'phone',
+        'aadhaar_no',
+        'national_id',
+        'religion',
         'gender',
         'date_of_birth',
         'admission_date',
+        'joining_date',
         'blood_group',
         'status',
+        'current_status',
         'photo_path',
         'address',
         'medical_notes',
+        'notes',
+        'category_id',
+        'house_id',
+        'created_by',
+        'updated_by',
     ];
 
     protected $hidden = [
         'school_id',
-    ];
-
-    protected $appends = [
-        'full_name',
     ];
 
     protected function casts(): array
@@ -47,13 +59,14 @@ class Student extends Model
         return [
             'date_of_birth' => 'date',
             'admission_date' => 'date',
+            'joining_date' => 'date',
             'address' => 'array',
         ];
     }
 
     public function getFullNameAttribute(): string
     {
-        return trim($this->first_name.' '.$this->last_name);
+        return trim((string) ($this->attributes['full_name'] ?? ($this->first_name.' '.$this->middle_name.' '.$this->last_name)));
     }
 
     public function user(): BelongsTo
@@ -64,7 +77,16 @@ class Student extends Model
     public function guardians(): BelongsToMany
     {
         return $this->belongsToMany(Guardian::class, 'student_guardian')
-            ->withPivot(['school_id', 'relationship', 'is_primary', 'is_emergency_contact', 'pickup_authorized'])
+            ->withPivot([
+                'school_id',
+                'relationship',
+                'relationship_label',
+                'is_primary',
+                'is_emergency_contact',
+                'pickup_authorized',
+                'financial_responsibility_percentage',
+                'notes',
+            ])
             ->withTimestamps();
     }
 
@@ -81,5 +103,35 @@ class Student extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(StudentDocument::class);
+    }
+
+    public function medicalRecords(): HasMany
+    {
+        return $this->hasMany(StudentMedicalRecord::class);
+    }
+
+    public function statusHistory(): HasMany
+    {
+        return $this->hasMany(StudentStatusHistory::class);
+    }
+
+    public function notesEntries(): HasMany
+    {
+        return $this->hasMany(StudentNote::class);
+    }
+
+    public function latestMedicalRecord(): HasOne
+    {
+        return $this->hasOne(StudentMedicalRecord::class)->latestOfMany();
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(StudentCategory::class, 'category_id');
+    }
+
+    public function house(): BelongsTo
+    {
+        return $this->belongsTo(StudentHouse::class, 'house_id');
     }
 }

@@ -2,59 +2,57 @@
 
 namespace App\Http\Controllers\Api\V1\MasterData;
 
+use App\DataTransferObjects\SIS\GuardianData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MasterData\StoreGuardianRequest;
+use App\Http\Requests\SIS\UpsertGuardianRequest;
+use App\Http\Resources\SIS\GuardianResource;
 use App\Models\Guardian;
+use App\Services\SIS\GuardianService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class GuardianController extends Controller
 {
+    public function __construct(
+        protected GuardianService $guardians,
+    ) {
+    }
+
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Guardian::class);
+
         return response()->json([
-            'data' => Guardian::query()
-                ->when($request->string('search')->toString(), function ($query, string $search): void {
-                    $query->where(function ($guardianQuery) use ($search): void {
-                        $guardianQuery->where('first_name', 'like', "%{$search}%")
-                            ->orWhere('last_name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%")
-                            ->orWhere('phone', 'like', "%{$search}%");
-                    });
-                })
-                ->orderBy('first_name')
-                ->orderBy('last_name')
-                ->get(),
+            'data' => GuardianResource::collection(
+                $this->guardians->all($request->only(['search']))
+            ),
         ]);
     }
 
-    public function store(StoreGuardianRequest $request): JsonResponse
+    public function store(UpsertGuardianRequest $request): JsonResponse
     {
-        $guardian = Guardian::create([
-            'uuid' => (string) Str::uuid(),
-            ...$request->validated(),
-        ]);
+        $guardian = $this->guardians->create(GuardianData::fromArray($request->validated()));
 
         return response()->json([
             'message' => 'Guardian created successfully.',
-            'data' => $guardian,
+            'data' => new GuardianResource($guardian),
         ], 201);
     }
 
-    public function update(StoreGuardianRequest $request, Guardian $guardian): JsonResponse
+    public function update(UpsertGuardianRequest $request, Guardian $guardian): JsonResponse
     {
-        $guardian->update($request->validated());
+        $guardian = $this->guardians->update($guardian, GuardianData::fromArray($request->validated()));
 
         return response()->json([
             'message' => 'Guardian updated successfully.',
-            'data' => $guardian->fresh(),
+            'data' => new GuardianResource($guardian),
         ]);
     }
 
     public function destroy(Guardian $guardian): JsonResponse
     {
-        $guardian->delete();
+        $this->authorize('delete', $guardian);
+        $this->guardians->delete($guardian);
 
         return response()->json(null, 204);
     }

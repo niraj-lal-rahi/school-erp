@@ -29,10 +29,10 @@ export function StudentProfileCard({ student }) {
           <div>
             <Typography variant="h5">{student.full_name || `${student.first_name} ${student.last_name}`}</Typography>
             <Typography variant="body2" color="text.secondary">
-              Admission No: {student.admission_no}
+              Admission No: {student.admission_no}{student.roll_no ? ` • Roll No: ${student.roll_no}` : ''}
             </Typography>
           </div>
-          <StudentStatusChip status={student.status} />
+          <StudentStatusChip status={student.current_status || student.status} />
         </Stack>
 
         <Grid container spacing={3}>
@@ -63,8 +63,8 @@ export function StudentProfileCard({ student }) {
                 <ListItem key={guardian.id} disableGutters>
                   <ListItemIcon><FamilyRestroomOutlinedIcon /></ListItemIcon>
                   <ListItemText
-                    primary={`${guardian.first_name} ${guardian.last_name}`}
-                    secondary={`${guardian.pivot?.relationship || guardian.relationship_type || 'Guardian'} • ${guardian.phone || 'No phone'}`}
+                    primary={guardian.full_name || `${guardian.first_name} ${guardian.last_name}`}
+                    secondary={`${guardian.pivot?.relationship_label || guardian.pivot?.relationship || guardian.relationship_type || 'Guardian'} • ${guardian.phone || 'No phone'}`}
                   />
                 </ListItem>
               ))}
@@ -84,6 +84,10 @@ export function StudentProfileCard({ student }) {
               <ListItem disableGutters>
                 <ListItemIcon><SchoolOutlinedIcon /></ListItemIcon>
                 <ListItemText primary="Blood Group" secondary={student.blood_group || 'Not available'} />
+              </ListItem>
+              <ListItem disableGutters>
+                <ListItemIcon><SchoolOutlinedIcon /></ListItemIcon>
+                <ListItemText primary="Religion" secondary={student.religion || 'Not available'} />
               </ListItem>
             </List>
           </Grid>

@@ -13,6 +13,30 @@ export const masterDataApi = {
   deleteGuardian(guardianId) {
     return axiosClient.delete(`/guardians/${guardianId}`);
   },
+  getStudentCategories() {
+    return axiosClient.get('/student-categories');
+  },
+  createStudentCategory(payload) {
+    return axiosClient.post('/student-categories', payload);
+  },
+  updateStudentCategory(categoryId, payload) {
+    return axiosClient.put(`/student-categories/${categoryId}`, payload);
+  },
+  deleteStudentCategory(categoryId) {
+    return axiosClient.delete(`/student-categories/${categoryId}`);
+  },
+  getStudentHouses() {
+    return axiosClient.get('/student-houses');
+  },
+  createStudentHouse(payload) {
+    return axiosClient.post('/student-houses', payload);
+  },
+  updateStudentHouse(houseId, payload) {
+    return axiosClient.put(`/student-houses/${houseId}`, payload);
+  },
+  deleteStudentHouse(houseId) {
+    return axiosClient.delete(`/student-houses/${houseId}`);
+  },
   getAcademicYears() {
     return axiosClient.get('/academic-years');
   },

@@ -16,6 +16,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'Update Students', 'code' => 'students.update', 'module' => 'sis'],
             ['name' => 'Delete Students', 'code' => 'students.delete', 'module' => 'sis'],
             ['name' => 'Upload Student Documents', 'code' => 'students.documents.upload', 'module' => 'sis'],
+            ['name' => 'Manage Student Medical Records', 'code' => 'students.medical.manage', 'module' => 'sis'],
             ['name' => 'View Academic Management', 'code' => 'academic-management.view', 'module' => 'academic-management'],
             ['name' => 'Manage Academic Management', 'code' => 'academic-management.manage', 'module' => 'academic-management'],
         ];

@@ -36,4 +36,39 @@ class StudentPolicy
     {
         return $user->school_id === $student->school_id && $user->hasPermission('students.documents.upload');
     }
+
+    public function viewDocuments(User $user, Student $student): bool
+    {
+        return $this->view($user, $student);
+    }
+
+    public function viewMedical(User $user, Student $student): bool
+    {
+        return $this->view($user, $student);
+    }
+
+    public function updateMedical(User $user, Student $student): bool
+    {
+        return $user->school_id === $student->school_id && $user->hasPermission('students.medical.manage');
+    }
+
+    public function manageLifecycle(User $user, Student $student): bool
+    {
+        return $this->update($user, $student);
+    }
+
+    public function manageNotes(User $user, Student $student): bool
+    {
+        return $this->update($user, $student);
+    }
+
+    public function assignGuardian(User $user, Student $student): bool
+    {
+        return $this->update($user, $student);
+    }
+
+    public function removeGuardian(User $user, Student $student): bool
+    {
+        return $this->update($user, $student);
+    }
 }

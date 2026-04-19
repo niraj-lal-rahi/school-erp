@@ -23,6 +23,7 @@ export function StudentEditPage() {
         guardians: (currentStudent.guardians || []).map((guardian) => ({
           id: guardian.id,
           relationship: guardian.pivot?.relationship,
+          relationship_label: guardian.pivot?.relationship_label,
           is_primary: guardian.pivot?.is_primary,
           is_emergency_contact: guardian.pivot?.is_emergency_contact,
           pickup_authorized: guardian.pivot?.pickup_authorized,
