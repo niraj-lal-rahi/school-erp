@@ -1,0 +1,57 @@
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material';
+import { NavLink } from 'react-router-dom';
+
+const navItems = [
+  { label: 'Students', to: '/students', icon: <PeopleAltOutlinedIcon /> },
+];
+
+export function SidebarNav() {
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 2,
+        height: '100%',
+        border: '1px solid rgba(20,33,61,0.08)',
+        background: 'linear-gradient(180deg, #ffffff 0%, #f4fbf8 100%)',
+      }}
+    >
+      <Stack spacing={2}>
+        <Typography variant="h6">School ERP</Typography>
+        <Typography variant="body2" color="text.secondary">
+          Admin panel for the Student Information System.
+        </Typography>
+      </Stack>
+
+      <List sx={{ mt: 3 }}>
+        {navItems.map((item) => (
+          <ListItemButton
+            key={item.to}
+            component={NavLink}
+            to={item.to}
+            sx={{
+              borderRadius: 3,
+              mb: 1,
+              '&.active': {
+                backgroundColor: 'rgba(11, 110, 79, 0.1)',
+                color: 'primary.main',
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.label} />
+          </ListItemButton>
+        ))}
+      </List>
+    </Paper>
+  );
+}
