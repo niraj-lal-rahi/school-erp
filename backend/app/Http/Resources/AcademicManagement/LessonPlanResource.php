@@ -29,7 +29,7 @@ class LessonPlanResource extends JsonResource
             'school_class' => $this->whenLoaded('schoolClass', fn () => ['id' => $this->schoolClass?->id, 'name' => $this->schoolClass?->name]),
             'section' => $this->whenLoaded('section', fn () => $this->section ? ['id' => $this->section->id, 'name' => $this->section->name] : null),
             'subject' => $this->whenLoaded('subject', fn () => ['id' => $this->subject?->id, 'name' => $this->subject?->name]),
-            'staff' => $this->whenLoaded('staff', fn () => ['id' => $this->staff?->id, 'name' => $this->staff?->name]),
+            'staff' => $this->whenLoaded('staff', fn () => ['id' => $this->staff?->id, 'name' => $this->staff?->full_name, 'employee_code' => $this->staff?->employee_code]),
         ];
     }
 }

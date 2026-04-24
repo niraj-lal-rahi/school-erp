@@ -4,9 +4,9 @@ namespace App\Models\AcademicManagement;
 
 use App\Models\AcademicYear;
 use App\Models\Concerns\BelongsToSchool;
+use App\Models\HR\Staff;
 use App\Models\SchoolClass;
 use App\Models\Section;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -56,6 +56,6 @@ class TeacherAssignment extends Model
 
     public function staff(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'staff_id');
+        return $this->belongsTo(Staff::class, 'staff_id');
     }
 }

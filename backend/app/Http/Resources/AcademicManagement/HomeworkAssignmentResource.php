@@ -25,7 +25,7 @@ class HomeworkAssignmentResource extends JsonResource
             'attachment_path' => $this->attachment_path,
             'status' => $this->status,
             'subject' => $this->whenLoaded('subject', fn () => ['id' => $this->subject?->id, 'name' => $this->subject?->name]),
-            'staff' => $this->whenLoaded('staff', fn () => ['id' => $this->staff?->id, 'name' => $this->staff?->name]),
+            'staff' => $this->whenLoaded('staff', fn () => ['id' => $this->staff?->id, 'name' => $this->staff?->full_name, 'employee_code' => $this->staff?->employee_code]),
         ];
     }
 }

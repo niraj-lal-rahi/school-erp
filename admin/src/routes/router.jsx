@@ -31,6 +31,18 @@ const LessonPlansPage = lazy(() => import('../features/academicManagement/pages/
 const AssignmentsPage = lazy(() => import('../features/academicManagement/pages/AssignmentsPage').then((module) => ({ default: module.AssignmentsPage })));
 const AcademicCalendarPage = lazy(() => import('../features/academicManagement/pages/AcademicCalendarPage').then((module) => ({ default: module.AcademicCalendarPage })));
 const GradingStructuresPage = lazy(() => import('../features/academicManagement/pages/GradingStructuresPage').then((module) => ({ default: module.GradingStructuresPage })));
+const StaffDirectoryPage = lazy(() => import('../features/hr/pages/StaffDirectoryPage').then((module) => ({ default: module.StaffDirectoryPage })));
+const StaffProfilePage = lazy(() => import('../features/hr/pages/StaffProfilePage').then((module) => ({ default: module.StaffProfilePage })));
+const DepartmentsPage = lazy(() => import('../features/hr/pages/DepartmentsPage').then((module) => ({ default: module.DepartmentsPage })));
+const DesignationsPage = lazy(() => import('../features/hr/pages/DesignationsPage').then((module) => ({ default: module.DesignationsPage })));
+const StaffAttendancePage = lazy(() => import('../features/hr/pages/StaffAttendancePage').then((module) => ({ default: module.StaffAttendancePage })));
+const LeaveTypesPage = lazy(() => import('../features/hr/pages/LeaveTypesPage').then((module) => ({ default: module.LeaveTypesPage })));
+const LeaveApplicationsPage = lazy(() => import('../features/hr/pages/LeaveApplicationsPage').then((module) => ({ default: module.LeaveApplicationsPage })));
+const LeaveBalancesPage = lazy(() => import('../features/hr/pages/LeaveBalancesPage').then((module) => ({ default: module.LeaveBalancesPage })));
+const SalaryComponentsPage = lazy(() => import('../features/hr/pages/SalaryComponentsPage').then((module) => ({ default: module.SalaryComponentsPage })));
+const SalaryStructuresPage = lazy(() => import('../features/hr/pages/SalaryStructuresPage').then((module) => ({ default: module.SalaryStructuresPage })));
+const PayrollRunsPage = lazy(() => import('../features/hr/pages/PayrollRunsPage').then((module) => ({ default: module.PayrollRunsPage })));
+const PayslipsPage = lazy(() => import('../features/hr/pages/PayslipsPage').then((module) => ({ default: module.PayslipsPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -155,6 +167,54 @@ export const router = createBrowserRouter([
           {
             path: 'academic-management/grading-structures',
             element: withSuspense(<GradingStructuresPage />),
+          },
+          {
+            path: 'hr/staff',
+            element: withSuspense(<StaffDirectoryPage />),
+          },
+          {
+            path: 'hr/staff/:staffId',
+            element: withSuspense(<StaffProfilePage />),
+          },
+          {
+            path: 'hr/departments',
+            element: withSuspense(<DepartmentsPage />),
+          },
+          {
+            path: 'hr/designations',
+            element: withSuspense(<DesignationsPage />),
+          },
+          {
+            path: 'hr/staff-attendance',
+            element: withSuspense(<StaffAttendancePage />),
+          },
+          {
+            path: 'hr/leave-types',
+            element: withSuspense(<LeaveTypesPage />),
+          },
+          {
+            path: 'hr/leave-applications',
+            element: withSuspense(<LeaveApplicationsPage />),
+          },
+          {
+            path: 'hr/leave-balances',
+            element: withSuspense(<LeaveBalancesPage />),
+          },
+          {
+            path: 'hr/salary-components',
+            element: withSuspense(<SalaryComponentsPage />),
+          },
+          {
+            path: 'hr/salary-structures',
+            element: withSuspense(<SalaryStructuresPage />),
+          },
+          {
+            path: 'hr/payroll-runs',
+            element: withSuspense(<PayrollRunsPage />),
+          },
+          {
+            path: 'hr/payslips',
+            element: withSuspense(<PayslipsPage />),
           },
         ],
       },

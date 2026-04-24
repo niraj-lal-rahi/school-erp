@@ -20,7 +20,7 @@ class UpsertTeacherAssignmentRequest extends AcademicManagementRequest
             'school_class_id' => ['required', 'integer', 'exists:school_classes,id'],
             'section_id' => ['nullable', 'integer', 'exists:sections,id'],
             'subject_id' => ['required', 'integer', 'exists:subjects,id'],
-            'staff_id' => ['required', 'integer', 'exists:users,id'],
+            'staff_id' => ['required', 'integer', 'exists:staff,id'],
             'is_class_teacher' => ['nullable', 'boolean'],
             'status' => ['required', Rule::enum(AcademicStatus::class)],
             'unique_guard' => [

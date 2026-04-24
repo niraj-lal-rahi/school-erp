@@ -21,6 +21,24 @@ use App\Http\Controllers\Api\V1\AcademicManagement\SectionController as Academic
 use App\Http\Controllers\Api\V1\AcademicManagement\SubjectController;
 use App\Http\Controllers\Api\V1\AcademicManagement\TeacherAssignmentController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
+use App\Http\Controllers\Api\V1\HR\DepartmentController;
+use App\Http\Controllers\Api\V1\HR\DesignationController;
+use App\Http\Controllers\Api\V1\HR\LeaveBalanceController;
+use App\Http\Controllers\Api\V1\HR\LeaveTypeController;
+use App\Http\Controllers\Api\V1\HR\PayrollRunController;
+use App\Http\Controllers\Api\V1\HR\SalaryComponentController;
+use App\Http\Controllers\Api\V1\HR\SalaryStructureController;
+use App\Http\Controllers\Api\V1\HR\StaffController;
+use App\Http\Controllers\Api\V1\HR\StaffAttendanceController;
+use App\Http\Controllers\Api\V1\HR\StaffBankDetailController;
+use App\Http\Controllers\Api\V1\HR\StaffDocumentController;
+use App\Http\Controllers\Api\V1\HR\StaffEmergencyContactController;
+use App\Http\Controllers\Api\V1\HR\StaffLeaveApplicationController;
+use App\Http\Controllers\Api\V1\HR\StaffNoteController;
+use App\Http\Controllers\Api\V1\HR\StaffPayslipController;
+use App\Http\Controllers\Api\V1\HR\StaffQualificationController;
+use App\Http\Controllers\Api\V1\HR\StaffStatusHistoryController;
+use App\Http\Controllers\Api\V1\HR\StaffWorkExperienceController;
 use App\Http\Controllers\Api\V1\MasterData\AcademicYearController as MasterDataAcademicYearController;
 use App\Http\Controllers\Api\V1\MasterData\GuardianController;
 use App\Http\Controllers\Api\V1\MasterData\SectionController as MasterDataSectionController;
@@ -195,6 +213,119 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/grading-structures/{gradingStructure}', [GradingStructureController::class, 'show'])->middleware('permission:academic-management.view');
             Route::put('/grading-structures/{gradingStructure}', [GradingStructureController::class, 'update'])->middleware('permission:academic-management.manage');
             Route::delete('/grading-structures/{gradingStructure}', [GradingStructureController::class, 'destroy'])->middleware('permission:academic-management.manage');
+        });
+
+        Route::prefix('hr')->group(function (): void {
+            Route::get('/departments', [DepartmentController::class, 'index'])->middleware('permission:hr.view');
+            Route::post('/departments', [DepartmentController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/departments/{department}', [DepartmentController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/departments/{department}', [DepartmentController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->middleware('permission:hr.manage');
+
+            Route::get('/designations', [DesignationController::class, 'index'])->middleware('permission:hr.view');
+            Route::post('/designations', [DesignationController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/designations/{designation}', [DesignationController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/designations/{designation}', [DesignationController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/designations/{designation}', [DesignationController::class, 'destroy'])->middleware('permission:hr.manage');
+
+            Route::get('/leave-types', [LeaveTypeController::class, 'index'])->middleware('permission:hr.view');
+            Route::post('/leave-types', [LeaveTypeController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/leave-types/{leaveType}', [LeaveTypeController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/leave-types/{leaveType}', [LeaveTypeController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/leave-types/{leaveType}', [LeaveTypeController::class, 'destroy'])->middleware('permission:hr.manage');
+
+            Route::get('/leave-applications', [StaffLeaveApplicationController::class, 'index'])->middleware('permission:hr.view');
+            Route::post('/leave-applications', [StaffLeaveApplicationController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/leave-applications/{leaveApplication}', [StaffLeaveApplicationController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/leave-applications/{leaveApplication}', [StaffLeaveApplicationController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/leave-applications/{leaveApplication}', [StaffLeaveApplicationController::class, 'destroy'])->middleware('permission:hr.manage');
+            Route::post('/leave-applications/{leaveApplication}/submit', [StaffLeaveApplicationController::class, 'submit'])->middleware('permission:hr.manage');
+            Route::post('/leave-applications/{leaveApplication}/approve', [StaffLeaveApplicationController::class, 'approve'])->middleware('permission:hr.manage');
+            Route::post('/leave-applications/{leaveApplication}/reject', [StaffLeaveApplicationController::class, 'reject'])->middleware('permission:hr.manage');
+            Route::post('/leave-applications/{leaveApplication}/cancel', [StaffLeaveApplicationController::class, 'cancel'])->middleware('permission:hr.manage');
+
+            Route::get('/leave-balances', [LeaveBalanceController::class, 'index'])->middleware('permission:hr.view');
+
+            Route::get('/salary-components', [SalaryComponentController::class, 'index'])->middleware('permission:hr.view');
+            Route::post('/salary-components', [SalaryComponentController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/salary-components/{salaryComponent}', [SalaryComponentController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/salary-components/{salaryComponent}', [SalaryComponentController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/salary-components/{salaryComponent}', [SalaryComponentController::class, 'destroy'])->middleware('permission:hr.manage');
+
+            Route::get('/salary-structures', [SalaryStructureController::class, 'index'])->middleware('permission:hr.view');
+            Route::post('/salary-structures', [SalaryStructureController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/salary-structures/{salaryStructure}', [SalaryStructureController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/salary-structures/{salaryStructure}', [SalaryStructureController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/salary-structures/{salaryStructure}', [SalaryStructureController::class, 'destroy'])->middleware('permission:hr.manage');
+
+            Route::get('/payroll-runs', [PayrollRunController::class, 'index'])->middleware('permission:hr.view');
+            Route::post('/payroll-runs', [PayrollRunController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/payroll-runs/{payrollRun}', [PayrollRunController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/payroll-runs/{payrollRun}', [PayrollRunController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/payroll-runs/{payrollRun}', [PayrollRunController::class, 'destroy'])->middleware('permission:hr.manage');
+            Route::post('/payroll-runs/{payrollRun}/process', [PayrollRunController::class, 'process'])->middleware('permission:hr.manage');
+            Route::post('/payroll-runs/{payrollRun}/finalize', [PayrollRunController::class, 'finalize'])->middleware('permission:hr.manage');
+            Route::post('/payroll-runs/{payrollRun}/mark-paid', [PayrollRunController::class, 'markPaid'])->middleware('permission:hr.manage');
+
+            Route::get('/payslips', [StaffPayslipController::class, 'index'])->middleware('permission:hr.view');
+            Route::get('/payslips/{payslip}', [StaffPayslipController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/payslips/{payslip}', [StaffPayslipController::class, 'update'])->middleware('permission:hr.manage');
+
+            Route::get('/staff', [StaffController::class, 'index'])->middleware('permission:hr.view');
+            Route::post('/staff', [StaffController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/staff/{staff}', [StaffController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/staff/{staff}', [StaffController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->middleware('permission:hr.manage');
+            Route::post('/staff/{staff}/activate', [StaffController::class, 'activate'])->middleware('permission:hr.manage');
+            Route::post('/staff/{staff}/suspend', [StaffController::class, 'suspend'])->middleware('permission:hr.manage');
+            Route::post('/staff/{staff}/resign', [StaffController::class, 'resign'])->middleware('permission:hr.manage');
+            Route::post('/staff/{staff}/terminate', [StaffController::class, 'terminate'])->middleware('permission:hr.manage');
+            Route::post('/staff/{staff}/retire', [StaffController::class, 'retire'])->middleware('permission:hr.manage');
+            Route::get('/staff/{staff}/documents', [StaffDocumentController::class, 'staffDocuments'])->middleware('permission:hr.view');
+            Route::post('/staff/{staff}/upload-document', [StaffDocumentController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/staff/{staff}/attendance', [StaffAttendanceController::class, 'staffAttendance'])->middleware('permission:hr.view');
+            Route::post('/staff/{staff}/attendance', [StaffAttendanceController::class, 'storeForStaff'])->middleware('permission:hr.manage');
+            Route::get('/staff/{staff}/leave-balance', [LeaveBalanceController::class, 'staffBalance'])->middleware('permission:hr.view');
+            Route::get('/staff/{staff}/bank-details', [StaffBankDetailController::class, 'staffBankDetails'])->middleware('permission:hr.view');
+            Route::post('/staff/{staff}/bank-details', [StaffBankDetailController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/staff/{staff}/emergency-contacts', [StaffEmergencyContactController::class, 'staffContacts'])->middleware('permission:hr.view');
+            Route::post('/staff/{staff}/emergency-contacts', [StaffEmergencyContactController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/staff/{staff}/status-history', [StaffStatusHistoryController::class, 'staffHistory'])->middleware('permission:hr.view');
+            Route::get('/staff/{staff}/notes', [StaffNoteController::class, 'staffNotes'])->middleware('permission:hr.view');
+            Route::post('/staff/{staff}/notes', [StaffNoteController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/staff/{staff}/qualifications', [StaffQualificationController::class, 'staffQualifications'])->middleware('permission:hr.view');
+            Route::post('/staff/{staff}/qualifications', [StaffQualificationController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/staff/{staff}/experiences', [StaffWorkExperienceController::class, 'staffExperiences'])->middleware('permission:hr.view');
+            Route::post('/staff/{staff}/experiences', [StaffWorkExperienceController::class, 'store'])->middleware('permission:hr.manage');
+
+            Route::get('/staff-bank-details', [StaffBankDetailController::class, 'index'])->middleware('permission:hr.view');
+            Route::put('/staff-bank-details/{staffBankDetail}', [StaffBankDetailController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/staff-bank-details/{staffBankDetail}', [StaffBankDetailController::class, 'destroy'])->middleware('permission:hr.manage');
+            Route::get('/staff-documents', [StaffDocumentController::class, 'index'])->middleware('permission:hr.view');
+            Route::get('/staff-documents/{staffDocument}', [StaffDocumentController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/staff-documents/{staffDocument}', [StaffDocumentController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/staff-documents/{staffDocument}', [StaffDocumentController::class, 'destroy'])->middleware('permission:hr.manage');
+
+            Route::get('/staff-attendance', [StaffAttendanceController::class, 'index'])->middleware('permission:hr.view');
+            Route::post('/staff-attendance', [StaffAttendanceController::class, 'store'])->middleware('permission:hr.manage');
+            Route::get('/staff-attendance/{staffAttendance}', [StaffAttendanceController::class, 'show'])->middleware('permission:hr.view');
+            Route::put('/staff-attendance/{staffAttendance}', [StaffAttendanceController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/staff-attendance/{staffAttendance}', [StaffAttendanceController::class, 'destroy'])->middleware('permission:hr.manage');
+
+            Route::get('/staff-emergency-contacts', [StaffEmergencyContactController::class, 'index'])->middleware('permission:hr.view');
+            Route::put('/staff-emergency-contacts/{staffEmergencyContact}', [StaffEmergencyContactController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/staff-emergency-contacts/{staffEmergencyContact}', [StaffEmergencyContactController::class, 'destroy'])->middleware('permission:hr.manage');
+            Route::get('/staff-notes', [StaffNoteController::class, 'index'])->middleware('permission:hr.view');
+            Route::put('/staff-notes/{staffNote}', [StaffNoteController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/staff-notes/{staffNote}', [StaffNoteController::class, 'destroy'])->middleware('permission:hr.manage');
+
+            Route::get('/staff-qualifications', [StaffQualificationController::class, 'index'])->middleware('permission:hr.view');
+            Route::put('/staff-qualifications/{staffQualification}', [StaffQualificationController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/staff-qualifications/{staffQualification}', [StaffQualificationController::class, 'destroy'])->middleware('permission:hr.manage');
+
+            Route::get('/staff-experiences', [StaffWorkExperienceController::class, 'index'])->middleware('permission:hr.view');
+            Route::put('/staff-experiences/{staffWorkExperience}', [StaffWorkExperienceController::class, 'update'])->middleware('permission:hr.manage');
+            Route::delete('/staff-experiences/{staffWorkExperience}', [StaffWorkExperienceController::class, 'destroy'])->middleware('permission:hr.manage');
         });
     });
 });

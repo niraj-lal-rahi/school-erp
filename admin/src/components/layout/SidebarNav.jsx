@@ -16,6 +16,13 @@ import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
 import TodayOutlinedIcon from '@mui/icons-material/TodayOutlined';
 import ViewKanbanOutlinedIcon from '@mui/icons-material/ViewKanbanOutlined';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
+import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
+import CurrencyRupeeOutlinedIcon from '@mui/icons-material/CurrencyRupeeOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import {
   Collapse,
   Divider,
@@ -62,6 +69,20 @@ const academicManagementChildren = [
   { label: 'Grading Structures', to: '/academic-management/grading-structures', icon: <TimelineOutlinedIcon />, permission: 'academic-management.view' },
 ];
 
+const hrChildren = [
+  { label: 'Staff Directory', to: '/hr/staff', icon: <BadgeOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Departments', to: '/hr/departments', icon: <BusinessCenterOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Designations', to: '/hr/designations', icon: <WorkOutlineOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Attendance', to: '/hr/staff-attendance', icon: <AssignmentTurnedInOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Leave Types', to: '/hr/leave-types', icon: <TodayOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Leave Applications', to: '/hr/leave-applications', icon: <DescriptionOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Leave Balances', to: '/hr/leave-balances', icon: <TimelineOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Salary Components', to: '/hr/salary-components', icon: <CurrencyRupeeOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Salary Structures', to: '/hr/salary-structures', icon: <AccountBalanceOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Payroll Runs', to: '/hr/payroll-runs', icon: <PaymentsOutlinedIcon />, permission: 'hr.view' },
+  { label: 'Payslips', to: '/hr/payslips', icon: <DescriptionOutlinedIcon />, permission: 'hr.view' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -92,6 +113,10 @@ export function SidebarNav() {
     () => academicManagementChildren.filter((item) => permissions.includes(item.permission)),
     [permissions],
   );
+  const visibleHrChildren = useMemo(
+    () => hrChildren.filter((item) => permissions.includes(item.permission)),
+    [permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -105,9 +130,11 @@ export function SidebarNav() {
     '/sections',
   ].some((path) => location.pathname.startsWith(path));
   const academicRouteActive = location.pathname.startsWith('/academic-management');
+  const hrRouteActive = location.pathname.startsWith('/hr');
   const [sisOpen, setSisOpen] = useState(sisRouteActive);
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
+  const [hrOpen, setHrOpen] = useState(hrRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -121,6 +148,12 @@ export function SidebarNav() {
       setAcademicOpen(true);
     }
   }, [academicRouteActive]);
+
+  useEffect(() => {
+    if (hrRouteActive) {
+      setHrOpen(true);
+    }
+  }, [hrRouteActive]);
 
   return (
     <Paper
@@ -160,7 +193,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleSisStudentManagementChildren.length || visibleAcademicChildren.length ? (
+      {visibleSisStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -248,6 +281,40 @@ export function SidebarNav() {
                 ))}
               </List>
             </Collapse>
+
+            {visibleHrChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setHrOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: hrRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <BadgeOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Staff & HR" />
+                  {hrOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={hrOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleHrChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
           </List>
         </Stack>
       ) : null}

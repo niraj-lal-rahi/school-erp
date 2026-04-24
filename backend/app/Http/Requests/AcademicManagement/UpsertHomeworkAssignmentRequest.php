@@ -16,7 +16,7 @@ class UpsertHomeworkAssignmentRequest extends AcademicManagementRequest
             'school_class_id' => ['required', 'integer', 'exists:school_classes,id'],
             'section_id' => ['nullable', 'integer', 'exists:sections,id'],
             'subject_id' => ['required', 'integer', 'exists:subjects,id'],
-            'staff_id' => ['required', 'integer', 'exists:users,id'],
+            'staff_id' => ['required', 'integer', 'exists:staff,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'assigned_date' => ['required', 'date'],

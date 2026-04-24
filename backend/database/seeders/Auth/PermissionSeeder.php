@@ -19,6 +19,8 @@ class PermissionSeeder extends Seeder
             ['name' => 'Manage Student Medical Records', 'code' => 'students.medical.manage', 'module' => 'sis'],
             ['name' => 'View Academic Management', 'code' => 'academic-management.view', 'module' => 'academic-management'],
             ['name' => 'Manage Academic Management', 'code' => 'academic-management.manage', 'module' => 'academic-management'],
+            ['name' => 'View HR', 'code' => 'hr.view', 'module' => 'hr'],
+            ['name' => 'Manage HR', 'code' => 'hr.manage', 'module' => 'hr'],
         ];
 
         foreach ($permissions as $permission) {

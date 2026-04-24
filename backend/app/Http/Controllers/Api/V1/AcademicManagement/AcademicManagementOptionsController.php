@@ -9,13 +9,13 @@ use App\Http\Resources\AcademicManagement\GradingStructureResource;
 use App\Http\Resources\AcademicManagement\SchoolClassResource;
 use App\Http\Resources\AcademicManagement\SectionResource;
 use App\Http\Resources\AcademicManagement\SubjectResource;
+use App\Models\HR\Staff;
 use App\Models\AcademicManagement\AcademicTerm;
 use App\Models\AcademicManagement\GradingStructure;
 use App\Models\AcademicManagement\Subject;
 use App\Models\AcademicYear;
 use App\Models\SchoolClass;
 use App\Models\Section;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
 class AcademicManagementOptionsController extends Controller
@@ -30,7 +30,18 @@ class AcademicManagementOptionsController extends Controller
                 'sections' => SectionResource::collection(Section::query()->with('schoolClass')->get()),
                 'subjects' => SubjectResource::collection(Subject::query()->get()),
                 'grading_structures' => GradingStructureResource::collection(GradingStructure::query()->with('scaleItems')->get()),
-                'staff' => User::query()->select(['id', 'name', 'email'])->orderBy('name')->get(),
+                'staff' => Staff::query()
+                    ->select(['id', 'employee_code', 'full_name', 'email', 'staff_type', 'current_status'])
+                    ->orderBy('full_name')
+                    ->get()
+                    ->map(fn (Staff $staff) => [
+                        'id' => $staff->id,
+                        'name' => $staff->full_name,
+                        'employee_code' => $staff->employee_code,
+                        'email' => $staff->email,
+                        'staff_type' => $staff->staff_type,
+                        'current_status' => $staff->current_status,
+                    ]),
             ],
         ]);
     }

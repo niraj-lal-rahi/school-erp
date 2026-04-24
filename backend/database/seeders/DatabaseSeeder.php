@@ -6,6 +6,7 @@ use Database\Seeders\Auth\PermissionSeeder;
 use Database\Seeders\Auth\RoleSeeder;
 use Database\Seeders\Auth\UserSeeder;
 use Database\Seeders\AcademicManagement\AcademicManagementSeeder;
+use Database\Seeders\HR\HrSeeder;
 use Database\Seeders\SIS\SisSeeder;
 use Database\Seeders\Tenant\TenantSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -25,6 +26,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
+            HrSeeder::class,
             AcademicManagementSeeder::class,
             SisSeeder::class,
         ]);

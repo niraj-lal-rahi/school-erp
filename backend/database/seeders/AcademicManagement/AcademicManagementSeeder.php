@@ -12,6 +12,7 @@ use App\Models\AcademicManagement\LessonPlan;
 use App\Models\AcademicManagement\Subject;
 use App\Models\AcademicManagement\TeacherAssignment;
 use App\Models\AcademicYear;
+use App\Models\HR\Staff;
 use App\Models\Role;
 use App\Models\School;
 use App\Models\SchoolClass;
@@ -26,6 +27,8 @@ class AcademicManagementSeeder extends Seeder
     {
         $school = School::withoutGlobalScopes()->where('code', 'greenwood')->firstOrFail();
         $admin = User::withoutGlobalScopes()->where('school_id', $school->id)->where('email', 'admin@greenwood.edu')->firstOrFail();
+        $teacherStaff = Staff::withoutGlobalScopes()->where('school_id', $school->id)->where('employee_code', 'EMP-0002')->first()
+            ?? Staff::withoutGlobalScopes()->where('school_id', $school->id)->where('user_id', $admin->id)->firstOrFail();
 
         $academicYear = AcademicYear::withoutGlobalScopes()->updateOrCreate(
             ['school_id' => $school->id, 'code' => 'AY-2026-27'],
@@ -122,7 +125,7 @@ class AcademicManagementSeeder extends Seeder
                 'school_class_id' => $schoolClass->id,
                 'section_id' => $section->id,
                 'subject_id' => $math->id,
-                'staff_id' => $admin->id,
+                'staff_id' => $teacherStaff->id,
             ],
             [
                 'is_class_teacher' => true,
@@ -154,7 +157,7 @@ class AcademicManagementSeeder extends Seeder
                 'school_class_id' => $schoolClass->id,
                 'section_id' => $section->id,
                 'subject_id' => $math->id,
-                'staff_id' => $admin->id,
+                'staff_id' => $teacherStaff->id,
                 'title' => 'Introduction to Linear Equations',
             ],
             [
@@ -177,7 +180,7 @@ class AcademicManagementSeeder extends Seeder
                 'school_class_id' => $schoolClass->id,
                 'section_id' => $section->id,
                 'subject_id' => $math->id,
-                'staff_id' => $admin->id,
+                'staff_id' => $teacherStaff->id,
                 'title' => 'Worksheet 1',
             ],
             [
