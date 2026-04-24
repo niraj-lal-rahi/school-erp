@@ -6,6 +6,7 @@ use Database\Seeders\Auth\PermissionSeeder;
 use Database\Seeders\Auth\RoleSeeder;
 use Database\Seeders\Auth\UserSeeder;
 use Database\Seeders\AcademicManagement\AcademicManagementSeeder;
+use Database\Seeders\Finance\FinanceSeeder;
 use Database\Seeders\HR\HrSeeder;
 use Database\Seeders\SIS\SisSeeder;
 use Database\Seeders\Tenant\TenantSeeder;
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
             HrSeeder::class,
             AcademicManagementSeeder::class,
             SisSeeder::class,
+            FinanceSeeder::class,
         ]);
     }
 }

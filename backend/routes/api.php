@@ -21,6 +21,23 @@ use App\Http\Controllers\Api\V1\AcademicManagement\SectionController as Academic
 use App\Http\Controllers\Api\V1\AcademicManagement\SubjectController;
 use App\Http\Controllers\Api\V1\AcademicManagement\TeacherAssignmentController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
+use App\Http\Controllers\Api\V1\Finance\FeeCategoryController;
+use App\Http\Controllers\Api\V1\Finance\ExpenseCategoryController;
+use App\Http\Controllers\Api\V1\Finance\ExpenseController;
+use App\Http\Controllers\Api\V1\Finance\FinanceReportController;
+use App\Http\Controllers\Api\V1\Finance\DiscountTypeController;
+use App\Http\Controllers\Api\V1\Finance\FeeHeadController;
+use App\Http\Controllers\Api\V1\Finance\FeeInstallmentController;
+use App\Http\Controllers\Api\V1\Finance\FeeInvoiceController;
+use App\Http\Controllers\Api\V1\Finance\FineRuleController;
+use App\Http\Controllers\Api\V1\Finance\LedgerAccountController;
+use App\Http\Controllers\Api\V1\Finance\LedgerEntryController;
+use App\Http\Controllers\Api\V1\Finance\PaymentController;
+use App\Http\Controllers\Api\V1\Finance\ReceiptController;
+use App\Http\Controllers\Api\V1\Finance\RefundController;
+use App\Http\Controllers\Api\V1\Finance\FeeStructureController;
+use App\Http\Controllers\Api\V1\Finance\StudentDiscountController;
+use App\Http\Controllers\Api\V1\Finance\StudentFeeAssignmentController;
 use App\Http\Controllers\Api\V1\HR\DepartmentController;
 use App\Http\Controllers\Api\V1\HR\DesignationController;
 use App\Http\Controllers\Api\V1\HR\LeaveBalanceController;
@@ -326,6 +343,125 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/staff-experiences', [StaffWorkExperienceController::class, 'index'])->middleware('permission:hr.view');
             Route::put('/staff-experiences/{staffWorkExperience}', [StaffWorkExperienceController::class, 'update'])->middleware('permission:hr.manage');
             Route::delete('/staff-experiences/{staffWorkExperience}', [StaffWorkExperienceController::class, 'destroy'])->middleware('permission:hr.manage');
+        });
+
+        Route::prefix('finance')->group(function (): void {
+            Route::get('/fee-categories', [FeeCategoryController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/fee-categories', [FeeCategoryController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/fee-categories/{feeCategory}', [FeeCategoryController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/fee-categories/{feeCategory}', [FeeCategoryController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/fee-categories/{feeCategory}', [FeeCategoryController::class, 'destroy'])->middleware('permission:finance.manage');
+
+            Route::get('/expense-categories', [ExpenseCategoryController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/expense-categories', [ExpenseCategoryController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/expense-categories/{expenseCategory}', [ExpenseCategoryController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/expense-categories/{expenseCategory}', [ExpenseCategoryController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/expense-categories/{expenseCategory}', [ExpenseCategoryController::class, 'destroy'])->middleware('permission:finance.manage');
+
+            Route::get('/fee-heads', [FeeHeadController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/fee-heads', [FeeHeadController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/fee-heads/{feeHead}', [FeeHeadController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/fee-heads/{feeHead}', [FeeHeadController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/fee-heads/{feeHead}', [FeeHeadController::class, 'destroy'])->middleware('permission:finance.manage');
+
+            Route::get('/discount-types', [DiscountTypeController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/discount-types', [DiscountTypeController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/discount-types/{discountType}', [DiscountTypeController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/discount-types/{discountType}', [DiscountTypeController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/discount-types/{discountType}', [DiscountTypeController::class, 'destroy'])->middleware('permission:finance.manage');
+
+            Route::get('/student-discounts', [StudentDiscountController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/student-discounts', [StudentDiscountController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/student-discounts/{studentDiscount}', [StudentDiscountController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/student-discounts/{studentDiscount}', [StudentDiscountController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/student-discounts/{studentDiscount}', [StudentDiscountController::class, 'destroy'])->middleware('permission:finance.manage');
+            Route::post('/student-discounts/{studentDiscount}/approve', [StudentDiscountController::class, 'approve'])->middleware('permission:finance.manage');
+            Route::post('/student-discounts/{studentDiscount}/reject', [StudentDiscountController::class, 'reject'])->middleware('permission:finance.manage');
+
+            Route::get('/fine-rules', [FineRuleController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/fine-rules', [FineRuleController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/fine-rules/{fineRule}', [FineRuleController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/fine-rules/{fineRule}', [FineRuleController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/fine-rules/{fineRule}', [FineRuleController::class, 'destroy'])->middleware('permission:finance.manage');
+
+            Route::get('/fee-structures', [FeeStructureController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/fee-structures', [FeeStructureController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/fee-structures/{feeStructure}', [FeeStructureController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/fee-structures/{feeStructure}', [FeeStructureController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/fee-structures/{feeStructure}', [FeeStructureController::class, 'destroy'])->middleware('permission:finance.manage');
+
+            Route::get('/student-fee-assignments', [StudentFeeAssignmentController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/student-fee-assignments', [StudentFeeAssignmentController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/student-fee-assignments/{studentFeeAssignment}', [StudentFeeAssignmentController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/student-fee-assignments/{studentFeeAssignment}', [StudentFeeAssignmentController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/student-fee-assignments/{studentFeeAssignment}', [StudentFeeAssignmentController::class, 'destroy'])->middleware('permission:finance.manage');
+            Route::post('/students/{student}/assign-fee-structure', [StudentFeeAssignmentController::class, 'assignFeeStructure'])->middleware('permission:finance.manage');
+
+            Route::get('/fee-installments', [FeeInstallmentController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/fee-installments', [FeeInstallmentController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/fee-installments/{feeInstallment}', [FeeInstallmentController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/fee-installments/{feeInstallment}', [FeeInstallmentController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/fee-installments/{feeInstallment}', [FeeInstallmentController::class, 'destroy'])->middleware('permission:finance.manage');
+            Route::post('/student-fee-assignments/{studentFeeAssignment}/generate-installments', [FeeInstallmentController::class, 'generate'])->middleware('permission:finance.manage');
+
+            Route::get('/invoices', [FeeInvoiceController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/invoices', [FeeInvoiceController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/invoices/{feeInvoice}', [FeeInvoiceController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/invoices/{feeInvoice}', [FeeInvoiceController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/invoices/{feeInvoice}', [FeeInvoiceController::class, 'destroy'])->middleware('permission:finance.manage');
+            Route::post('/invoices/{feeInvoice}/issue', [FeeInvoiceController::class, 'issue'])->middleware('permission:finance.manage');
+            Route::post('/invoices/{feeInvoice}/cancel', [FeeInvoiceController::class, 'cancel'])->middleware('permission:finance.manage');
+            Route::post('/invoices/{feeInvoice}/apply-discount', [FeeInvoiceController::class, 'applyDiscount'])->middleware('permission:finance.manage');
+            Route::post('/invoices/{feeInvoice}/apply-fine', [FeeInvoiceController::class, 'applyFine'])->middleware('permission:finance.manage');
+
+            Route::get('/payments', [PaymentController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/payments', [PaymentController::class, 'store'])->middleware('permission:finance.manage');
+            Route::post('/payments/collect', [PaymentController::class, 'collect'])->middleware('permission:finance.manage');
+            Route::get('/payments/{payment}', [PaymentController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/payments/{payment}', [PaymentController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/payments/{payment}', [PaymentController::class, 'destroy'])->middleware('permission:finance.manage');
+            Route::post('/payments/{payment}/confirm', [PaymentController::class, 'confirm'])->middleware('permission:finance.manage');
+            Route::post('/payments/{payment}/fail', [PaymentController::class, 'fail'])->middleware('permission:finance.manage');
+
+            Route::get('/receipts', [ReceiptController::class, 'index'])->middleware('permission:finance.view');
+            Route::get('/receipts/{receipt}', [ReceiptController::class, 'show'])->middleware('permission:finance.view');
+            Route::get('/receipts/{receipt}/download', [ReceiptController::class, 'download'])->middleware('permission:finance.view');
+
+            Route::get('/refunds', [RefundController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/refunds', [RefundController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/refunds/{refund}', [RefundController::class, 'show'])->middleware('permission:finance.view');
+            Route::delete('/refunds/{refund}', [RefundController::class, 'destroy'])->middleware('permission:finance.manage');
+            Route::post('/refunds/{refund}/approve', [RefundController::class, 'approve'])->middleware('permission:finance.manage');
+            Route::post('/refunds/{refund}/process', [RefundController::class, 'process'])->middleware('permission:finance.manage');
+
+            Route::get('/expenses', [ExpenseController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/expenses', [ExpenseController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/expenses/{expense}', [ExpenseController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->middleware('permission:finance.manage');
+            Route::post('/expenses/{expense}/approve', [ExpenseController::class, 'approve'])->middleware('permission:finance.manage');
+            Route::post('/expenses/{expense}/mark-paid', [ExpenseController::class, 'markPaid'])->middleware('permission:finance.manage');
+
+            Route::get('/ledger-accounts', [LedgerAccountController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/ledger-accounts', [LedgerAccountController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/ledger-accounts/{ledgerAccount}', [LedgerAccountController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/ledger-accounts/{ledgerAccount}', [LedgerAccountController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/ledger-accounts/{ledgerAccount}', [LedgerAccountController::class, 'destroy'])->middleware('permission:finance.manage');
+
+            Route::get('/ledger-entries', [LedgerEntryController::class, 'index'])->middleware('permission:finance.view');
+            Route::post('/ledger-entries', [LedgerEntryController::class, 'store'])->middleware('permission:finance.manage');
+            Route::get('/ledger-entries/{ledgerEntry}', [LedgerEntryController::class, 'show'])->middleware('permission:finance.view');
+            Route::put('/ledger-entries/{ledgerEntry}', [LedgerEntryController::class, 'update'])->middleware('permission:finance.manage');
+            Route::delete('/ledger-entries/{ledgerEntry}', [LedgerEntryController::class, 'destroy'])->middleware('permission:finance.manage');
+
+            Route::prefix('/reports')->group(function (): void {
+                Route::get('/fee-collection', [FinanceReportController::class, 'feeCollection'])->middleware('permission:finance.view');
+                Route::get('/outstanding-fees', [FinanceReportController::class, 'outstandingFees'])->middleware('permission:finance.view');
+                Route::get('/student-ledger', [FinanceReportController::class, 'studentLedger'])->middleware('permission:finance.view');
+                Route::get('/daily-collection', [FinanceReportController::class, 'dailyCollection'])->middleware('permission:finance.view');
+                Route::get('/expense-summary', [FinanceReportController::class, 'expenseSummary'])->middleware('permission:finance.view');
+                Route::get('/income-vs-expense', [FinanceReportController::class, 'incomeVsExpense'])->middleware('permission:finance.view');
+            });
         });
     });
 });

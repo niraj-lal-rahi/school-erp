@@ -23,6 +23,7 @@ import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlin
 import CurrencyRupeeOutlinedIcon from '@mui/icons-material/CurrencyRupeeOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import {
   Collapse,
   Divider,
@@ -83,6 +84,27 @@ const hrChildren = [
   { label: 'Payslips', to: '/hr/payslips', icon: <DescriptionOutlinedIcon />, permission: 'hr.view' },
 ];
 
+const financeChildren = [
+  { label: 'Fee Categories', to: '/finance/fee-categories', icon: <LibraryBooksOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Expense Categories', to: '/finance/expense-categories', icon: <BusinessCenterOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Fee Heads', to: '/finance/fee-heads', icon: <ReceiptLongOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Discount Types', to: '/finance/discount-types', icon: <DescriptionOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Student Discounts', to: '/finance/student-discounts', icon: <DescriptionOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Fine Rules', to: '/finance/fine-rules', icon: <DescriptionOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Fee Structures', to: '/finance/fee-structures', icon: <AccountBalanceOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Student Fee Assignments', to: '/finance/student-fee-assignments', icon: <PaymentsOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Fee Installments', to: '/finance/fee-installments', icon: <AssignmentTurnedInOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Invoices', to: '/finance/invoices', icon: <DescriptionOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Fee Collection', to: '/finance/fee-collection', icon: <CurrencyRupeeOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Payments', to: '/finance/payments', icon: <PaymentsOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Receipts', to: '/finance/receipts', icon: <ReceiptLongOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Refunds', to: '/finance/refunds', icon: <ReceiptLongOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Expenses', to: '/finance/expenses', icon: <BusinessCenterOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Ledger Accounts', to: '/finance/ledger-accounts', icon: <AccountBalanceOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Ledger Entries', to: '/finance/ledger-entries', icon: <DescriptionOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Reports Dashboard', to: '/finance/reports', icon: <TimelineOutlinedIcon />, permission: 'finance.view' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -117,6 +139,10 @@ export function SidebarNav() {
     () => hrChildren.filter((item) => permissions.includes(item.permission)),
     [permissions],
   );
+  const visibleFinanceChildren = useMemo(
+    () => financeChildren.filter((item) => permissions.includes(item.permission)),
+    [permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -131,10 +157,12 @@ export function SidebarNav() {
   ].some((path) => location.pathname.startsWith(path));
   const academicRouteActive = location.pathname.startsWith('/academic-management');
   const hrRouteActive = location.pathname.startsWith('/hr');
+  const financeRouteActive = location.pathname.startsWith('/finance');
   const [sisOpen, setSisOpen] = useState(sisRouteActive);
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
+  const [financeOpen, setFinanceOpen] = useState(financeRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -154,6 +182,12 @@ export function SidebarNav() {
       setHrOpen(true);
     }
   }, [hrRouteActive]);
+
+  useEffect(() => {
+    if (financeRouteActive) {
+      setFinanceOpen(true);
+    }
+  }, [financeRouteActive]);
 
   return (
     <Paper
@@ -193,7 +227,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleSisStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length ? (
+      {visibleSisStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -301,6 +335,40 @@ export function SidebarNav() {
                 <Collapse in={hrOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visibleHrChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleFinanceChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setFinanceOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: financeRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <CurrencyRupeeOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Fees & Finance" />
+                  {financeOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={financeOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleFinanceChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

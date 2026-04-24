@@ -43,6 +43,24 @@ const SalaryComponentsPage = lazy(() => import('../features/hr/pages/SalaryCompo
 const SalaryStructuresPage = lazy(() => import('../features/hr/pages/SalaryStructuresPage').then((module) => ({ default: module.SalaryStructuresPage })));
 const PayrollRunsPage = lazy(() => import('../features/hr/pages/PayrollRunsPage').then((module) => ({ default: module.PayrollRunsPage })));
 const PayslipsPage = lazy(() => import('../features/hr/pages/PayslipsPage').then((module) => ({ default: module.PayslipsPage })));
+const FeeCategoriesPage = lazy(() => import('../features/finance/pages/FeeCategoriesPage').then((module) => ({ default: module.FeeCategoriesPage })));
+const ExpenseCategoriesPage = lazy(() => import('../features/finance/pages/ExpenseCategoriesPage').then((module) => ({ default: module.ExpenseCategoriesPage })));
+const FeeHeadsPage = lazy(() => import('../features/finance/pages/FeeHeadsPage').then((module) => ({ default: module.FeeHeadsPage })));
+const DiscountTypesPage = lazy(() => import('../features/finance/pages/DiscountTypesPage').then((module) => ({ default: module.DiscountTypesPage })));
+const StudentDiscountsPage = lazy(() => import('../features/finance/pages/StudentDiscountsPage').then((module) => ({ default: module.StudentDiscountsPage })));
+const FineRulesPage = lazy(() => import('../features/finance/pages/FineRulesPage').then((module) => ({ default: module.FineRulesPage })));
+const FeeStructuresPage = lazy(() => import('../features/finance/pages/FeeStructuresPage').then((module) => ({ default: module.FeeStructuresPage })));
+const StudentFeeAssignmentsPage = lazy(() => import('../features/finance/pages/StudentFeeAssignmentsPage').then((module) => ({ default: module.StudentFeeAssignmentsPage })));
+const FeeInstallmentsPage = lazy(() => import('../features/finance/pages/FeeInstallmentsPage').then((module) => ({ default: module.FeeInstallmentsPage })));
+const InvoicesPage = lazy(() => import('../features/finance/pages/InvoicesPage').then((module) => ({ default: module.InvoicesPage })));
+const FeeCollectionPage = lazy(() => import('../features/finance/pages/FeeCollectionPage').then((module) => ({ default: module.FeeCollectionPage })));
+const PaymentsPage = lazy(() => import('../features/finance/pages/PaymentsPage').then((module) => ({ default: module.PaymentsPage })));
+const ReceiptsPage = lazy(() => import('../features/finance/pages/ReceiptsPage').then((module) => ({ default: module.ReceiptsPage })));
+const RefundsPage = lazy(() => import('../features/finance/pages/RefundsPage').then((module) => ({ default: module.RefundsPage })));
+const ExpensesPage = lazy(() => import('../features/finance/pages/ExpensesPage').then((module) => ({ default: module.ExpensesPage })));
+const LedgerAccountsPage = lazy(() => import('../features/finance/pages/LedgerAccountsPage').then((module) => ({ default: module.LedgerAccountsPage })));
+const LedgerEntriesPage = lazy(() => import('../features/finance/pages/LedgerEntriesPage').then((module) => ({ default: module.LedgerEntriesPage })));
+const FinanceReportsPage = lazy(() => import('../features/finance/pages/FinanceReportsPage').then((module) => ({ default: module.FinanceReportsPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -215,6 +233,78 @@ export const router = createBrowserRouter([
           {
             path: 'hr/payslips',
             element: withSuspense(<PayslipsPage />),
+          },
+          {
+            path: 'finance/fee-categories',
+            element: withSuspense(<FeeCategoriesPage />),
+          },
+          {
+            path: 'finance/expense-categories',
+            element: withSuspense(<ExpenseCategoriesPage />),
+          },
+          {
+            path: 'finance/fee-heads',
+            element: withSuspense(<FeeHeadsPage />),
+          },
+          {
+            path: 'finance/discount-types',
+            element: withSuspense(<DiscountTypesPage />),
+          },
+          {
+            path: 'finance/student-discounts',
+            element: withSuspense(<StudentDiscountsPage />),
+          },
+          {
+            path: 'finance/fine-rules',
+            element: withSuspense(<FineRulesPage />),
+          },
+          {
+            path: 'finance/fee-structures',
+            element: withSuspense(<FeeStructuresPage />),
+          },
+          {
+            path: 'finance/student-fee-assignments',
+            element: withSuspense(<StudentFeeAssignmentsPage />),
+          },
+          {
+            path: 'finance/fee-installments',
+            element: withSuspense(<FeeInstallmentsPage />),
+          },
+          {
+            path: 'finance/invoices',
+            element: withSuspense(<InvoicesPage />),
+          },
+          {
+            path: 'finance/fee-collection',
+            element: withSuspense(<FeeCollectionPage />),
+          },
+          {
+            path: 'finance/payments',
+            element: withSuspense(<PaymentsPage />),
+          },
+          {
+            path: 'finance/receipts',
+            element: withSuspense(<ReceiptsPage />),
+          },
+          {
+            path: 'finance/refunds',
+            element: withSuspense(<RefundsPage />),
+          },
+          {
+            path: 'finance/expenses',
+            element: withSuspense(<ExpensesPage />),
+          },
+          {
+            path: 'finance/ledger-accounts',
+            element: withSuspense(<LedgerAccountsPage />),
+          },
+          {
+            path: 'finance/ledger-entries',
+            element: withSuspense(<LedgerEntriesPage />),
+          },
+          {
+            path: 'finance/reports',
+            element: withSuspense(<FinanceReportsPage />),
           },
         ],
       },
