@@ -48,7 +48,7 @@ const coreItems = [
   { label: 'Dashboard', to: '/dashboard', icon: <DashboardOutlinedIcon />, permission: 'students.view' },
 ];
 
-const sisStudentManagementChildren = [
+const studentManagementChildren = [
   { label: 'Students', to: '/students', icon: <PeopleAltOutlinedIcon />, permission: 'students.view' },
   { label: 'Admissions', to: '/student-admissions', icon: <PersonAddAltOutlinedIcon />, permission: 'students.view' },
   { label: 'Enrollments', to: '/student-enrollments', icon: <RecentActorsOutlinedIcon />, permission: 'students.view' },
@@ -144,8 +144,8 @@ export function SidebarNav() {
     [permissions],
   );
 
-  const visibleSisStudentManagementChildren = useMemo(
-    () => sisStudentManagementChildren.filter((item) => permissions.includes(item.permission)),
+  const visibleStudentManagementChildren = useMemo(
+    () => studentManagementChildren.filter((item) => permissions.includes(item.permission)),
     [permissions],
   );
 
@@ -181,7 +181,6 @@ export function SidebarNav() {
   const hrRouteActive = location.pathname.startsWith('/hr');
   const financeRouteActive = location.pathname.startsWith('/finance');
   const attendanceRouteActive = location.pathname.startsWith('/attendance');
-  const [sisOpen, setSisOpen] = useState(sisRouteActive);
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
@@ -190,7 +189,6 @@ export function SidebarNav() {
 
   useEffect(() => {
     if (sisRouteActive) {
-      setSisOpen(true);
       setStudentManagementOpen(true);
     }
   }, [sisRouteActive]);
@@ -257,60 +255,42 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleSisStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
             Modules
           </Typography>
           <List disablePadding>
-            {visibleSisStudentManagementChildren.length ? (
+            {visibleStudentManagementChildren.length ? (
               <>
                 <ListItemButton
-                  onClick={() => setSisOpen((current) => !current)}
+                  onClick={() => setStudentManagementOpen((current) => !current)}
                   sx={{
                     ...itemStyles(),
                     backgroundColor: sisRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: 36 }}>
-                    <PeopleAltOutlinedIcon />
+                    <SchoolOutlinedIcon />
                   </ListItemIcon>
-                  <ListItemText primary="SIS" />
-                  {sisOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                  <ListItemText primary="Student Management" />
+                  {studentManagementOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
                 </ListItemButton>
 
-                <Collapse in={sisOpen} timeout="auto" unmountOnExit>
+                <Collapse in={studentManagementOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
-                    <ListItemButton
-                      onClick={() => setStudentManagementOpen((current) => !current)}
-                      sx={{
-                        ...itemStyles(true),
-                        backgroundColor: sisRouteActive ? 'rgba(11, 110, 79, 0.04)' : 'transparent',
-                      }}
-                    >
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <SchoolOutlinedIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Student Management" />
-                      {studentManagementOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
-                    </ListItemButton>
-
-                    <Collapse in={studentManagementOpen} timeout="auto" unmountOnExit>
-                      <List disablePadding sx={{ mt: 0.5 }}>
-                        {visibleSisStudentManagementChildren.map((item) => (
-                          <ListItemButton
-                            key={item.to}
-                            component={NavLink}
-                            to={item.to}
-                            sx={itemStyles(true)}
-                          >
-                            <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
-                            <ListItemText primary={item.label} />
-                          </ListItemButton>
-                        ))}
-                      </List>
-                    </Collapse>
+                    {visibleStudentManagementChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
                   </List>
                 </Collapse>
               </>
