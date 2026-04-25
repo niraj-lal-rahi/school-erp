@@ -45,7 +45,11 @@ class StaffLeaveApplicationRepository implements StaffLeaveApplicationRepository
 
     public function create(Staff $staff, LeaveApplicationData $data): StaffLeaveApplication
     {
-        return $staff->leaveApplications()->create($data->attributes + ['school_id' => $staff->school_id]);
+        $application = $staff->leaveApplications()->create(
+            $data->attributes + ['school_id' => $staff->school_id]
+        );
+
+        return $this->findOrFail($application->id);
     }
 
     public function update(StaffLeaveApplication $application, LeaveApplicationData $data): StaffLeaveApplication
