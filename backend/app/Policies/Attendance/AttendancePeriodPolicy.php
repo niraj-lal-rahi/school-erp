@@ -9,26 +9,29 @@ class AttendancePeriodPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('attendance.view');
+        return $user->hasPermission('attendance.view') || $user->hasPermission('timetable.view');
     }
 
     public function view(User $user, AttendancePeriod $attendancePeriod): bool
     {
-        return $user->school_id === $attendancePeriod->school_id && $user->hasPermission('attendance.view');
+        return $user->school_id === $attendancePeriod->school_id
+            && ($user->hasPermission('attendance.view') || $user->hasPermission('timetable.view'));
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermission('attendance.manage');
+        return $user->hasPermission('attendance.manage') || $user->hasPermission('timetable.manage');
     }
 
     public function update(User $user, AttendancePeriod $attendancePeriod): bool
     {
-        return $user->school_id === $attendancePeriod->school_id && $user->hasPermission('attendance.manage');
+        return $user->school_id === $attendancePeriod->school_id
+            && ($user->hasPermission('attendance.manage') || $user->hasPermission('timetable.manage'));
     }
 
     public function delete(User $user, AttendancePeriod $attendancePeriod): bool
     {
-        return $user->school_id === $attendancePeriod->school_id && $user->hasPermission('attendance.manage');
+        return $user->school_id === $attendancePeriod->school_id
+            && ($user->hasPermission('attendance.manage') || $user->hasPermission('timetable.manage'));
     }
 }

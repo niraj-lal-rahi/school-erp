@@ -73,6 +73,15 @@ use App\Http\Controllers\Api\V1\MasterData\SectionController as MasterDataSectio
 use App\Http\Controllers\Api\V1\MasterData\SchoolClassController as MasterDataSchoolClassController;
 use App\Http\Controllers\Api\V1\SIS\StudentController;
 use App\Http\Controllers\Api\V1\SIS\StudentNoteController;
+use App\Http\Controllers\Api\V1\Timetable\TimetableEntryController;
+use App\Http\Controllers\Api\V1\Timetable\TimetableOptionsController;
+use App\Http\Controllers\Api\V1\Timetable\TimetablePeriodController;
+use App\Http\Controllers\Api\V1\Timetable\TimetablePublishLogController;
+use App\Http\Controllers\Api\V1\Timetable\TimetableRoomController;
+use App\Http\Controllers\Api\V1\Timetable\TimetableScheduleExceptionController;
+use App\Http\Controllers\Api\V1\Timetable\TimetableSubstitutionController;
+use App\Http\Controllers\Api\V1\Timetable\TimetableVersionController;
+use App\Http\Controllers\Api\V1\Timetable\TimetableViewController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -473,6 +482,59 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('/expense-summary', [FinanceReportController::class, 'expenseSummary'])->middleware('permission:finance.view');
                 Route::get('/income-vs-expense', [FinanceReportController::class, 'incomeVsExpense'])->middleware('permission:finance.view');
             });
+        });
+
+        Route::prefix('timetable')->group(function (): void {
+            Route::get('/options', [TimetableOptionsController::class, 'index'])->middleware('permission:timetable.view');
+
+            Route::get('/periods', [TimetablePeriodController::class, 'index'])->middleware('permission:timetable.view');
+            Route::post('/periods', [TimetablePeriodController::class, 'store'])->middleware('permission:timetable.manage');
+            Route::get('/periods/{period}', [TimetablePeriodController::class, 'show'])->middleware('permission:timetable.view');
+            Route::put('/periods/{period}', [TimetablePeriodController::class, 'update'])->middleware('permission:timetable.manage');
+            Route::delete('/periods/{period}', [TimetablePeriodController::class, 'destroy'])->middleware('permission:timetable.manage');
+
+            Route::get('/rooms', [TimetableRoomController::class, 'index'])->middleware('permission:timetable.view');
+            Route::post('/rooms', [TimetableRoomController::class, 'store'])->middleware('permission:timetable.manage');
+            Route::get('/rooms/{room}', [TimetableRoomController::class, 'show'])->middleware('permission:timetable.view');
+            Route::put('/rooms/{room}', [TimetableRoomController::class, 'update'])->middleware('permission:timetable.manage');
+            Route::delete('/rooms/{room}', [TimetableRoomController::class, 'destroy'])->middleware('permission:timetable.manage');
+
+            Route::get('/versions', [TimetableVersionController::class, 'index'])->middleware('permission:timetable.view');
+            Route::post('/versions', [TimetableVersionController::class, 'store'])->middleware('permission:timetable.manage');
+            Route::get('/versions/{version}', [TimetableVersionController::class, 'show'])->middleware('permission:timetable.view');
+            Route::put('/versions/{version}', [TimetableVersionController::class, 'update'])->middleware('permission:timetable.manage');
+            Route::delete('/versions/{version}', [TimetableVersionController::class, 'destroy'])->middleware('permission:timetable.manage');
+            Route::post('/versions/{version}/publish', [TimetableVersionController::class, 'publish'])->middleware('permission:timetable.manage');
+            Route::post('/versions/{version}/archive', [TimetableVersionController::class, 'archive'])->middleware('permission:timetable.manage');
+            Route::post('/versions/{version}/duplicate', [TimetableVersionController::class, 'duplicate'])->middleware('permission:timetable.manage');
+
+            Route::get('/entries', [TimetableEntryController::class, 'index'])->middleware('permission:timetable.view');
+            Route::post('/entries', [TimetableEntryController::class, 'store'])->middleware('permission:timetable.manage');
+            Route::get('/entries/{entry}', [TimetableEntryController::class, 'show'])->middleware('permission:timetable.view');
+            Route::put('/entries/{entry}', [TimetableEntryController::class, 'update'])->middleware('permission:timetable.manage');
+            Route::delete('/entries/{entry}', [TimetableEntryController::class, 'destroy'])->middleware('permission:timetable.manage');
+            Route::post('/entries/bulk-create', [TimetableEntryController::class, 'bulkCreate'])->middleware('permission:timetable.manage');
+            Route::post('/entries/check-conflicts', [TimetableEntryController::class, 'checkConflicts'])->middleware('permission:timetable.manage');
+
+            Route::get('/substitutions', [TimetableSubstitutionController::class, 'index'])->middleware('permission:timetable.view');
+            Route::post('/substitutions', [TimetableSubstitutionController::class, 'store'])->middleware('permission:timetable.manage');
+            Route::get('/substitutions/{substitution}', [TimetableSubstitutionController::class, 'show'])->middleware('permission:timetable.view');
+            Route::put('/substitutions/{substitution}', [TimetableSubstitutionController::class, 'update'])->middleware('permission:timetable.manage');
+            Route::delete('/substitutions/{substitution}', [TimetableSubstitutionController::class, 'destroy'])->middleware('permission:timetable.manage');
+            Route::post('/substitutions/{substitution}/approve', [TimetableSubstitutionController::class, 'approve'])->middleware('permission:timetable.manage');
+            Route::post('/substitutions/{substitution}/cancel', [TimetableSubstitutionController::class, 'cancel'])->middleware('permission:timetable.manage');
+
+            Route::get('/exceptions', [TimetableScheduleExceptionController::class, 'index'])->middleware('permission:timetable.view');
+            Route::post('/exceptions', [TimetableScheduleExceptionController::class, 'store'])->middleware('permission:timetable.manage');
+            Route::get('/exceptions/{exception}', [TimetableScheduleExceptionController::class, 'show'])->middleware('permission:timetable.view');
+            Route::put('/exceptions/{exception}', [TimetableScheduleExceptionController::class, 'update'])->middleware('permission:timetable.manage');
+            Route::delete('/exceptions/{exception}', [TimetableScheduleExceptionController::class, 'destroy'])->middleware('permission:timetable.manage');
+
+            Route::get('/classes/{classId}/sections/{sectionId}/weekly', [TimetableViewController::class, 'classWeekly'])->middleware('permission:timetable.view');
+            Route::get('/staff/{staffId}/weekly', [TimetableViewController::class, 'staffWeekly'])->middleware('permission:timetable.view');
+            Route::get('/staff/{staffId}/daily', [TimetableViewController::class, 'staffDaily'])->middleware('permission:timetable.view');
+
+            Route::get('/publish-logs', [TimetablePublishLogController::class, 'index'])->middleware('permission:timetable.view');
         });
 
         Route::prefix('attendance')->group(function (): void {

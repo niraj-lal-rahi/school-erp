@@ -71,6 +71,16 @@ const AttendanceHolidaysPage = lazy(() => import('../features/attendance/pages/A
 const AttendanceStatusTypesPage = lazy(() => import('../features/attendance/pages/AttendanceStatusTypesPage').then((module) => ({ default: module.AttendanceStatusTypesPage })));
 const AttendanceReportsPage = lazy(() => import('../features/attendance/pages/AttendanceReportsPage').then((module) => ({ default: module.AttendanceReportsPage })));
 const AttendanceSummaryPage = lazy(() => import('../features/attendance/pages/AttendanceSummaryPage').then((module) => ({ default: module.AttendanceSummaryPage })));
+const TimetablePeriodsPage = lazy(() => import('../features/timetable/pages/PeriodsPage').then((module) => ({ default: module.PeriodsPage })));
+const TimetableRoomsPage = lazy(() => import('../features/timetable/pages/RoomsPage').then((module) => ({ default: module.RoomsPage })));
+const TimetableVersionsPage = lazy(() => import('../features/timetable/pages/VersionsPage').then((module) => ({ default: module.VersionsPage })));
+const WeeklyTimetableBuilderPage = lazy(() => import('../features/timetable/pages/WeeklyTimetableBuilderPage').then((module) => ({ default: module.WeeklyTimetableBuilderPage })));
+const ClassTimetableViewPage = lazy(() => import('../features/timetable/pages/ClassTimetableViewPage').then((module) => ({ default: module.ClassTimetableViewPage })));
+const TeacherTimetableViewPage = lazy(() => import('../features/timetable/pages/TeacherTimetableViewPage').then((module) => ({ default: module.TeacherTimetableViewPage })));
+const RoomScheduleViewPage = lazy(() => import('../features/timetable/pages/RoomScheduleViewPage').then((module) => ({ default: module.RoomScheduleViewPage })));
+const ConflictCheckerPage = lazy(() => import('../features/timetable/pages/ConflictCheckerPage').then((module) => ({ default: module.ConflictCheckerPage })));
+const SubstitutionsPage = lazy(() => import('../features/timetable/pages/SubstitutionsPage').then((module) => ({ default: module.SubstitutionsPage })));
+const ScheduleExceptionsPage = lazy(() => import('../features/timetable/pages/ScheduleExceptionsPage').then((module) => ({ default: module.ScheduleExceptionsPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -355,6 +365,46 @@ export const router = createBrowserRouter([
           {
             path: 'attendance/summary',
             element: withSuspense(<AttendanceSummaryPage />),
+          },
+          {
+            path: 'timetable/periods',
+            element: withSuspense(<TimetablePeriodsPage />),
+          },
+          {
+            path: 'timetable/rooms',
+            element: withSuspense(<TimetableRoomsPage />),
+          },
+          {
+            path: 'timetable/versions',
+            element: withSuspense(<TimetableVersionsPage />),
+          },
+          {
+            path: 'timetable/builder',
+            element: withSuspense(<WeeklyTimetableBuilderPage />),
+          },
+          {
+            path: 'timetable/class-view',
+            element: withSuspense(<ClassTimetableViewPage />),
+          },
+          {
+            path: 'timetable/teacher-view',
+            element: withSuspense(<TeacherTimetableViewPage />),
+          },
+          {
+            path: 'timetable/room-view',
+            element: withSuspense(<RoomScheduleViewPage />),
+          },
+          {
+            path: 'timetable/conflicts',
+            element: withSuspense(<ConflictCheckerPage />),
+          },
+          {
+            path: 'timetable/substitutions',
+            element: withSuspense(<SubstitutionsPage />),
+          },
+          {
+            path: 'timetable/exceptions',
+            element: withSuspense(<ScheduleExceptionsPage />),
           },
         ],
       },

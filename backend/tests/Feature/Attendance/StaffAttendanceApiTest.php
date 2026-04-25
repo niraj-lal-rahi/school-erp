@@ -58,13 +58,14 @@ class StaffAttendanceApiTest extends TestCase
         $headers = $this->authenticate();
         $staff = Staff::withoutGlobalScopes()->where('employee_code', 'EMP-0002')->firstOrFail();
         $leaveType = LeaveType::withoutGlobalScopes()->where('school_id', $staff->school_id)->firstOrFail();
+        $attendanceDate = '2026-04-28';
 
         StaffLeaveApplication::withoutGlobalScopes()->create([
             'school_id' => $staff->school_id,
             'staff_id' => $staff->id,
             'leave_type_id' => $leaveType->id,
-            'start_date' => '2026-04-25',
-            'end_date' => '2026-04-25',
+            'start_date' => $attendanceDate,
+            'end_date' => $attendanceDate,
             'total_days' => 1,
             'reason' => 'Medical leave',
             'status' => 'approved',
@@ -80,7 +81,7 @@ class StaffAttendanceApiTest extends TestCase
 
         $this->withHeaders($headers)
             ->postJson('/api/v1/attendance/staff/'.$staff->id.'/mark', [
-                'attendance_date' => '2026-04-25',
+                'attendance_date' => $attendanceDate,
                 'attendance_status_type_id' => $presentStatus->id,
                 'source' => 'manual',
                 'remarks' => 'Should be overridden to leave.',

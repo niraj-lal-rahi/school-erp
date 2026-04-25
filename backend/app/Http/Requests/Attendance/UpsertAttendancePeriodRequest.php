@@ -29,6 +29,8 @@ class UpsertAttendancePeriodRequest extends FormRequest
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'sequence' => ['required', 'integer', 'min:1'],
+            'is_break' => ['nullable', 'boolean'],
+            'break_type' => ['nullable', 'string', Rule::in(['short_break', 'lunch', 'assembly', 'activity'])],
             'status' => ['required', 'string', Rule::in(['active', 'inactive'])],
         ];
     }

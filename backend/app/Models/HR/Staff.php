@@ -6,6 +6,8 @@ use App\Models\AcademicManagement\HomeworkAssignment;
 use App\Models\AcademicManagement\LessonPlan;
 use App\Models\AcademicManagement\TeacherAssignment;
 use App\Models\Concerns\BelongsToSchool;
+use App\Models\Timetable\TimetableEntry;
+use App\Models\Timetable\TimetableSubstitution;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -151,5 +153,20 @@ class Staff extends Model
     public function homeworkAssignments(): HasMany
     {
         return $this->hasMany(HomeworkAssignment::class, 'staff_id');
+    }
+
+    public function timetableEntries(): HasMany
+    {
+        return $this->hasMany(TimetableEntry::class, 'staff_id');
+    }
+
+    public function originalSubstitutions(): HasMany
+    {
+        return $this->hasMany(TimetableSubstitution::class, 'original_staff_id');
+    }
+
+    public function substituteAssignments(): HasMany
+    {
+        return $this->hasMany(TimetableSubstitution::class, 'substitute_staff_id');
     }
 }
