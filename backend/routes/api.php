@@ -20,6 +20,17 @@ use App\Http\Controllers\Api\V1\AcademicManagement\SchoolClassController as Acad
 use App\Http\Controllers\Api\V1\AcademicManagement\SectionController as AcademicManagementSectionController;
 use App\Http\Controllers\Api\V1\AcademicManagement\SubjectController;
 use App\Http\Controllers\Api\V1\AcademicManagement\TeacherAssignmentController;
+use App\Http\Controllers\Api\V1\Attendance\AttendancePeriodController;
+use App\Http\Controllers\Api\V1\Attendance\AttendanceCorrectionController;
+use App\Http\Controllers\Api\V1\Attendance\AttendanceHolidayController;
+use App\Http\Controllers\Api\V1\Attendance\AttendanceImportController;
+use App\Http\Controllers\Api\V1\Attendance\AttendanceReportController;
+use App\Http\Controllers\Api\V1\Attendance\AttendanceSummaryController;
+use App\Http\Controllers\Api\V1\Attendance\AttendanceStatusTypeController;
+use App\Http\Controllers\Api\V1\Attendance\BiometricLogController;
+use App\Http\Controllers\Api\V1\Attendance\StaffAttendanceController as AttendanceStaffAttendanceController;
+use App\Http\Controllers\Api\V1\Attendance\StudentAttendanceRecordController;
+use App\Http\Controllers\Api\V1\Attendance\StudentAttendanceSessionController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
 use App\Http\Controllers\Api\V1\Finance\FeeCategoryController;
 use App\Http\Controllers\Api\V1\Finance\ExpenseCategoryController;
@@ -461,6 +472,74 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('/daily-collection', [FinanceReportController::class, 'dailyCollection'])->middleware('permission:finance.view');
                 Route::get('/expense-summary', [FinanceReportController::class, 'expenseSummary'])->middleware('permission:finance.view');
                 Route::get('/income-vs-expense', [FinanceReportController::class, 'incomeVsExpense'])->middleware('permission:finance.view');
+            });
+        });
+
+        Route::prefix('attendance')->group(function (): void {
+            Route::get('/status-types', [AttendanceStatusTypeController::class, 'index'])->middleware('permission:attendance.view');
+            Route::post('/status-types', [AttendanceStatusTypeController::class, 'store'])->middleware('permission:attendance.manage');
+            Route::get('/status-types/{attendanceStatusType}', [AttendanceStatusTypeController::class, 'show'])->middleware('permission:attendance.view');
+            Route::put('/status-types/{attendanceStatusType}', [AttendanceStatusTypeController::class, 'update'])->middleware('permission:attendance.manage');
+            Route::delete('/status-types/{attendanceStatusType}', [AttendanceStatusTypeController::class, 'destroy'])->middleware('permission:attendance.manage');
+
+            Route::get('/periods', [AttendancePeriodController::class, 'index'])->middleware('permission:attendance.view');
+            Route::post('/periods', [AttendancePeriodController::class, 'store'])->middleware('permission:attendance.manage');
+            Route::get('/periods/{attendancePeriod}', [AttendancePeriodController::class, 'show'])->middleware('permission:attendance.view');
+            Route::put('/periods/{attendancePeriod}', [AttendancePeriodController::class, 'update'])->middleware('permission:attendance.manage');
+            Route::delete('/periods/{attendancePeriod}', [AttendancePeriodController::class, 'destroy'])->middleware('permission:attendance.manage');
+
+            Route::get('/student-sessions', [StudentAttendanceSessionController::class, 'index'])->middleware('permission:attendance.view');
+            Route::post('/student-sessions', [StudentAttendanceSessionController::class, 'store'])->middleware('permission:attendance.manage');
+            Route::get('/student-sessions/{studentSession}', [StudentAttendanceSessionController::class, 'show'])->middleware('permission:attendance.view');
+            Route::put('/student-sessions/{studentSession}', [StudentAttendanceSessionController::class, 'update'])->middleware('permission:attendance.manage');
+            Route::delete('/student-sessions/{studentSession}', [StudentAttendanceSessionController::class, 'destroy'])->middleware('permission:attendance.manage');
+            Route::post('/student-sessions/{studentSession}/bulk-mark', [StudentAttendanceSessionController::class, 'bulkMark'])->middleware('permission:attendance.manage');
+            Route::post('/student-sessions/{studentSession}/submit', [StudentAttendanceSessionController::class, 'submit'])->middleware('permission:attendance.manage');
+            Route::post('/student-sessions/{studentSession}/lock', [StudentAttendanceSessionController::class, 'lock'])->middleware('permission:attendance.manage');
+
+            Route::get('/student-records', [StudentAttendanceRecordController::class, 'index'])->middleware('permission:attendance.view');
+            Route::get('/student-records/{studentRecord}', [StudentAttendanceRecordController::class, 'show'])->middleware('permission:attendance.view');
+            Route::put('/student-records/{studentRecord}', [StudentAttendanceRecordController::class, 'update'])->middleware('permission:attendance.manage');
+            Route::delete('/student-records/{studentRecord}', [StudentAttendanceRecordController::class, 'destroy'])->middleware('permission:attendance.manage');
+            Route::post('/students/{student}/mark', [StudentAttendanceSessionController::class, 'markForStudent'])->middleware('permission:attendance.manage');
+
+            Route::get('/staff-records', [AttendanceStaffAttendanceController::class, 'index'])->middleware('permission:attendance.view');
+            Route::post('/staff-records', [AttendanceStaffAttendanceController::class, 'store'])->middleware('permission:attendance.manage');
+            Route::get('/staff-records/{staffRecord}', [AttendanceStaffAttendanceController::class, 'show'])->middleware('permission:attendance.view');
+            Route::put('/staff-records/{staffRecord}', [AttendanceStaffAttendanceController::class, 'update'])->middleware('permission:attendance.manage');
+            Route::delete('/staff-records/{staffRecord}', [AttendanceStaffAttendanceController::class, 'destroy'])->middleware('permission:attendance.manage');
+            Route::post('/staff/{staff}/mark', [AttendanceStaffAttendanceController::class, 'mark'])->middleware('permission:attendance.manage');
+
+            Route::get('/corrections', [AttendanceCorrectionController::class, 'index'])->middleware('permission:attendance.view');
+            Route::post('/corrections', [AttendanceCorrectionController::class, 'store'])->middleware('permission:attendance.manage');
+            Route::get('/corrections/{correction}', [AttendanceCorrectionController::class, 'show'])->middleware('permission:attendance.view');
+            Route::post('/corrections/{correction}/approve', [AttendanceCorrectionController::class, 'approve'])->middleware('permission:attendance.manage');
+            Route::post('/corrections/{correction}/reject', [AttendanceCorrectionController::class, 'reject'])->middleware('permission:attendance.manage');
+
+            Route::get('/holidays', [AttendanceHolidayController::class, 'index'])->middleware('permission:attendance.view');
+            Route::post('/holidays', [AttendanceHolidayController::class, 'store'])->middleware('permission:attendance.manage');
+            Route::get('/holidays/{holiday}', [AttendanceHolidayController::class, 'show'])->middleware('permission:attendance.view');
+            Route::put('/holidays/{holiday}', [AttendanceHolidayController::class, 'update'])->middleware('permission:attendance.manage');
+            Route::delete('/holidays/{holiday}', [AttendanceHolidayController::class, 'destroy'])->middleware('permission:attendance.manage');
+
+            Route::get('/imports', [AttendanceImportController::class, 'index'])->middleware('permission:attendance.view');
+            Route::post('/imports', [AttendanceImportController::class, 'store'])->middleware('permission:attendance.manage');
+            Route::get('/imports/{attendanceImport}', [AttendanceImportController::class, 'show'])->middleware('permission:attendance.view');
+            Route::post('/imports/{attendanceImport}/process', [AttendanceImportController::class, 'process'])->middleware('permission:attendance.manage');
+
+            Route::get('/biometric-logs', [BiometricLogController::class, 'index'])->middleware('permission:attendance.view');
+            Route::post('/biometric-logs', [BiometricLogController::class, 'store'])->middleware('permission:attendance.manage');
+            Route::get('/biometric-logs/{biometricLog}', [BiometricLogController::class, 'show'])->middleware('permission:attendance.view');
+            Route::post('/biometric-logs/process', [BiometricLogController::class, 'process'])->middleware('permission:attendance.manage');
+
+            Route::get('/summary', [AttendanceSummaryController::class, 'index'])->middleware('permission:attendance.view');
+            Route::post('/summary/refresh', [AttendanceSummaryController::class, 'refresh'])->middleware('permission:attendance.manage');
+
+            Route::prefix('/reports')->group(function (): void {
+                Route::get('/student-summary', [AttendanceReportController::class, 'studentSummary'])->middleware('permission:attendance.view');
+                Route::get('/staff-summary', [AttendanceReportController::class, 'staffSummary'])->middleware('permission:attendance.view');
+                Route::get('/class-attendance', [AttendanceReportController::class, 'classAttendance'])->middleware('permission:attendance.view');
+                Route::get('/defaulters', [AttendanceReportController::class, 'defaulters'])->middleware('permission:attendance.view');
             });
         });
     });

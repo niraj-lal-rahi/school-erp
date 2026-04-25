@@ -2,6 +2,7 @@
 
 namespace App\Models\HR;
 
+use App\Models\Attendance\AttendanceStatusType;
 use App\Models\Concerns\BelongsToSchool;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,7 @@ class StaffAttendance extends Model
         'check_in_time',
         'check_out_time',
         'attendance_status',
+        'attendance_status_type_id',
         'source',
         'remarks',
         'marked_by',
@@ -42,5 +44,10 @@ class StaffAttendance extends Model
     public function marker(): BelongsTo
     {
         return $this->belongsTo(User::class, 'marked_by');
+    }
+
+    public function attendanceStatusType(): BelongsTo
+    {
+        return $this->belongsTo(AttendanceStatusType::class, 'attendance_status_type_id');
     }
 }

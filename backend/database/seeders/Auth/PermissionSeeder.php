@@ -23,6 +23,8 @@ class PermissionSeeder extends Seeder
             ['name' => 'Manage HR', 'code' => 'hr.manage', 'module' => 'hr'],
             ['name' => 'View Finance', 'code' => 'finance.view', 'module' => 'finance'],
             ['name' => 'Manage Finance', 'code' => 'finance.manage', 'module' => 'finance'],
+            ['name' => 'View Attendance', 'code' => 'attendance.view', 'module' => 'attendance'],
+            ['name' => 'Manage Attendance', 'code' => 'attendance.manage', 'module' => 'attendance'],
         ];
 
         foreach ($permissions as $permission) {

@@ -17,6 +17,7 @@ class StaffAttendanceRepository implements StaffAttendanceRepositoryInterface
         return $this->query()
             ->when($filters['staff_id'] ?? null, fn (Builder $query, int|string $staffId) => $query->where('staff_id', $staffId))
             ->when($filters['attendance_status'] ?? null, fn (Builder $query, string $status) => $query->where('attendance_status', $status))
+            ->when($filters['attendance_status_type_id'] ?? null, fn (Builder $query, int|string $statusTypeId) => $query->where('attendance_status_type_id', $statusTypeId))
             ->when($filters['source'] ?? null, fn (Builder $query, string $source) => $query->where('source', $source))
             ->when($filters['date_from'] ?? null, fn (Builder $query, string $dateFrom) => $query->whereDate('attendance_date', '>=', $dateFrom))
             ->when($filters['date_to'] ?? null, fn (Builder $query, string $dateTo) => $query->whereDate('attendance_date', '<=', $dateTo))
@@ -40,7 +41,9 @@ class StaffAttendanceRepository implements StaffAttendanceRepositoryInterface
 
     public function create(Staff $staff, StaffAttendanceData $data): StaffAttendance
     {
-        return $staff->attendanceRecords()->create($data->attributes + ['school_id' => $staff->school_id]);
+        $attendance = $staff->attendanceRecords()->create($data->attributes + ['school_id' => $staff->school_id]);
+
+        return $this->findOrFail($attendance->id);
     }
 
     public function update(StaffAttendance $attendance, StaffAttendanceData $data): StaffAttendance
@@ -62,12 +65,13 @@ class StaffAttendanceRepository implements StaffAttendanceRepositoryInterface
             ->when($filters['date_from'] ?? null, fn (Builder $query, string $dateFrom) => $query->whereDate('attendance_date', '>=', $dateFrom))
             ->when($filters['date_to'] ?? null, fn (Builder $query, string $dateTo) => $query->whereDate('attendance_date', '<=', $dateTo))
             ->when($filters['attendance_status'] ?? null, fn (Builder $query, string $status) => $query->where('attendance_status', $status))
+            ->when($filters['attendance_status_type_id'] ?? null, fn (Builder $query, int|string $statusTypeId) => $query->where('attendance_status_type_id', $statusTypeId))
             ->orderByDesc('attendance_date')
             ->get();
     }
 
     protected function query(): Builder
     {
-        return StaffAttendance::query()->with(['staff', 'marker']);
+        return StaffAttendance::query()->with(['staff', 'marker', 'attendanceStatusType']);
     }
 }

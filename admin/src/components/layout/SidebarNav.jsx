@@ -24,6 +24,11 @@ import CurrencyRupeeOutlinedIcon from '@mui/icons-material/CurrencyRupeeOutlined
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
+import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
+import HailOutlinedIcon from '@mui/icons-material/HailOutlined';
+import InputOutlinedIcon from '@mui/icons-material/InputOutlined';
+import ManageHistoryOutlinedIcon from '@mui/icons-material/ManageHistoryOutlined';
 import {
   Collapse,
   Divider,
@@ -105,6 +110,19 @@ const financeChildren = [
   { label: 'Reports Dashboard', to: '/finance/reports', icon: <TimelineOutlinedIcon />, permission: 'finance.view' },
 ];
 
+const attendanceChildren = [
+  { label: 'Student Attendance (Daily)', to: '/attendance/student-daily', icon: <FactCheckOutlinedIcon />, permission: 'attendance.view' },
+  { label: 'Student Attendance (Period)', to: '/attendance/student-period', icon: <TodayOutlinedIcon />, permission: 'attendance.view' },
+  { label: 'Bulk Marking', to: '/attendance/bulk-marking', icon: <PlaylistAddCheckOutlinedIcon />, permission: 'attendance.view' },
+  { label: 'Staff Attendance', to: '/attendance/staff', icon: <BadgeOutlinedIcon />, permission: 'attendance.view' },
+  { label: 'Corrections', to: '/attendance/corrections', icon: <ManageHistoryOutlinedIcon />, permission: 'attendance.view' },
+  { label: 'Imports', to: '/attendance/imports', icon: <InputOutlinedIcon />, permission: 'attendance.view' },
+  { label: 'Holidays', to: '/attendance/holidays', icon: <HailOutlinedIcon />, permission: 'attendance.view' },
+  { label: 'Status Types', to: '/attendance/status-types', icon: <PaletteOutlinedIcon />, permission: 'attendance.view' },
+  { label: 'Reports', to: '/attendance/reports', icon: <TimelineOutlinedIcon />, permission: 'attendance.view' },
+  { label: 'Summary', to: '/attendance/summary', icon: <EventAvailableOutlinedIcon />, permission: 'attendance.view' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -143,6 +161,10 @@ export function SidebarNav() {
     () => financeChildren.filter((item) => permissions.includes(item.permission)),
     [permissions],
   );
+  const visibleAttendanceChildren = useMemo(
+    () => attendanceChildren.filter((item) => permissions.includes(item.permission)),
+    [permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -158,11 +180,13 @@ export function SidebarNav() {
   const academicRouteActive = location.pathname.startsWith('/academic-management');
   const hrRouteActive = location.pathname.startsWith('/hr');
   const financeRouteActive = location.pathname.startsWith('/finance');
+  const attendanceRouteActive = location.pathname.startsWith('/attendance');
   const [sisOpen, setSisOpen] = useState(sisRouteActive);
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
   const [financeOpen, setFinanceOpen] = useState(financeRouteActive);
+  const [attendanceOpen, setAttendanceOpen] = useState(attendanceRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -188,6 +212,12 @@ export function SidebarNav() {
       setFinanceOpen(true);
     }
   }, [financeRouteActive]);
+
+  useEffect(() => {
+    if (attendanceRouteActive) {
+      setAttendanceOpen(true);
+    }
+  }, [attendanceRouteActive]);
 
   return (
     <Paper
@@ -227,7 +257,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleSisStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length ? (
+      {visibleSisStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -369,6 +399,40 @@ export function SidebarNav() {
                 <Collapse in={financeOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visibleFinanceChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleAttendanceChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setAttendanceOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: attendanceRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <AssignmentTurnedInOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Attendance" />
+                  {attendanceOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={attendanceOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleAttendanceChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import admissionReducer from '../features/admissions/store/admissionSlice';
+import attendanceReducer from '../features/attendance/store/attendanceSlice';
 import authReducer from '../features/auth/authSlice';
 import academicManagementReducer from '../features/academicManagement/store/academicManagementSlice';
 import enrollmentReducer from '../features/enrollments/store/enrollmentSlice';
@@ -12,6 +13,7 @@ export const store = configureStore({
   reducer: {
     admissions: admissionReducer,
     academicManagement: academicManagementReducer,
+    attendance: attendanceReducer,
     auth: authReducer,
     enrollments: enrollmentReducer,
     finance: financeReducer,

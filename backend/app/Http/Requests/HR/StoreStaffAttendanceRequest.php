@@ -3,7 +3,7 @@
 namespace App\Http\Requests\HR;
 
 use App\Enums\HR\AttendanceSource;
-use App\Enums\HR\AttendanceStatus;
+use App\Models\Attendance\AttendanceStatusType;
 use App\Models\HR\Staff;
 use App\Models\HR\StaffAttendance;
 use Illuminate\Foundation\Http\FormRequest;
@@ -39,7 +39,12 @@ class StoreStaffAttendanceRequest extends FormRequest
             ],
             'check_in_time' => ['nullable', 'date_format:H:i'],
             'check_out_time' => ['nullable', 'date_format:H:i', 'after:check_in_time'],
-            'attendance_status' => ['required', 'string', Rule::in(AttendanceStatus::values())],
+            'attendance_status' => ['nullable', 'string', 'max:50'],
+            'attendance_status_type_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('attendance_status_types', 'id')->where(fn ($query) => $query->where('school_id', $schoolId)),
+            ],
             'source' => ['nullable', 'string', Rule::in(AttendanceSource::values())],
             'remarks' => ['nullable', 'string'],
         ];
@@ -59,6 +64,18 @@ class StoreStaffAttendanceRequest extends FormRequest
 
             if (! $staffId || ! $attendanceDate || ! $schoolId) {
                 return;
+            }
+
+            if (! $this->filled('attendance_status') && ! $this->filled('attendance_status_type_id')) {
+                $validator->errors()->add('attendance_status', 'An attendance status is required.');
+            }
+
+            if ($this->filled('attendance_status_type_id')) {
+                $statusType = AttendanceStatusType::query()->find($this->integer('attendance_status_type_id'));
+
+                if (! $statusType || $statusType->school_id !== $schoolId) {
+                    $validator->errors()->add('attendance_status_type_id', 'The selected attendance status type is invalid for this tenant.');
+                }
             }
 
             $exists = StaffAttendance::query()

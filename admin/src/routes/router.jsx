@@ -61,6 +61,16 @@ const ExpensesPage = lazy(() => import('../features/finance/pages/ExpensesPage')
 const LedgerAccountsPage = lazy(() => import('../features/finance/pages/LedgerAccountsPage').then((module) => ({ default: module.LedgerAccountsPage })));
 const LedgerEntriesPage = lazy(() => import('../features/finance/pages/LedgerEntriesPage').then((module) => ({ default: module.LedgerEntriesPage })));
 const FinanceReportsPage = lazy(() => import('../features/finance/pages/FinanceReportsPage').then((module) => ({ default: module.FinanceReportsPage })));
+const StudentAttendanceDailyPage = lazy(() => import('../features/attendance/pages/StudentAttendanceDailyPage').then((module) => ({ default: module.StudentAttendanceDailyPage })));
+const StudentAttendancePeriodPage = lazy(() => import('../features/attendance/pages/StudentAttendancePeriodPage').then((module) => ({ default: module.StudentAttendancePeriodPage })));
+const AttendanceBulkMarkingPage = lazy(() => import('../features/attendance/pages/AttendanceBulkMarkingPage').then((module) => ({ default: module.AttendanceBulkMarkingPage })));
+const AttendanceStaffPage = lazy(() => import('../features/attendance/pages/AttendanceStaffPage').then((module) => ({ default: module.AttendanceStaffPage })));
+const AttendanceCorrectionsPage = lazy(() => import('../features/attendance/pages/AttendanceCorrectionsPage').then((module) => ({ default: module.AttendanceCorrectionsPage })));
+const AttendanceImportsPage = lazy(() => import('../features/attendance/pages/AttendanceImportsPage').then((module) => ({ default: module.AttendanceImportsPage })));
+const AttendanceHolidaysPage = lazy(() => import('../features/attendance/pages/AttendanceHolidaysPage').then((module) => ({ default: module.AttendanceHolidaysPage })));
+const AttendanceStatusTypesPage = lazy(() => import('../features/attendance/pages/AttendanceStatusTypesPage').then((module) => ({ default: module.AttendanceStatusTypesPage })));
+const AttendanceReportsPage = lazy(() => import('../features/attendance/pages/AttendanceReportsPage').then((module) => ({ default: module.AttendanceReportsPage })));
+const AttendanceSummaryPage = lazy(() => import('../features/attendance/pages/AttendanceSummaryPage').then((module) => ({ default: module.AttendanceSummaryPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -305,6 +315,46 @@ export const router = createBrowserRouter([
           {
             path: 'finance/reports',
             element: withSuspense(<FinanceReportsPage />),
+          },
+          {
+            path: 'attendance/student-daily',
+            element: withSuspense(<StudentAttendanceDailyPage />),
+          },
+          {
+            path: 'attendance/student-period',
+            element: withSuspense(<StudentAttendancePeriodPage />),
+          },
+          {
+            path: 'attendance/bulk-marking',
+            element: withSuspense(<AttendanceBulkMarkingPage />),
+          },
+          {
+            path: 'attendance/staff',
+            element: withSuspense(<AttendanceStaffPage />),
+          },
+          {
+            path: 'attendance/corrections',
+            element: withSuspense(<AttendanceCorrectionsPage />),
+          },
+          {
+            path: 'attendance/imports',
+            element: withSuspense(<AttendanceImportsPage />),
+          },
+          {
+            path: 'attendance/holidays',
+            element: withSuspense(<AttendanceHolidaysPage />),
+          },
+          {
+            path: 'attendance/status-types',
+            element: withSuspense(<AttendanceStatusTypesPage />),
+          },
+          {
+            path: 'attendance/reports',
+            element: withSuspense(<AttendanceReportsPage />),
+          },
+          {
+            path: 'attendance/summary',
+            element: withSuspense(<AttendanceSummaryPage />),
           },
         ],
       },

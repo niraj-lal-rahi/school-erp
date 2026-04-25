@@ -8,6 +8,7 @@ use App\Models\AcademicManagement\Curriculum;
 use App\Models\AcademicManagement\HomeworkAssignment;
 use App\Models\AcademicManagement\LessonPlan;
 use App\Models\AcademicManagement\TeacherAssignment;
+use App\Models\Attendance\StudentAttendanceSession;
 use App\Models\Concerns\BelongsToSchool;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -74,5 +75,10 @@ class SchoolClass extends Model
     public function academicCalendarEvents(): HasMany
     {
         return $this->hasMany(AcademicCalendarEvent::class);
+    }
+
+    public function attendanceSessions(): HasMany
+    {
+        return $this->hasMany(StudentAttendanceSession::class);
     }
 }

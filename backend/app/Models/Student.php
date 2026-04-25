@@ -7,6 +7,7 @@ use App\Models\Finance\FeeInvoice;
 use App\Models\Finance\Payment;
 use App\Models\Finance\Receipt;
 use App\Models\Finance\StudentFeeAssignment;
+use App\Models\Attendance\StudentAttendanceRecord;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -117,6 +118,11 @@ class Student extends Model
     public function receipts(): HasMany
     {
         return $this->hasMany(Receipt::class);
+    }
+
+    public function attendanceRecords(): HasMany
+    {
+        return $this->hasMany(StudentAttendanceRecord::class);
     }
 
     public function enrollments(): HasMany
