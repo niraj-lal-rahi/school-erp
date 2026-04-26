@@ -81,6 +81,16 @@ const RoomScheduleViewPage = lazy(() => import('../features/timetable/pages/Room
 const ConflictCheckerPage = lazy(() => import('../features/timetable/pages/ConflictCheckerPage').then((module) => ({ default: module.ConflictCheckerPage })));
 const SubstitutionsPage = lazy(() => import('../features/timetable/pages/SubstitutionsPage').then((module) => ({ default: module.SubstitutionsPage })));
 const ScheduleExceptionsPage = lazy(() => import('../features/timetable/pages/ScheduleExceptionsPage').then((module) => ({ default: module.ScheduleExceptionsPage })));
+const TransportVehiclesPage = lazy(() => import('../features/transport/pages/VehiclesPage').then((module) => ({ default: module.VehiclesPage })));
+const TransportDriversPage = lazy(() => import('../features/transport/pages/DriversPage').then((module) => ({ default: module.DriversPage })));
+const TransportRoutesPage = lazy(() => import('../features/transport/pages/RoutesPage').then((module) => ({ default: module.RoutesPage })));
+const TransportStopsPage = lazy(() => import('../features/transport/pages/StopsPage').then((module) => ({ default: module.StopsPage })));
+const TransportAllocationsPage = lazy(() => import('../features/transport/pages/AllocationsPage').then((module) => ({ default: module.AllocationsPage })));
+const TransportTripsPage = lazy(() => import('../features/transport/pages/TripsPage').then((module) => ({ default: module.TripsPage })));
+const TransportTrackingPage = lazy(() => import('../features/transport/pages/TrackingPage').then((module) => ({ default: module.TrackingPage })));
+const TransportMaintenancePage = lazy(() => import('../features/transport/pages/MaintenancePage').then((module) => ({ default: module.MaintenancePage })));
+const TransportFuelLogsPage = lazy(() => import('../features/transport/pages/FuelLogsPage').then((module) => ({ default: module.FuelLogsPage })));
+const TransportReportsPage = lazy(() => import('../features/transport/pages/ReportsPage').then((module) => ({ default: module.ReportsPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -405,6 +415,46 @@ export const router = createBrowserRouter([
           {
             path: 'timetable/exceptions',
             element: withSuspense(<ScheduleExceptionsPage />),
+          },
+          {
+            path: 'transport/vehicles',
+            element: withSuspense(<TransportVehiclesPage />),
+          },
+          {
+            path: 'transport/drivers',
+            element: withSuspense(<TransportDriversPage />),
+          },
+          {
+            path: 'transport/routes',
+            element: withSuspense(<TransportRoutesPage />),
+          },
+          {
+            path: 'transport/stops',
+            element: withSuspense(<TransportStopsPage />),
+          },
+          {
+            path: 'transport/allocations',
+            element: withSuspense(<TransportAllocationsPage />),
+          },
+          {
+            path: 'transport/trips',
+            element: withSuspense(<TransportTripsPage />),
+          },
+          {
+            path: 'transport/tracking',
+            element: withSuspense(<TransportTrackingPage />),
+          },
+          {
+            path: 'transport/maintenance',
+            element: withSuspense(<TransportMaintenancePage />),
+          },
+          {
+            path: 'transport/fuel-logs',
+            element: withSuspense(<TransportFuelLogsPage />),
+          },
+          {
+            path: 'transport/reports',
+            element: withSuspense(<TransportReportsPage />),
           },
         ],
       },

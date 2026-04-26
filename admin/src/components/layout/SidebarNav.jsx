@@ -30,6 +30,11 @@ import HailOutlinedIcon from '@mui/icons-material/HailOutlined';
 import InputOutlinedIcon from '@mui/icons-material/InputOutlined';
 import ManageHistoryOutlinedIcon from '@mui/icons-material/ManageHistoryOutlined';
 import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
+import DirectionsBusFilledOutlinedIcon from '@mui/icons-material/DirectionsBusFilledOutlined';
+import RouteOutlinedIcon from '@mui/icons-material/RouteOutlined';
+import PinDropOutlinedIcon from '@mui/icons-material/PinDropOutlined';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import LocalGasStationOutlinedIcon from '@mui/icons-material/LocalGasStationOutlined';
 import ViewWeekOutlinedIcon from '@mui/icons-material/ViewWeekOutlined';
 import {
   Collapse,
@@ -138,6 +143,19 @@ const timetableChildren = [
   { label: 'Schedule Exceptions', to: '/timetable/exceptions', icon: <CalendarMonthOutlinedIcon />, permission: 'timetable.view' },
 ];
 
+const transportChildren = [
+  { label: 'Vehicles', to: '/transport/vehicles', icon: <DirectionsBusFilledOutlinedIcon />, permission: 'transport.view' },
+  { label: 'Drivers', to: '/transport/drivers', icon: <BadgeOutlinedIcon />, permission: 'transport.view' },
+  { label: 'Routes', to: '/transport/routes', icon: <RouteOutlinedIcon />, permission: 'transport.view' },
+  { label: 'Stops', to: '/transport/stops', icon: <PinDropOutlinedIcon />, permission: 'transport.view' },
+  { label: 'Allocations', to: '/transport/allocations', icon: <PeopleAltOutlinedIcon />, permission: 'transport.view' },
+  { label: 'Trips', to: '/transport/trips', icon: <TodayOutlinedIcon />, permission: 'transport.view' },
+  { label: 'Tracking', to: '/transport/tracking', icon: <LocationOnOutlinedIcon />, permission: 'transport.view' },
+  { label: 'Maintenance', to: '/transport/maintenance', icon: <ManageHistoryOutlinedIcon />, permission: 'transport.view' },
+  { label: 'Fuel Logs', to: '/transport/fuel-logs', icon: <LocalGasStationOutlinedIcon />, permission: 'transport.view' },
+  { label: 'Reports', to: '/transport/reports', icon: <TimelineOutlinedIcon />, permission: 'transport.view' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -184,6 +202,10 @@ export function SidebarNav() {
     () => timetableChildren.filter((item) => permissions.includes(item.permission)),
     [permissions],
   );
+  const visibleTransportChildren = useMemo(
+    () => transportChildren.filter((item) => permissions.includes(item.permission)),
+    [permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -201,12 +223,14 @@ export function SidebarNav() {
   const financeRouteActive = location.pathname.startsWith('/finance');
   const attendanceRouteActive = location.pathname.startsWith('/attendance');
   const timetableRouteActive = location.pathname.startsWith('/timetable');
+  const transportRouteActive = location.pathname.startsWith('/transport');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
   const [financeOpen, setFinanceOpen] = useState(financeRouteActive);
   const [attendanceOpen, setAttendanceOpen] = useState(attendanceRouteActive);
   const [timetableOpen, setTimetableOpen] = useState(timetableRouteActive);
+  const [transportOpen, setTransportOpen] = useState(transportRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -243,6 +267,12 @@ export function SidebarNav() {
       setTimetableOpen(true);
     }
   }, [timetableRouteActive]);
+
+  useEffect(() => {
+    if (transportRouteActive) {
+      setTransportOpen(true);
+    }
+  }, [transportRouteActive]);
 
   return (
     <Paper
@@ -282,7 +312,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -474,6 +504,40 @@ export function SidebarNav() {
                 <Collapse in={timetableOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visibleTimetableChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleTransportChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setTransportOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: transportRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <DirectionsBusFilledOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Transport" />
+                  {transportOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={transportOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleTransportChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

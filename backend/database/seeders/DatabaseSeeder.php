@@ -12,6 +12,7 @@ use Database\Seeders\HR\HrSeeder;
 use Database\Seeders\SIS\SisSeeder;
 use Database\Seeders\Tenant\TenantSeeder;
 use Database\Seeders\Timetable\TimetableSeeder;
+use Database\Seeders\Transport\TransportSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -35,6 +36,7 @@ class DatabaseSeeder extends Seeder
             SisSeeder::class,
             FinanceSeeder::class,
             AttendanceSeeder::class,
+            TransportSeeder::class,
         ]);
     }
 }

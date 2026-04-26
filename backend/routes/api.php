@@ -82,6 +82,15 @@ use App\Http\Controllers\Api\V1\Timetable\TimetableScheduleExceptionController;
 use App\Http\Controllers\Api\V1\Timetable\TimetableSubstitutionController;
 use App\Http\Controllers\Api\V1\Timetable\TimetableVersionController;
 use App\Http\Controllers\Api\V1\Timetable\TimetableViewController;
+use App\Http\Controllers\Api\V1\Transport\AllocationController;
+use App\Http\Controllers\Api\V1\Transport\DriverController;
+use App\Http\Controllers\Api\V1\Transport\FuelController;
+use App\Http\Controllers\Api\V1\Transport\GpsController;
+use App\Http\Controllers\Api\V1\Transport\MaintenanceController;
+use App\Http\Controllers\Api\V1\Transport\RouteController;
+use App\Http\Controllers\Api\V1\Transport\RouteStopController;
+use App\Http\Controllers\Api\V1\Transport\TripController;
+use App\Http\Controllers\Api\V1\Transport\VehicleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -603,6 +612,83 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('/class-attendance', [AttendanceReportController::class, 'classAttendance'])->middleware('permission:attendance.view');
                 Route::get('/defaulters', [AttendanceReportController::class, 'defaulters'])->middleware('permission:attendance.view');
             });
+        });
+
+        Route::prefix('transport')->group(function (): void {
+            Route::get('/vehicles', [VehicleController::class, 'index'])->middleware('permission:transport.view');
+            Route::post('/vehicles', [VehicleController::class, 'store'])->middleware('permission:transport.manage');
+            Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show'])->middleware('permission:transport.view');
+            Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update'])->middleware('permission:transport.manage');
+            Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])->middleware('permission:transport.manage');
+            Route::get('/vehicles/{vehicle}/location', [VehicleController::class, 'location'])->middleware('permission:transport.view');
+
+            Route::get('/drivers', [DriverController::class, 'index'])->middleware('permission:transport.view');
+            Route::post('/drivers', [DriverController::class, 'store'])->middleware('permission:transport.manage');
+            Route::get('/drivers/{driver}', [DriverController::class, 'show'])->middleware('permission:transport.view');
+            Route::put('/drivers/{driver}', [DriverController::class, 'update'])->middleware('permission:transport.manage');
+            Route::delete('/drivers/{driver}', [DriverController::class, 'destroy'])->middleware('permission:transport.manage');
+
+            Route::get('/routes', [RouteController::class, 'index'])->middleware('permission:transport.view');
+            Route::post('/routes', [RouteController::class, 'store'])->middleware('permission:transport.manage');
+            Route::get('/routes/{route}', [RouteController::class, 'show'])->middleware('permission:transport.view');
+            Route::put('/routes/{route}', [RouteController::class, 'update'])->middleware('permission:transport.manage');
+            Route::delete('/routes/{route}', [RouteController::class, 'destroy'])->middleware('permission:transport.manage');
+
+            Route::get('/route-stops', [RouteStopController::class, 'index'])->middleware('permission:transport.view');
+            Route::post('/route-stops', [RouteStopController::class, 'store'])->middleware('permission:transport.manage');
+            Route::get('/route-stops/{routeStop}', [RouteStopController::class, 'show'])->middleware('permission:transport.view');
+            Route::put('/route-stops/{routeStop}', [RouteStopController::class, 'update'])->middleware('permission:transport.manage');
+            Route::delete('/route-stops/{routeStop}', [RouteStopController::class, 'destroy'])->middleware('permission:transport.manage');
+            Route::get('/routes/{route}/stops', [RouteStopController::class, 'routeStops'])->middleware('permission:transport.view');
+
+            Route::get('/route-vehicle-assignments', [RouteController::class, 'assignmentIndex'])->middleware('permission:transport.view');
+            Route::post('/route-vehicle-assignments', [RouteController::class, 'assignmentStore'])->middleware('permission:transport.manage');
+            Route::get('/route-vehicle-assignments/{assignment}', [RouteController::class, 'assignmentShow'])->middleware('permission:transport.view');
+            Route::put('/route-vehicle-assignments/{assignment}', [RouteController::class, 'assignmentUpdate'])->middleware('permission:transport.manage');
+            Route::delete('/route-vehicle-assignments/{assignment}', [RouteController::class, 'assignmentDestroy'])->middleware('permission:transport.manage');
+
+            Route::get('/student-allocations', [AllocationController::class, 'studentIndex'])->middleware('permission:transport.view');
+            Route::post('/student-allocations', [AllocationController::class, 'studentStore'])->middleware('permission:transport.manage');
+            Route::get('/student-allocations/{allocation}', [AllocationController::class, 'studentShow'])->middleware('permission:transport.view');
+            Route::put('/student-allocations/{allocation}', [AllocationController::class, 'studentUpdate'])->middleware('permission:transport.manage');
+            Route::delete('/student-allocations/{allocation}', [AllocationController::class, 'studentDestroy'])->middleware('permission:transport.manage');
+
+            Route::get('/staff-allocations', [AllocationController::class, 'staffIndex'])->middleware('permission:transport.view');
+            Route::post('/staff-allocations', [AllocationController::class, 'staffStore'])->middleware('permission:transport.manage');
+            Route::get('/staff-allocations/{allocation}', [AllocationController::class, 'staffShow'])->middleware('permission:transport.view');
+            Route::put('/staff-allocations/{allocation}', [AllocationController::class, 'staffUpdate'])->middleware('permission:transport.manage');
+            Route::delete('/staff-allocations/{allocation}', [AllocationController::class, 'staffDestroy'])->middleware('permission:transport.manage');
+
+            Route::get('/trips', [TripController::class, 'index'])->middleware('permission:transport.view');
+            Route::post('/trips', [TripController::class, 'store'])->middleware('permission:transport.manage');
+            Route::get('/trips/{trip}', [TripController::class, 'show'])->middleware('permission:transport.view');
+            Route::put('/trips/{trip}', [TripController::class, 'update'])->middleware('permission:transport.manage');
+            Route::delete('/trips/{trip}', [TripController::class, 'destroy'])->middleware('permission:transport.manage');
+            Route::post('/trips/{trip}/start', [TripController::class, 'start'])->middleware('permission:transport.manage');
+            Route::post('/trips/{trip}/complete', [TripController::class, 'complete'])->middleware('permission:transport.manage');
+            Route::post('/trips/{trip}/cancel', [TripController::class, 'cancel'])->middleware('permission:transport.manage');
+            Route::post('/trips/{trip}/mark-boarded', [TripController::class, 'markBoarded'])->middleware('permission:transport.manage');
+            Route::post('/trips/{trip}/mark-dropped', [TripController::class, 'markDropped'])->middleware('permission:transport.manage');
+            Route::get('/trip-logs', [TripController::class, 'logs'])->middleware('permission:transport.view');
+
+            Route::get('/maintenance', [MaintenanceController::class, 'index'])->middleware('permission:transport.view');
+            Route::post('/maintenance', [MaintenanceController::class, 'store'])->middleware('permission:transport.manage');
+            Route::get('/maintenance/{maintenance}', [MaintenanceController::class, 'show'])->middleware('permission:transport.view');
+            Route::put('/maintenance/{maintenance}', [MaintenanceController::class, 'update'])->middleware('permission:transport.manage');
+            Route::delete('/maintenance/{maintenance}', [MaintenanceController::class, 'destroy'])->middleware('permission:transport.manage');
+
+            Route::get('/fuel-logs', [FuelController::class, 'index'])->middleware('permission:transport.view');
+            Route::post('/fuel-logs', [FuelController::class, 'store'])->middleware('permission:transport.manage');
+            Route::get('/fuel-logs/{fuel}', [FuelController::class, 'show'])->middleware('permission:transport.view');
+            Route::put('/fuel-logs/{fuel}', [FuelController::class, 'update'])->middleware('permission:transport.manage');
+            Route::delete('/fuel-logs/{fuel}', [FuelController::class, 'destroy'])->middleware('permission:transport.manage');
+
+            Route::get('/gps-logs', [GpsController::class, 'index'])->middleware('permission:transport.view');
+            Route::post('/gps-logs', [GpsController::class, 'store'])->middleware('permission:transport.manage');
+            Route::get('/gps-logs/{gps}', [GpsController::class, 'show'])->middleware('permission:transport.view');
+            Route::get('/vehicle-location/{vehicle}', [GpsController::class, 'vehicleLocation'])->middleware('permission:transport.view');
+
+            Route::get('/reports', [TripController::class, 'reports'])->middleware('permission:transport.view');
         });
     });
 });

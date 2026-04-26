@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -55,10 +56,12 @@ return new class extends Migration
     {
         Schema::dropIfExists('student_medical_records');
 
+        $this->ensureIndexExists('student_documents', 'student_documents_school_id_tmp_idx', ['school_id']);
+        $this->dropIndexIfExists('student_documents', 'student_documents_school_id_student_id_index');
+        $this->dropIndexIfExists('student_documents', 'student_documents_school_id_document_type_index');
+        $this->dropIndexIfExists('student_documents', 'student_documents_school_id_verification_status_index');
+
         Schema::table('student_documents', function (Blueprint $table) {
-            $table->dropIndex(['school_id', 'student_id']);
-            $table->dropIndex(['school_id', 'document_type']);
-            $table->dropIndex(['school_id', 'verification_status']);
             $table->dropSoftDeletes();
             $table->dropColumn([
                 'file_name',
@@ -71,5 +74,36 @@ return new class extends Migration
                 'remarks',
             ]);
         });
+    }
+
+    protected function ensureIndexExists(string $tableName, string $indexName, array $columns): void
+    {
+        if ($this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($columns, $indexName): void {
+            $table->index($columns, $indexName);
+        });
+    }
+
+    protected function dropIndexIfExists(string $tableName, string $indexName): void
+    {
+        if (! $this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($indexName): void {
+            $table->dropIndex($indexName);
+        });
+    }
+
+    protected function indexExists(string $tableName, string $indexName): bool
+    {
+        return DB::table('information_schema.STATISTICS')
+            ->where('TABLE_SCHEMA', DB::getDatabaseName())
+            ->where('TABLE_NAME', $tableName)
+            ->where('INDEX_NAME', $indexName)
+            ->exists();
     }
 };

@@ -9,6 +9,7 @@ import hrReducer from '../features/hr/store/hrSlice';
 import masterDataReducer from '../features/masterData/store/masterDataSlice';
 import studentsReducer from '../features/students/store/studentSlice';
 import timetableReducer from '../features/timetable/store/timetableSlice';
+import transportReducer from '../features/transport/store/transportSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,5 +23,6 @@ export const store = configureStore({
     masterData: masterDataReducer,
     students: studentsReducer,
     timetable: timetableReducer,
+    transport: transportReducer,
   },
 });

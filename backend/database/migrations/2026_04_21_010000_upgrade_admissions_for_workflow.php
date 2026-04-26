@@ -84,10 +84,12 @@ return new class extends Migration
 
     public function down(): void
     {
+        $this->ensureIndexExists('admissions', 'admissions_school_id_tmp_idx', ['school_id']);
+        $this->dropUniqueIfExists('admissions', 'admissions_school_id_application_no_unique');
+        $this->dropIndexIfExists('admissions', 'admissions_school_id_application_status_index');
+        $this->dropIndexIfExists('admissions', 'admissions_school_id_academic_year_id_index');
+
         Schema::table('admissions', function (Blueprint $table) {
-            $table->dropUnique(['school_id', 'application_no']);
-            $table->dropIndex(['school_id', 'application_status']);
-            $table->dropIndex(['school_id', 'academic_year_id']);
             $table->dropConstrainedForeignId('reviewed_by');
             $table->dropConstrainedForeignId('section_id');
             $table->dropSoftDeletes();
@@ -114,5 +116,47 @@ return new class extends Migration
                 'reviewed_at',
             ]);
         });
+    }
+
+    protected function dropUniqueIfExists(string $tableName, string $indexName): void
+    {
+        if (! $this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($indexName): void {
+            $table->dropUnique($indexName);
+        });
+    }
+
+    protected function ensureIndexExists(string $tableName, string $indexName, array $columns): void
+    {
+        if ($this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($columns, $indexName): void {
+            $table->index($columns, $indexName);
+        });
+    }
+
+    protected function dropIndexIfExists(string $tableName, string $indexName): void
+    {
+        if (! $this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($indexName): void {
+            $table->dropIndex($indexName);
+        });
+    }
+
+    protected function indexExists(string $tableName, string $indexName): bool
+    {
+        return DB::table('information_schema.STATISTICS')
+            ->where('TABLE_SCHEMA', DB::getDatabaseName())
+            ->where('TABLE_NAME', $tableName)
+            ->where('INDEX_NAME', $indexName)
+            ->exists();
     }
 };

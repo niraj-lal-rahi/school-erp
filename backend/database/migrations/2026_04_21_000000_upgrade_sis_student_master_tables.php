@@ -109,61 +109,121 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('student_guardian', function (Blueprint $table) {
-            $table->dropIndex(['school_id', 'guardian_id']);
-            $table->dropColumn(['relationship_label', 'financial_responsibility_percentage', 'notes']);
-        });
+        $this->ensureIndexExists('student_guardian', 'student_guardian_school_id_tmp_idx', ['school_id']);
+        $this->dropIndexIfExists('student_guardian', 'student_guardian_school_id_guardian_id_index');
+
+        $this->dropColumnsIfExist('student_guardian', [
+            'relationship_label',
+            'financial_responsibility_percentage',
+            'notes',
+        ]);
+
+        $this->ensureIndexExists('guardians', 'guardians_school_id_tmp_idx', ['school_id']);
+        $this->dropIndexIfExists('guardians', 'guardians_school_id_status_index');
 
         Schema::table('guardians', function (Blueprint $table) {
-            $table->dropIndex(['school_id', 'status']);
-            $table->dropSoftDeletes();
-            $table->dropColumn([
-                'middle_name',
-                'full_name',
-                'alternate_phone',
-                'annual_income',
-                'education',
-                'aadhaar_no',
-                'national_id',
-                'photo_path',
-                'is_primary',
-                'can_receive_sms',
-                'can_receive_email',
-                'can_pickup_student',
-                'address_line1',
-                'address_line2',
-                'city',
-                'state',
-                'country',
-                'postal_code',
-                'notes',
-                'status',
-            ]);
+            if (Schema::hasColumn('guardians', 'deleted_at')) {
+                $table->dropSoftDeletes();
+            }
         });
 
+        $this->dropColumnsIfExist('guardians', [
+            'middle_name',
+            'full_name',
+            'alternate_phone',
+            'annual_income',
+            'education',
+            'aadhaar_no',
+            'national_id',
+            'photo_path',
+            'is_primary',
+            'can_receive_sms',
+            'can_receive_email',
+            'can_pickup_student',
+            'address_line1',
+            'address_line2',
+            'city',
+            'state',
+            'country',
+            'postal_code',
+            'notes',
+            'status',
+        ]);
+
+        $this->ensureIndexExists('students', 'students_school_id_tmp_idx', ['school_id']);
+        $this->dropIndexIfExists('students', 'students_school_id_current_status_index');
+        $this->dropIndexIfExists('students', 'students_school_id_category_id_index');
+        $this->dropIndexIfExists('students', 'students_school_id_house_id_index');
+
         Schema::table('students', function (Blueprint $table) {
-            $table->dropIndex(['school_id', 'current_status']);
-            $table->dropIndex(['school_id', 'category_id']);
-            $table->dropIndex(['school_id', 'house_id']);
-            $table->dropConstrainedForeignId('created_by');
-            $table->dropConstrainedForeignId('updated_by');
-            $table->dropConstrainedForeignId('category_id');
-            $table->dropConstrainedForeignId('house_id');
-            $table->dropSoftDeletes();
-            $table->dropColumn([
-                'middle_name',
-                'full_name',
-                'roll_no',
-                'aadhaar_no',
-                'national_id',
-                'religion',
-                'current_status',
-                'joining_date',
-                'notes',
-            ]);
+            foreach (['created_by', 'updated_by', 'category_id', 'house_id'] as $column) {
+                if (Schema::hasColumn('students', $column)) {
+                    $table->dropConstrainedForeignId($column);
+                }
+            }
+
+            if (Schema::hasColumn('students', 'deleted_at')) {
+                $table->dropSoftDeletes();
+            }
         });
+
+        $this->dropColumnsIfExist('students', [
+            'middle_name',
+            'full_name',
+            'roll_no',
+            'aadhaar_no',
+            'national_id',
+            'religion',
+            'current_status',
+            'joining_date',
+            'notes',
+        ]);
 
         Schema::dropIfExists('student_houses');
         Schema::dropIfExists('student_categories');
+    }
+
+    protected function ensureIndexExists(string $tableName, string $indexName, array $columns): void
+    {
+        if ($this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($columns, $indexName): void {
+            $table->index($columns, $indexName);
+        });
+    }
+
+    protected function dropIndexIfExists(string $tableName, string $indexName): void
+    {
+        if (! $this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($indexName): void {
+            $table->dropIndex($indexName);
+        });
+    }
+
+    protected function indexExists(string $tableName, string $indexName): bool
+    {
+        return DB::table('information_schema.STATISTICS')
+            ->where('TABLE_SCHEMA', DB::getDatabaseName())
+            ->where('TABLE_NAME', $tableName)
+            ->where('INDEX_NAME', $indexName)
+            ->exists();
+    }
+
+    protected function dropColumnsIfExist(string $tableName, array $columns): void
+    {
+        $existing = array_values(array_filter($columns, fn (string $column): bool => Schema::hasColumn($tableName, $column)));
+
+        if ($existing === []) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($existing): void {
+            $table->dropColumn($existing);
+        });
     }
 };

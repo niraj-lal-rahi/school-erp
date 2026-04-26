@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Transport\StudentTransportAllocation;
+use App\Models\Transport\TransportTripLog;
 
 class Student extends Model
 {
@@ -123,6 +125,16 @@ class Student extends Model
     public function attendanceRecords(): HasMany
     {
         return $this->hasMany(StudentAttendanceRecord::class);
+    }
+
+    public function transportAllocations(): HasMany
+    {
+        return $this->hasMany(StudentTransportAllocation::class, 'student_id');
+    }
+
+    public function transportTripLogs(): HasMany
+    {
+        return $this->hasMany(TransportTripLog::class, 'student_id');
     }
 
     public function enrollments(): HasMany

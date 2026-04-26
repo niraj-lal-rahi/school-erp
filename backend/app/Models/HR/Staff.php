@@ -8,6 +8,9 @@ use App\Models\AcademicManagement\TeacherAssignment;
 use App\Models\Concerns\BelongsToSchool;
 use App\Models\Timetable\TimetableEntry;
 use App\Models\Timetable\TimetableSubstitution;
+use App\Models\Transport\StaffTransportAllocation;
+use App\Models\Transport\TransportDriver;
+use App\Models\Transport\TransportTripLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -168,5 +171,20 @@ class Staff extends Model
     public function substituteAssignments(): HasMany
     {
         return $this->hasMany(TimetableSubstitution::class, 'substitute_staff_id');
+    }
+
+    public function transportDriverProfiles(): HasMany
+    {
+        return $this->hasMany(TransportDriver::class, 'staff_id');
+    }
+
+    public function transportAllocations(): HasMany
+    {
+        return $this->hasMany(StaffTransportAllocation::class, 'staff_id');
+    }
+
+    public function transportTripLogs(): HasMany
+    {
+        return $this->hasMany(TransportTripLog::class, 'staff_id');
     }
 }

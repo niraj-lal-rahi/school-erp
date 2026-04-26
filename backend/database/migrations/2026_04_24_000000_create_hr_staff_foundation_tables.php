@@ -104,9 +104,7 @@ return new class extends Migration
         }
 
         foreach (['teacher_assignments', 'lesson_plans', 'homework_assignments'] as $tableName) {
-            Schema::table($tableName, function (Blueprint $table): void {
-                $table->dropForeign(['staff_id']);
-            });
+            $this->dropForeignIfExists($tableName, 'staff_id');
         }
 
         $userIds = collect(
@@ -185,17 +183,45 @@ return new class extends Migration
             ->pluck('user_id', 'id');
 
         foreach (['teacher_assignments', 'lesson_plans', 'homework_assignments'] as $tableName) {
-            Schema::table($tableName, function (Blueprint $table): void {
-                $table->dropForeign(['staff_id']);
-            });
+            $this->dropForeignIfExists($tableName, 'staff_id');
 
             foreach ($mapping as $staffId => $userId) {
                 DB::table($tableName)->where('staff_id', $staffId)->update(['staff_id' => $userId]);
+            }
+
+            // Rollback targets the pre-HR schema where these references pointed to users.
+            // Any rows still holding HR-only staff ids cannot satisfy that older FK, so we
+            // remove them here to keep migrate:refresh deterministic on MySQL.
+            $validUserIds = DB::table('users')->pluck('id')->all();
+            if ($validUserIds === []) {
+                DB::table($tableName)->delete();
+            } else {
+                DB::table($tableName)->whereNotIn('staff_id', $validUserIds)->delete();
             }
 
             Schema::table($tableName, function (Blueprint $table): void {
                 $table->foreign('staff_id')->references('id')->on('users')->cascadeOnDelete();
             });
         }
+    }
+
+    protected function dropForeignIfExists(string $tableName, string $column): void
+    {
+        $databaseName = DB::getDatabaseName();
+
+        $constraint = DB::table('information_schema.KEY_COLUMN_USAGE')
+            ->where('TABLE_SCHEMA', $databaseName)
+            ->where('TABLE_NAME', $tableName)
+            ->where('COLUMN_NAME', $column)
+            ->whereNotNull('REFERENCED_TABLE_NAME')
+            ->value('CONSTRAINT_NAME');
+
+        if (! $constraint) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($constraint): void {
+            $table->dropForeign($constraint);
+        });
     }
 };
