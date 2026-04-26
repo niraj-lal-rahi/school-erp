@@ -91,6 +91,18 @@ const TransportTrackingPage = lazy(() => import('../features/transport/pages/Tra
 const TransportMaintenancePage = lazy(() => import('../features/transport/pages/MaintenancePage').then((module) => ({ default: module.MaintenancePage })));
 const TransportFuelLogsPage = lazy(() => import('../features/transport/pages/FuelLogsPage').then((module) => ({ default: module.FuelLogsPage })));
 const TransportReportsPage = lazy(() => import('../features/transport/pages/ReportsPage').then((module) => ({ default: module.ReportsPage })));
+const AnnouncementsPage = lazy(() => import('../features/communication/pages/AnnouncementsPage').then((module) => ({ default: module.AnnouncementsPage })));
+const CreateAnnouncementPage = lazy(() => import('../features/communication/pages/CreateAnnouncementPage').then((module) => ({ default: module.CreateAnnouncementPage })));
+const NoticesCircularsPage = lazy(() => import('../features/communication/pages/NoticesCircularsPage').then((module) => ({ default: module.NoticesCircularsPage })));
+const MessageInboxPage = lazy(() => import('../features/communication/pages/MessageInboxPage').then((module) => ({ default: module.MessageInboxPage })));
+const ConversationViewPage = lazy(() => import('../features/communication/pages/ConversationViewPage').then((module) => ({ default: module.ConversationViewPage })));
+const SendMessagePage = lazy(() => import('../features/communication/pages/SendMessagePage').then((module) => ({ default: module.SendMessagePage })));
+const MessageTemplatesPage = lazy(() => import('../features/communication/pages/MessageTemplatesPage').then((module) => ({ default: module.MessageTemplatesPage })));
+const ScheduledMessagesPage = lazy(() => import('../features/communication/pages/ScheduledMessagesPage').then((module) => ({ default: module.ScheduledMessagesPage })));
+const CommunicationGroupsPage = lazy(() => import('../features/communication/pages/CommunicationGroupsPage').then((module) => ({ default: module.CommunicationGroupsPage })));
+const NotificationLogsPage = lazy(() => import('../features/communication/pages/NotificationLogsPage').then((module) => ({ default: module.NotificationLogsPage })));
+const NotificationPreferencesPage = lazy(() => import('../features/communication/pages/NotificationPreferencesPage').then((module) => ({ default: module.NotificationPreferencesPage })));
+const CommunicationReportsPage = lazy(() => import('../features/communication/pages/CommunicationReportsPage').then((module) => ({ default: module.CommunicationReportsPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -455,6 +467,54 @@ export const router = createBrowserRouter([
           {
             path: 'transport/reports',
             element: withSuspense(<TransportReportsPage />),
+          },
+          {
+            path: 'communication/announcements',
+            element: withSuspense(<AnnouncementsPage />),
+          },
+          {
+            path: 'communication/announcements/new',
+            element: withSuspense(<CreateAnnouncementPage />),
+          },
+          {
+            path: 'communication/notices',
+            element: withSuspense(<NoticesCircularsPage />),
+          },
+          {
+            path: 'communication/messages',
+            element: withSuspense(<MessageInboxPage />),
+          },
+          {
+            path: 'communication/conversations',
+            element: withSuspense(<ConversationViewPage />),
+          },
+          {
+            path: 'communication/send',
+            element: withSuspense(<SendMessagePage />),
+          },
+          {
+            path: 'communication/templates',
+            element: withSuspense(<MessageTemplatesPage />),
+          },
+          {
+            path: 'communication/scheduled',
+            element: withSuspense(<ScheduledMessagesPage />),
+          },
+          {
+            path: 'communication/groups',
+            element: withSuspense(<CommunicationGroupsPage />),
+          },
+          {
+            path: 'communication/notifications',
+            element: withSuspense(<NotificationLogsPage />),
+          },
+          {
+            path: 'communication/preferences',
+            element: withSuspense(<NotificationPreferencesPage />),
+          },
+          {
+            path: 'communication/reports',
+            element: withSuspense(<CommunicationReportsPage />),
           },
         ],
       },

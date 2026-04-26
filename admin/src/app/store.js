@@ -3,6 +3,7 @@ import admissionReducer from '../features/admissions/store/admissionSlice';
 import attendanceReducer from '../features/attendance/store/attendanceSlice';
 import authReducer from '../features/auth/authSlice';
 import academicManagementReducer from '../features/academicManagement/store/academicManagementSlice';
+import communicationReducer from '../features/communication/store/communicationSlice';
 import enrollmentReducer from '../features/enrollments/store/enrollmentSlice';
 import financeReducer from '../features/finance/store/financeSlice';
 import hrReducer from '../features/hr/store/hrSlice';
@@ -18,6 +19,7 @@ export const store = configureStore({
     attendance: attendanceReducer,
     auth: authReducer,
     enrollments: enrollmentReducer,
+    communication: communicationReducer,
     finance: financeReducer,
     hr: hrReducer,
     masterData: masterDataReducer,

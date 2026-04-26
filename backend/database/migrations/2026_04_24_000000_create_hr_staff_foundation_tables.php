@@ -207,6 +207,10 @@ return new class extends Migration
 
     protected function dropForeignIfExists(string $tableName, string $column): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         $databaseName = DB::getDatabaseName();
 
         $constraint = DB::table('information_schema.KEY_COLUMN_USAGE')

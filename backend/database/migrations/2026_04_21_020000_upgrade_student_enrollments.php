@@ -68,6 +68,10 @@ return new class extends Migration
 
     protected function indexExists(string $tableName, string $indexName): bool
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return false;
+        }
+
         return DB::table('information_schema.STATISTICS')
             ->where('TABLE_SCHEMA', DB::getDatabaseName())
             ->where('TABLE_NAME', $tableName)

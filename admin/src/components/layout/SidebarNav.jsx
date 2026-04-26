@@ -36,6 +36,10 @@ import PinDropOutlinedIcon from '@mui/icons-material/PinDropOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import LocalGasStationOutlinedIcon from '@mui/icons-material/LocalGasStationOutlined';
 import ViewWeekOutlinedIcon from '@mui/icons-material/ViewWeekOutlined';
+import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
+import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined';
 import {
   Collapse,
   Divider,
@@ -156,6 +160,21 @@ const transportChildren = [
   { label: 'Reports', to: '/transport/reports', icon: <TimelineOutlinedIcon />, permission: 'transport.view' },
 ];
 
+const communicationChildren = [
+  { label: 'Announcements', to: '/communication/announcements', icon: <CampaignOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Create Announcement', to: '/communication/announcements/new', icon: <PersonAddAltOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Notices & Circulars', to: '/communication/notices', icon: <DescriptionOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Message Inbox', to: '/communication/messages', icon: <ForumOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Conversation View', to: '/communication/conversations', icon: <ForumOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Send Message', to: '/communication/send', icon: <MarkEmailReadOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Message Templates', to: '/communication/templates', icon: <LibraryBooksOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Scheduled Messages', to: '/communication/scheduled', icon: <TodayOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Communication Groups', to: '/communication/groups', icon: <PeopleAltOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Notification Logs', to: '/communication/notifications', icon: <NotificationsActiveOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Preferences', to: '/communication/preferences', icon: <PaletteOutlinedIcon />, permission: 'communication.view' },
+  { label: 'Reports', to: '/communication/reports', icon: <TimelineOutlinedIcon />, permission: 'communication.view' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -206,6 +225,10 @@ export function SidebarNav() {
     () => transportChildren.filter((item) => permissions.includes(item.permission)),
     [permissions],
   );
+  const visibleCommunicationChildren = useMemo(
+    () => communicationChildren.filter((item) => permissions.includes(item.permission)),
+    [permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -224,6 +247,7 @@ export function SidebarNav() {
   const attendanceRouteActive = location.pathname.startsWith('/attendance');
   const timetableRouteActive = location.pathname.startsWith('/timetable');
   const transportRouteActive = location.pathname.startsWith('/transport');
+  const communicationRouteActive = location.pathname.startsWith('/communication');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
@@ -231,6 +255,7 @@ export function SidebarNav() {
   const [attendanceOpen, setAttendanceOpen] = useState(attendanceRouteActive);
   const [timetableOpen, setTimetableOpen] = useState(timetableRouteActive);
   const [transportOpen, setTransportOpen] = useState(transportRouteActive);
+  const [communicationOpen, setCommunicationOpen] = useState(communicationRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -274,6 +299,12 @@ export function SidebarNav() {
     }
   }, [transportRouteActive]);
 
+  useEffect(() => {
+    if (communicationRouteActive) {
+      setCommunicationOpen(true);
+    }
+  }, [communicationRouteActive]);
+
   return (
     <Paper
       elevation={0}
@@ -312,7 +343,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -538,6 +569,40 @@ export function SidebarNav() {
                 <Collapse in={transportOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visibleTransportChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleCommunicationChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setCommunicationOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: communicationRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <CampaignOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Communication" />
+                  {communicationOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={communicationOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleCommunicationChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

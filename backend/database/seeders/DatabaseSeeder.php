@@ -7,6 +7,10 @@ use Database\Seeders\Auth\RoleSeeder;
 use Database\Seeders\Auth\UserSeeder;
 use Database\Seeders\AcademicManagement\AcademicManagementSeeder;
 use Database\Seeders\Attendance\AttendanceSeeder;
+use Database\Seeders\Communication\CommunicationChannelSeeder;
+use Database\Seeders\Communication\CommunicationDemoSeeder;
+use Database\Seeders\Communication\CommunicationGroupSeeder;
+use Database\Seeders\Communication\MessageTemplateSeeder;
 use Database\Seeders\Finance\FinanceSeeder;
 use Database\Seeders\HR\HrSeeder;
 use Database\Seeders\SIS\SisSeeder;
@@ -37,6 +41,10 @@ class DatabaseSeeder extends Seeder
             FinanceSeeder::class,
             AttendanceSeeder::class,
             TransportSeeder::class,
+            CommunicationChannelSeeder::class,
+            MessageTemplateSeeder::class,
+            CommunicationGroupSeeder::class,
+            CommunicationDemoSeeder::class,
         ]);
     }
 }

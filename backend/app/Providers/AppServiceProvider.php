@@ -293,8 +293,18 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(TenantContext::class);
         $this->app->singleton(JwtManager::class);
+        $this->app->bind(\App\Contracts\Communication\EmailProviderInterface::class, \App\Services\Communication\Providers\LogEmailProvider::class);
+        $this->app->bind(\App\Contracts\Communication\SmsProviderInterface::class, \App\Services\Communication\Providers\LogSmsProvider::class);
+        $this->app->bind(\App\Contracts\Communication\PushProviderInterface::class, \App\Services\Communication\Providers\LogPushProvider::class);
 
         $this->app->bind(SchoolRepositoryInterface::class, SchoolRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Communication\AnnouncementRepositoryInterface::class, \App\Repositories\Eloquent\Communication\AnnouncementRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Communication\CommunicationMessageRepositoryInterface::class, \App\Repositories\Eloquent\Communication\CommunicationMessageRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Communication\ConversationRepositoryInterface::class, \App\Repositories\Eloquent\Communication\ConversationRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Communication\MessageTemplateRepositoryInterface::class, \App\Repositories\Eloquent\Communication\MessageTemplateRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Communication\NotificationRepositoryInterface::class, \App\Repositories\Eloquent\Communication\NotificationRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Communication\ScheduledMessageRepositoryInterface::class, \App\Repositories\Eloquent\Communication\ScheduledMessageRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Communication\CommunicationGroupRepositoryInterface::class, \App\Repositories\Eloquent\Communication\CommunicationGroupRepository::class);
         $this->app->bind(TimetableRoomRepositoryInterface::class, TimetableRoomRepository::class);
         $this->app->bind(TimetableVersionRepositoryInterface::class, TimetableVersionRepository::class);
         $this->app->bind(TimetablePublishLogRepositoryInterface::class, TimetablePublishLogRepository::class);
@@ -429,6 +439,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(BiometricLog::class, BiometricLogPolicy::class);
         Gate::policy(StudentAttendanceSession::class, StudentAttendanceSessionPolicy::class);
         Gate::policy(StudentAttendanceRecord::class, StudentAttendanceRecordPolicy::class);
+        Gate::policy(\App\Models\Communication\Announcement::class, \App\Policies\Communication\AnnouncementPolicy::class);
+        Gate::policy(\App\Models\Communication\CommunicationMessage::class, \App\Policies\Communication\CommunicationMessagePolicy::class);
+        Gate::policy(\App\Models\Communication\CommunicationConversation::class, \App\Policies\Communication\ConversationPolicy::class);
+        Gate::policy(\App\Models\Communication\MessageTemplate::class, \App\Policies\Communication\MessageTemplatePolicy::class);
+        Gate::policy(\App\Models\Communication\NotificationLog::class, \App\Policies\Communication\NotificationPolicy::class);
+        Gate::policy(\App\Models\Communication\ScheduledMessage::class, \App\Policies\Communication\ScheduledMessagePolicy::class);
+        Gate::policy(\App\Models\Communication\CommunicationGroup::class, \App\Policies\Communication\CommunicationGroupPolicy::class);
         Gate::policy(TransportVehicle::class, TransportManagementPolicy::class);
         Gate::policy(TransportDriver::class, TransportManagementPolicy::class);
         Gate::policy(TransportRoute::class, TransportManagementPolicy::class);

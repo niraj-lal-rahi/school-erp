@@ -31,6 +31,15 @@ use App\Http\Controllers\Api\V1\Attendance\BiometricLogController;
 use App\Http\Controllers\Api\V1\Attendance\StaffAttendanceController as AttendanceStaffAttendanceController;
 use App\Http\Controllers\Api\V1\Attendance\StudentAttendanceRecordController;
 use App\Http\Controllers\Api\V1\Attendance\StudentAttendanceSessionController;
+use App\Http\Controllers\Api\V1\Communication\AnnouncementController as CommunicationAnnouncementController;
+use App\Http\Controllers\Api\V1\Communication\CommunicationChannelController;
+use App\Http\Controllers\Api\V1\Communication\CommunicationGroupController;
+use App\Http\Controllers\Api\V1\Communication\CommunicationMessageController;
+use App\Http\Controllers\Api\V1\Communication\ConversationController;
+use App\Http\Controllers\Api\V1\Communication\MessageTemplateController;
+use App\Http\Controllers\Api\V1\Communication\NotificationController as CommunicationNotificationController;
+use App\Http\Controllers\Api\V1\Communication\NotificationPreferenceController;
+use App\Http\Controllers\Api\V1\Communication\ScheduledMessageController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
 use App\Http\Controllers\Api\V1\Finance\FeeCategoryController;
 use App\Http\Controllers\Api\V1\Finance\ExpenseCategoryController;
@@ -611,6 +620,75 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('/staff-summary', [AttendanceReportController::class, 'staffSummary'])->middleware('permission:attendance.view');
                 Route::get('/class-attendance', [AttendanceReportController::class, 'classAttendance'])->middleware('permission:attendance.view');
                 Route::get('/defaulters', [AttendanceReportController::class, 'defaulters'])->middleware('permission:attendance.view');
+            });
+        });
+
+        Route::prefix('communication')->group(function (): void {
+            Route::get('/channels', [CommunicationChannelController::class, 'index'])->middleware('permission:communication.view');
+            Route::post('/channels', [CommunicationChannelController::class, 'store'])->middleware('permission:communication.manage');
+            Route::get('/channels/{channel}', [CommunicationChannelController::class, 'show'])->middleware('permission:communication.view');
+            Route::put('/channels/{channel}', [CommunicationChannelController::class, 'update'])->middleware('permission:communication.manage');
+            Route::delete('/channels/{channel}', [CommunicationChannelController::class, 'destroy'])->middleware('permission:communication.manage');
+
+            Route::get('/templates', [MessageTemplateController::class, 'index'])->middleware('permission:communication.view');
+            Route::post('/templates', [MessageTemplateController::class, 'store'])->middleware('permission:communication.manage');
+            Route::get('/templates/{template}', [MessageTemplateController::class, 'show'])->middleware('permission:communication.view');
+            Route::put('/templates/{template}', [MessageTemplateController::class, 'update'])->middleware('permission:communication.manage');
+            Route::delete('/templates/{template}', [MessageTemplateController::class, 'destroy'])->middleware('permission:communication.manage');
+
+            Route::get('/announcements', [CommunicationAnnouncementController::class, 'index'])->middleware('permission:communication.view');
+            Route::post('/announcements', [CommunicationAnnouncementController::class, 'store'])->middleware('permission:communication.manage');
+            Route::get('/announcements/{announcement}', [CommunicationAnnouncementController::class, 'show'])->middleware('permission:communication.view');
+            Route::put('/announcements/{announcement}', [CommunicationAnnouncementController::class, 'update'])->middleware('permission:communication.manage');
+            Route::delete('/announcements/{announcement}', [CommunicationAnnouncementController::class, 'destroy'])->middleware('permission:communication.manage');
+            Route::post('/announcements/{announcement}/publish', [CommunicationAnnouncementController::class, 'publish'])->middleware('permission:communication.manage');
+            Route::post('/announcements/{announcement}/cancel', [CommunicationAnnouncementController::class, 'cancel'])->middleware('permission:communication.manage');
+            Route::get('/announcements/{announcement}/recipients', [CommunicationAnnouncementController::class, 'recipients'])->middleware('permission:communication.view');
+
+            Route::get('/messages', [CommunicationMessageController::class, 'index'])->middleware('permission:communication.view');
+            Route::post('/messages', [CommunicationMessageController::class, 'store'])->middleware('permission:communication.manage');
+            Route::get('/messages/{message}', [CommunicationMessageController::class, 'show'])->middleware('permission:communication.view');
+            Route::delete('/messages/{message}', [CommunicationMessageController::class, 'destroy'])->middleware('permission:communication.manage');
+            Route::post('/messages/{message}/mark-read', [CommunicationMessageController::class, 'markRead'])->middleware('permission:communication.view');
+            Route::post('/messages/{message}/archive', [CommunicationMessageController::class, 'archive'])->middleware('permission:communication.manage');
+
+            Route::get('/conversations', [ConversationController::class, 'index'])->middleware('permission:communication.view');
+            Route::post('/conversations', [ConversationController::class, 'store'])->middleware('permission:communication.manage');
+            Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])->middleware('permission:communication.view');
+            Route::put('/conversations/{conversation}', [ConversationController::class, 'update'])->middleware('permission:communication.manage');
+            Route::delete('/conversations/{conversation}', [ConversationController::class, 'destroy'])->middleware('permission:communication.manage');
+            Route::get('/conversations/{conversation}/messages', [ConversationController::class, 'messages'])->middleware('permission:communication.view');
+            Route::post('/conversations/{conversation}/participants', [ConversationController::class, 'addParticipant'])->middleware('permission:communication.manage');
+            Route::delete('/conversations/{conversation}/participants/{participantId}', [ConversationController::class, 'removeParticipant'])->middleware('permission:communication.manage');
+
+            Route::get('/notifications', [CommunicationNotificationController::class, 'index'])->middleware('permission:communication.view');
+            Route::get('/notifications/{notification}', [CommunicationNotificationController::class, 'show'])->middleware('permission:communication.view');
+            Route::post('/notifications/{notification}/mark-read', [CommunicationNotificationController::class, 'markRead'])->middleware('permission:communication.view');
+
+            Route::get('/scheduled-messages', [ScheduledMessageController::class, 'index'])->middleware('permission:communication.view');
+            Route::post('/scheduled-messages', [ScheduledMessageController::class, 'store'])->middleware('permission:communication.manage');
+            Route::get('/scheduled-messages/{scheduledMessage}', [ScheduledMessageController::class, 'show'])->middleware('permission:communication.view');
+            Route::put('/scheduled-messages/{scheduledMessage}', [ScheduledMessageController::class, 'update'])->middleware('permission:communication.manage');
+            Route::delete('/scheduled-messages/{scheduledMessage}', [ScheduledMessageController::class, 'destroy'])->middleware('permission:communication.manage');
+            Route::post('/scheduled-messages/{scheduledMessage}/cancel', [ScheduledMessageController::class, 'cancel'])->middleware('permission:communication.manage');
+            Route::post('/scheduled-messages/process-due', [ScheduledMessageController::class, 'processDue'])->middleware('permission:communication.manage');
+
+            Route::get('/groups', [CommunicationGroupController::class, 'index'])->middleware('permission:communication.view');
+            Route::post('/groups', [CommunicationGroupController::class, 'store'])->middleware('permission:communication.manage');
+            Route::get('/groups/{group}', [CommunicationGroupController::class, 'show'])->middleware('permission:communication.view');
+            Route::put('/groups/{group}', [CommunicationGroupController::class, 'update'])->middleware('permission:communication.manage');
+            Route::delete('/groups/{group}', [CommunicationGroupController::class, 'destroy'])->middleware('permission:communication.manage');
+            Route::post('/groups/{group}/members', [CommunicationGroupController::class, 'addMember'])->middleware('permission:communication.manage');
+            Route::delete('/groups/{group}/members/{memberId}', [CommunicationGroupController::class, 'removeMember'])->middleware('permission:communication.manage');
+
+            Route::get('/preferences', [NotificationPreferenceController::class, 'index'])->middleware('permission:communication.view');
+            Route::get('/preferences/{preference}', [NotificationPreferenceController::class, 'show'])->middleware('permission:communication.view');
+            Route::put('/preferences/{preference}', [NotificationPreferenceController::class, 'update'])->middleware('permission:communication.manage');
+
+            Route::prefix('reports')->group(function (): void {
+                Route::get('/notification-delivery', [CommunicationNotificationController::class, 'notificationDeliveryReport'])->middleware('permission:communication.view');
+                Route::get('/announcement-engagement', [CommunicationNotificationController::class, 'announcementEngagementReport'])->middleware('permission:communication.view');
+                Route::get('/message-volume', [CommunicationNotificationController::class, 'messageVolumeReport'])->middleware('permission:communication.view');
             });
         });
 

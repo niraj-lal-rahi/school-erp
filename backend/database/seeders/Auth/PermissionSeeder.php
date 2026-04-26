@@ -29,6 +29,8 @@ class PermissionSeeder extends Seeder
             ['name' => 'Manage Timetable', 'code' => 'timetable.manage', 'module' => 'timetable'],
             ['name' => 'View Transport', 'code' => 'transport.view', 'module' => 'transport'],
             ['name' => 'Manage Transport', 'code' => 'transport.manage', 'module' => 'transport'],
+            ['name' => 'View Communication', 'code' => 'communication.view', 'module' => 'communication'],
+            ['name' => 'Manage Communication', 'code' => 'communication.manage', 'module' => 'communication'],
         ];
 
         foreach ($permissions as $permission) {

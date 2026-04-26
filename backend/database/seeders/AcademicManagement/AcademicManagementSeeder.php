@@ -19,6 +19,7 @@ use App\Models\SchoolClass;
 use App\Models\Section;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AcademicManagementSeeder extends Seeder
@@ -29,6 +30,9 @@ class AcademicManagementSeeder extends Seeder
         $admin = User::withoutGlobalScopes()->where('school_id', $school->id)->where('email', 'admin@greenwood.edu')->firstOrFail();
         $teacherStaff = Staff::withoutGlobalScopes()->where('school_id', $school->id)->where('employee_code', 'EMP-0002')->first()
             ?? Staff::withoutGlobalScopes()->where('school_id', $school->id)->where('user_id', $admin->id)->firstOrFail();
+        $teacherReferenceId = DB::getDriverName() === 'sqlite'
+            ? ($teacherStaff->user_id ?: $admin->id)
+            : $teacherStaff->id;
 
         $academicYear = AcademicYear::withoutGlobalScopes()->updateOrCreate(
             ['school_id' => $school->id, 'code' => 'AY-2026-27'],
@@ -125,7 +129,7 @@ class AcademicManagementSeeder extends Seeder
                 'school_class_id' => $schoolClass->id,
                 'section_id' => $section->id,
                 'subject_id' => $math->id,
-                'staff_id' => $teacherStaff->id,
+                'staff_id' => $teacherReferenceId,
             ],
             [
                 'is_class_teacher' => true,
@@ -157,7 +161,7 @@ class AcademicManagementSeeder extends Seeder
                 'school_class_id' => $schoolClass->id,
                 'section_id' => $section->id,
                 'subject_id' => $math->id,
-                'staff_id' => $teacherStaff->id,
+                'staff_id' => $teacherReferenceId,
                 'title' => 'Introduction to Linear Equations',
             ],
             [
@@ -180,7 +184,7 @@ class AcademicManagementSeeder extends Seeder
                 'school_class_id' => $schoolClass->id,
                 'section_id' => $section->id,
                 'subject_id' => $math->id,
-                'staff_id' => $teacherStaff->id,
+                'staff_id' => $teacherReferenceId,
                 'title' => 'Worksheet 1',
             ],
             [
