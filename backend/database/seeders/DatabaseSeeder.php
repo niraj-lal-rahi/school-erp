@@ -11,8 +11,13 @@ use Database\Seeders\Communication\CommunicationChannelSeeder;
 use Database\Seeders\Communication\CommunicationDemoSeeder;
 use Database\Seeders\Communication\CommunicationGroupSeeder;
 use Database\Seeders\Communication\MessageTemplateSeeder;
+use Database\Seeders\Examination\DemoExamSeeder;
+use Database\Seeders\Examination\ExamTypeSeeder;
+use Database\Seeders\Examination\GradingSystemSeeder;
 use Database\Seeders\Finance\FinanceSeeder;
 use Database\Seeders\HR\HrSeeder;
+use Database\Seeders\Reports\DashboardWidgetSeeder;
+use Database\Seeders\Reports\ReportDefinitionSeeder;
 use Database\Seeders\SIS\SisSeeder;
 use Database\Seeders\Tenant\TenantSeeder;
 use Database\Seeders\Timetable\TimetableSeeder;
@@ -45,6 +50,11 @@ class DatabaseSeeder extends Seeder
             MessageTemplateSeeder::class,
             CommunicationGroupSeeder::class,
             CommunicationDemoSeeder::class,
+            ExamTypeSeeder::class,
+            GradingSystemSeeder::class,
+            DemoExamSeeder::class,
+            ReportDefinitionSeeder::class,
+            DashboardWidgetSeeder::class,
         ]);
     }
 }

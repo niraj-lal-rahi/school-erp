@@ -41,6 +41,14 @@ use App\Http\Controllers\Api\V1\Communication\NotificationController as Communic
 use App\Http\Controllers\Api\V1\Communication\NotificationPreferenceController;
 use App\Http\Controllers\Api\V1\Communication\ScheduledMessageController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
+use App\Http\Controllers\Api\V1\Examination\ExamController as ExaminationExamController;
+use App\Http\Controllers\Api\V1\Examination\ExamMarkController;
+use App\Http\Controllers\Api\V1\Examination\ExamSubjectController;
+use App\Http\Controllers\Api\V1\Examination\ExamTypeController;
+use App\Http\Controllers\Api\V1\Examination\GradingSystemController;
+use App\Http\Controllers\Api\V1\Examination\ResultController;
+use App\Http\Controllers\Api\V1\Examination\ResultPublicationController;
+use App\Http\Controllers\Api\V1\Examination\RevaluationController;
 use App\Http\Controllers\Api\V1\Finance\FeeCategoryController;
 use App\Http\Controllers\Api\V1\Finance\ExpenseCategoryController;
 use App\Http\Controllers\Api\V1\Finance\ExpenseController;
@@ -80,6 +88,11 @@ use App\Http\Controllers\Api\V1\MasterData\AcademicYearController as MasterDataA
 use App\Http\Controllers\Api\V1\MasterData\GuardianController;
 use App\Http\Controllers\Api\V1\MasterData\SectionController as MasterDataSectionController;
 use App\Http\Controllers\Api\V1\MasterData\SchoolClassController as MasterDataSchoolClassController;
+use App\Http\Controllers\Api\V1\Reports\DashboardController as ReportsDashboardController;
+use App\Http\Controllers\Api\V1\Reports\ReportDefinitionController;
+use App\Http\Controllers\Api\V1\Reports\ReportExportController;
+use App\Http\Controllers\Api\V1\Reports\ReportRunController;
+use App\Http\Controllers\Api\V1\Reports\ReportScheduleController;
 use App\Http\Controllers\Api\V1\SIS\StudentController;
 use App\Http\Controllers\Api\V1\SIS\StudentNoteController;
 use App\Http\Controllers\Api\V1\Timetable\TimetableEntryController;
@@ -692,6 +705,57 @@ Route::prefix('v1')->group(function (): void {
             });
         });
 
+        Route::prefix('exams')->group(function (): void {
+            Route::get('/types', [ExamTypeController::class, 'index'])->middleware('permission:exams.view');
+            Route::post('/types', [ExamTypeController::class, 'store'])->middleware('permission:exams.manage');
+            Route::get('/types/{examType}', [ExamTypeController::class, 'show'])->middleware('permission:exams.view');
+            Route::put('/types/{examType}', [ExamTypeController::class, 'update'])->middleware('permission:exams.manage');
+            Route::delete('/types/{examType}', [ExamTypeController::class, 'destroy'])->middleware('permission:exams.manage');
+
+            Route::get('/', [ExaminationExamController::class, 'index'])->middleware('permission:exams.view');
+            Route::post('/', [ExaminationExamController::class, 'store'])->middleware('permission:exams.manage');
+
+            Route::get('/subjects/list', [ExamSubjectController::class, 'index'])->middleware('permission:exams.view');
+            Route::post('/subjects', [ExamSubjectController::class, 'store'])->middleware('permission:exams.manage');
+            Route::get('/subjects/{examSubject}', [ExamSubjectController::class, 'show'])->middleware('permission:exams.view');
+            Route::delete('/subjects/{examSubject}', [ExamSubjectController::class, 'destroy'])->middleware('permission:exams.manage');
+
+            Route::get('/marks', [ExamMarkController::class, 'index'])->middleware('permission:exams.view');
+            Route::post('/marks', [ExamMarkController::class, 'store'])->middleware('permission:exams.manage');
+            Route::post('/marks/bulk', [ExamMarkController::class, 'bulkStore'])->middleware('permission:exams.manage');
+            Route::get('/marks/{examMark}', [ExamMarkController::class, 'show'])->middleware('permission:exams.view');
+            Route::delete('/marks/{examMark}', [ExamMarkController::class, 'destroy'])->middleware('permission:exams.manage');
+
+            Route::get('/grading-systems', [GradingSystemController::class, 'index'])->middleware('permission:exams.view');
+            Route::post('/grading-systems', [GradingSystemController::class, 'store'])->middleware('permission:exams.manage');
+            Route::get('/grading-systems/{gradingSystem}', [GradingSystemController::class, 'show'])->middleware('permission:exams.view');
+            Route::put('/grading-systems/{gradingSystem}', [GradingSystemController::class, 'update'])->middleware('permission:exams.manage');
+            Route::delete('/grading-systems/{gradingSystem}', [GradingSystemController::class, 'destroy'])->middleware('permission:exams.manage');
+            Route::post('/grading-systems/{gradingSystem}/scales', [GradingSystemController::class, 'addScale'])->middleware('permission:exams.manage');
+            Route::delete('/grading-scales/{gradeScale}', [GradingSystemController::class, 'removeScale'])->middleware('permission:exams.manage');
+
+            Route::get('/results', [ResultController::class, 'index'])->middleware('permission:exams.view');
+            Route::get('/results/records/{studentResult}', [ResultController::class, 'show'])->middleware('permission:exams.view');
+            Route::post('/results/{examId}/compute', [ResultController::class, 'compute'])->middleware('permission:exams.manage');
+            Route::get('/results/{examId}/student/{studentId}', [ResultController::class, 'studentResult'])->middleware('permission:exams.view');
+            Route::get('/results/{examId}/class/{classId}', [ResultController::class, 'classResults'])->middleware('permission:exams.view');
+            Route::get('/results/{examId}/merit-list', [ResultController::class, 'meritList'])->middleware('permission:exams.view');
+
+            Route::get('/publications', [ResultPublicationController::class, 'index'])->middleware('permission:exams.view');
+            Route::get('/publications/{resultPublication}', [ResultPublicationController::class, 'show'])->middleware('permission:exams.view');
+            Route::post('/results/{examId}/publish', [ResultPublicationController::class, 'publish'])->middleware('permission:exams.manage');
+
+            Route::get('/revaluation', [RevaluationController::class, 'index'])->middleware('permission:exams.view');
+            Route::post('/revaluation', [RevaluationController::class, 'store'])->middleware('permission:exams.manage');
+            Route::get('/revaluation/{revaluation}', [RevaluationController::class, 'show'])->middleware('permission:exams.view');
+            Route::delete('/revaluation/{revaluation}', [RevaluationController::class, 'destroy'])->middleware('permission:exams.manage');
+
+            Route::get('/{exam}', [ExaminationExamController::class, 'show'])->middleware('permission:exams.view');
+            Route::put('/{exam}', [ExaminationExamController::class, 'update'])->middleware('permission:exams.manage');
+            Route::delete('/{exam}', [ExaminationExamController::class, 'destroy'])->middleware('permission:exams.manage');
+            Route::post('/{exam}/enroll-students', [ExaminationExamController::class, 'enrollStudents'])->middleware('permission:exams.manage');
+        });
+
         Route::prefix('transport')->group(function (): void {
             Route::get('/vehicles', [VehicleController::class, 'index'])->middleware('permission:transport.view');
             Route::post('/vehicles', [VehicleController::class, 'store'])->middleware('permission:transport.manage');
@@ -767,6 +831,31 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/vehicle-location/{vehicle}', [GpsController::class, 'vehicleLocation'])->middleware('permission:transport.view');
 
             Route::get('/reports', [TripController::class, 'reports'])->middleware('permission:transport.view');
+        });
+
+        Route::prefix('reports')->group(function (): void {
+            Route::get('/dashboard', [ReportsDashboardController::class, 'overview'])->middleware('permission:reports.view');
+            Route::get('/widgets', [ReportsDashboardController::class, 'widgets'])->middleware('permission:reports.view');
+            Route::put('/dashboard/layout', [ReportsDashboardController::class, 'updateLayout'])->middleware('permission:reports.manage');
+
+            Route::get('/definitions', [ReportDefinitionController::class, 'index'])->middleware('permission:reports.view');
+            Route::post('/definitions', [ReportDefinitionController::class, 'store'])->middleware('permission:reports.manage');
+            Route::get('/definitions/{reportDefinition}', [ReportDefinitionController::class, 'show'])->middleware('permission:reports.view');
+            Route::put('/definitions/{reportDefinition}', [ReportDefinitionController::class, 'update'])->middleware('permission:reports.manage');
+            Route::delete('/definitions/{reportDefinition}', [ReportDefinitionController::class, 'destroy'])->middleware('permission:reports.manage');
+
+            Route::post('/run', [ReportRunController::class, 'run'])->middleware('permission:reports.run');
+            Route::get('/runs', [ReportRunController::class, 'index'])->middleware('permission:reports.view');
+            Route::get('/runs/{reportRun}', [ReportRunController::class, 'show'])->middleware('permission:reports.view');
+
+            Route::get('/schedules', [ReportScheduleController::class, 'index'])->middleware('permission:reports.view');
+            Route::post('/schedules', [ReportScheduleController::class, 'store'])->middleware('permission:reports.manage');
+            Route::get('/schedules/{reportSchedule}', [ReportScheduleController::class, 'show'])->middleware('permission:reports.view');
+            Route::put('/schedules/{reportSchedule}', [ReportScheduleController::class, 'update'])->middleware('permission:reports.manage');
+            Route::post('/schedules/{reportSchedule}/pause', [ReportScheduleController::class, 'pause'])->middleware('permission:reports.manage');
+            Route::post('/schedules/{reportSchedule}/resume', [ReportScheduleController::class, 'resume'])->middleware('permission:reports.manage');
+
+            Route::get('/exports/{reportExport}/download', [ReportExportController::class, 'download'])->middleware('permission:reports.export');
         });
     });
 });

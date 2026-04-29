@@ -31,6 +31,12 @@ class PermissionSeeder extends Seeder
             ['name' => 'Manage Transport', 'code' => 'transport.manage', 'module' => 'transport'],
             ['name' => 'View Communication', 'code' => 'communication.view', 'module' => 'communication'],
             ['name' => 'Manage Communication', 'code' => 'communication.manage', 'module' => 'communication'],
+            ['name' => 'View Examinations', 'code' => 'exams.view', 'module' => 'examinations'],
+            ['name' => 'Manage Examinations', 'code' => 'exams.manage', 'module' => 'examinations'],
+            ['name' => 'View Reports', 'code' => 'reports.view', 'module' => 'reports'],
+            ['name' => 'Manage Reports', 'code' => 'reports.manage', 'module' => 'reports'],
+            ['name' => 'Run Reports', 'code' => 'reports.run', 'module' => 'reports'],
+            ['name' => 'Export Reports', 'code' => 'reports.export', 'module' => 'reports'],
         ];
 
         foreach ($permissions as $permission) {

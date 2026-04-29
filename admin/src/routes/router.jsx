@@ -103,6 +103,25 @@ const CommunicationGroupsPage = lazy(() => import('../features/communication/pag
 const NotificationLogsPage = lazy(() => import('../features/communication/pages/NotificationLogsPage').then((module) => ({ default: module.NotificationLogsPage })));
 const NotificationPreferencesPage = lazy(() => import('../features/communication/pages/NotificationPreferencesPage').then((module) => ({ default: module.NotificationPreferencesPage })));
 const CommunicationReportsPage = lazy(() => import('../features/communication/pages/CommunicationReportsPage').then((module) => ({ default: module.CommunicationReportsPage })));
+const ExamTypesPage = lazy(() => import('../features/examination/pages/ExamTypesPage').then((module) => ({ default: module.ExamTypesPage })));
+const ExamSetupPage = lazy(() => import('../features/examination/pages/ExamSetupPage').then((module) => ({ default: module.ExamSetupPage })));
+const SubjectMappingPage = lazy(() => import('../features/examination/pages/SubjectMappingPage').then((module) => ({ default: module.SubjectMappingPage })));
+const StudentEnrollmentPage = lazy(() => import('../features/examination/pages/StudentEnrollmentPage').then((module) => ({ default: module.StudentEnrollmentPage })));
+const MarksEntryPage = lazy(() => import('../features/examination/pages/MarksEntryPage').then((module) => ({ default: module.MarksEntryPage })));
+const ResultProcessingPage = lazy(() => import('../features/examination/pages/ResultProcessingPage').then((module) => ({ default: module.ResultProcessingPage })));
+const ResultViewPage = lazy(() => import('../features/examination/pages/ResultViewPage').then((module) => ({ default: module.ResultViewPage })));
+const MeritListPage = lazy(() => import('../features/examination/pages/MeritListPage').then((module) => ({ default: module.MeritListPage })));
+const ReportCardViewPage = lazy(() => import('../features/examination/pages/ReportCardViewPage').then((module) => ({ default: module.ReportCardViewPage })));
+const RevaluationRequestsPage = lazy(() => import('../features/examination/pages/RevaluationRequestsPage').then((module) => ({ default: module.RevaluationRequestsPage })));
+const GradingSystemsPage = lazy(() => import('../features/examination/pages/GradingSystemsPage').then((module) => ({ default: module.GradingSystemsPage })));
+const ReportsDashboardPage = lazy(() => import('../features/reports/pages/DashboardPage').then((module) => ({ default: module.DashboardPage })));
+const ReportsListPage = lazy(() => import('../features/reports/pages/ReportsListPage').then((module) => ({ default: module.ReportsListPage })));
+const RunReportPage = lazy(() => import('../features/reports/pages/RunReportPage').then((module) => ({ default: module.RunReportPage })));
+const ReportResultsPage = lazy(() => import('../features/reports/pages/ReportResultsPage').then((module) => ({ default: module.ReportResultsPage })));
+const SavedReportsPage = lazy(() => import('../features/reports/pages/SavedReportsPage').then((module) => ({ default: module.SavedReportsPage })));
+const ScheduleReportsPage = lazy(() => import('../features/reports/pages/ScheduleReportsPage').then((module) => ({ default: module.ScheduleReportsPage })));
+const ExportsPage = lazy(() => import('../features/reports/pages/ExportsPage').then((module) => ({ default: module.ExportsPage })));
+const CustomReportBuilderPage = lazy(() => import('../features/reports/pages/CustomReportBuilderPage').then((module) => ({ default: module.CustomReportBuilderPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -515,6 +534,82 @@ export const router = createBrowserRouter([
           {
             path: 'communication/reports',
             element: withSuspense(<CommunicationReportsPage />),
+          },
+          {
+            path: 'exams/types',
+            element: withSuspense(<ExamTypesPage />),
+          },
+          {
+            path: 'exams/setup',
+            element: withSuspense(<ExamSetupPage />),
+          },
+          {
+            path: 'exams/subjects',
+            element: withSuspense(<SubjectMappingPage />),
+          },
+          {
+            path: 'exams/enrollment',
+            element: withSuspense(<StudentEnrollmentPage />),
+          },
+          {
+            path: 'exams/marks',
+            element: withSuspense(<MarksEntryPage />),
+          },
+          {
+            path: 'exams/results',
+            element: withSuspense(<ResultProcessingPage />),
+          },
+          {
+            path: 'exams/results-view',
+            element: withSuspense(<ResultViewPage />),
+          },
+          {
+            path: 'exams/merit-list',
+            element: withSuspense(<MeritListPage />),
+          },
+          {
+            path: 'exams/report-cards',
+            element: withSuspense(<ReportCardViewPage />),
+          },
+          {
+            path: 'exams/revaluation',
+            element: withSuspense(<RevaluationRequestsPage />),
+          },
+          {
+            path: 'exams/grading-systems',
+            element: withSuspense(<GradingSystemsPage />),
+          },
+          {
+            path: 'reports/dashboard',
+            element: withSuspense(<ReportsDashboardPage />),
+          },
+          {
+            path: 'reports/list',
+            element: withSuspense(<ReportsListPage />),
+          },
+          {
+            path: 'reports/run',
+            element: withSuspense(<RunReportPage />),
+          },
+          {
+            path: 'reports/results',
+            element: withSuspense(<ReportResultsPage />),
+          },
+          {
+            path: 'reports/saved',
+            element: withSuspense(<SavedReportsPage />),
+          },
+          {
+            path: 'reports/schedules',
+            element: withSuspense(<ScheduleReportsPage />),
+          },
+          {
+            path: 'reports/exports',
+            element: withSuspense(<ExportsPage />),
+          },
+          {
+            path: 'reports/custom-builder',
+            element: withSuspense(<CustomReportBuilderPage />),
           },
         ],
       },

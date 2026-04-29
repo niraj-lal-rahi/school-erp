@@ -37,6 +37,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import LocalGasStationOutlinedIcon from '@mui/icons-material/LocalGasStationOutlined';
 import ViewWeekOutlinedIcon from '@mui/icons-material/ViewWeekOutlined';
 import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
+import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined';
@@ -175,6 +176,31 @@ const communicationChildren = [
   { label: 'Reports', to: '/communication/reports', icon: <TimelineOutlinedIcon />, permission: 'communication.view' },
 ];
 
+const examinationChildren = [
+  { label: 'Exam Types', to: '/exams/types', icon: <LibraryBooksOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Exam Setup', to: '/exams/setup', icon: <SchoolOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Subject Mapping', to: '/exams/subjects', icon: <MenuBookOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Student Enrollment', to: '/exams/enrollment', icon: <PeopleAltOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Marks Entry', to: '/exams/marks', icon: <FactCheckOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Result Processing', to: '/exams/results', icon: <TimelineOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Result View', to: '/exams/results-view', icon: <DescriptionOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Merit List', to: '/exams/merit-list', icon: <EmojiEventsOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Report Cards', to: '/exams/report-cards', icon: <ReceiptLongOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Revaluation', to: '/exams/revaluation', icon: <ManageHistoryOutlinedIcon />, permission: 'exams.view' },
+  { label: 'Grading Systems', to: '/exams/grading-systems', icon: <PaletteOutlinedIcon />, permission: 'exams.view' },
+];
+
+const reportsChildren = [
+  { label: 'Dashboard', to: '/reports/dashboard', icon: <DashboardOutlinedIcon />, permission: 'reports.view' },
+  { label: 'Reports List', to: '/reports/list', icon: <DescriptionOutlinedIcon />, permission: 'reports.view' },
+  { label: 'Run Report', to: '/reports/run', icon: <PlaylistAddCheckOutlinedIcon />, permission: 'reports.run' },
+  { label: 'Results Table', to: '/reports/results', icon: <FactCheckOutlinedIcon />, permission: 'reports.view' },
+  { label: 'Saved Reports', to: '/reports/saved', icon: <LibraryBooksOutlinedIcon />, permission: 'reports.view' },
+  { label: 'Schedule Reports', to: '/reports/schedules', icon: <TodayOutlinedIcon />, permission: 'reports.view' },
+  { label: 'Exports', to: '/reports/exports', icon: <ReceiptLongOutlinedIcon />, permission: 'reports.export' },
+  { label: 'Custom Builder', to: '/reports/custom-builder', icon: <TimelineOutlinedIcon />, permission: 'reports.manage' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -229,6 +255,14 @@ export function SidebarNav() {
     () => communicationChildren.filter((item) => permissions.includes(item.permission)),
     [permissions],
   );
+  const visibleExaminationChildren = useMemo(
+    () => examinationChildren.filter((item) => permissions.includes(item.permission)),
+    [permissions],
+  );
+  const visibleReportsChildren = useMemo(
+    () => reportsChildren.filter((item) => permissions.includes(item.permission) || (item.permission === 'reports.view' && permissions.includes('reports.manage'))),
+    [permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -248,6 +282,8 @@ export function SidebarNav() {
   const timetableRouteActive = location.pathname.startsWith('/timetable');
   const transportRouteActive = location.pathname.startsWith('/transport');
   const communicationRouteActive = location.pathname.startsWith('/communication');
+  const examinationRouteActive = location.pathname.startsWith('/exams');
+  const reportsRouteActive = location.pathname.startsWith('/reports');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
@@ -256,6 +292,8 @@ export function SidebarNav() {
   const [timetableOpen, setTimetableOpen] = useState(timetableRouteActive);
   const [transportOpen, setTransportOpen] = useState(transportRouteActive);
   const [communicationOpen, setCommunicationOpen] = useState(communicationRouteActive);
+  const [examinationOpen, setExaminationOpen] = useState(examinationRouteActive);
+  const [reportsOpen, setReportsOpen] = useState(reportsRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -305,6 +343,18 @@ export function SidebarNav() {
     }
   }, [communicationRouteActive]);
 
+  useEffect(() => {
+    if (examinationRouteActive) {
+      setExaminationOpen(true);
+    }
+  }, [examinationRouteActive]);
+
+  useEffect(() => {
+    if (reportsRouteActive) {
+      setReportsOpen(true);
+    }
+  }, [reportsRouteActive]);
+
   return (
     <Paper
       elevation={0}
@@ -343,7 +393,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -603,6 +653,74 @@ export function SidebarNav() {
                 <Collapse in={communicationOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visibleCommunicationChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleExaminationChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setExaminationOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: examinationRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <EmojiEventsOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Examinations" />
+                  {examinationOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={examinationOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleExaminationChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleReportsChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setReportsOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: reportsRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <TimelineOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Reports & Analytics" />
+                  {reportsOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={reportsOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleReportsChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}
