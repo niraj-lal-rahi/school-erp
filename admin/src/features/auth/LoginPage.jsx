@@ -14,11 +14,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { login } from './authSlice';
 import { persistSession } from '../../utils/tokenStorage';
+import { flattenPermissions } from './authUtils';
+import { getDefaultAppRoute } from '../portal/utils/getDefaultAppRoute';
 
 export function LoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, error, accessToken } = useAppSelector((state) => state.auth);
+  const { loading, error, accessToken, user } = useAppSelector((state) => state.auth);
   const [form, setForm] = useState({
     tenant_code: localStorage.getItem('tenant_code') || 'greenwood',
     email: 'admin@greenwood.edu',
@@ -27,21 +29,27 @@ export function LoginPage() {
 
   useEffect(() => {
     if (accessToken) {
-      navigate('/students', { replace: true });
+      navigate(getDefaultAppRoute(user), { replace: true });
     }
-  }, [accessToken, navigate]);
+  }, [accessToken, navigate, user]);
 
   async function handleSubmit(event) {
     event.preventDefault();
     const result = await dispatch(login(form));
 
     if (!result.error) {
+      const permissions = flattenPermissions(result.payload.user);
+      const route = getDefaultAppRoute({
+        ...result.payload.user,
+        permissions,
+      });
+
       persistSession({
         accessToken: result.payload.access_token,
         refreshToken: result.payload.refresh_token,
         tenantCode: result.payload.tenant.code,
       });
-      navigate('/students', { replace: true });
+      navigate(route, { replace: true });
     }
   }
 
@@ -62,9 +70,9 @@ export function LoginPage() {
             <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
               <LockOutlinedIcon />
             </Avatar>
-            <Typography variant="h5">Admin Login</Typography>
+            <Typography variant="h5">School ERP Login</Typography>
             <Typography variant="body2" color="text.secondary" textAlign="center">
-              Sign in to manage students, guardians, classes, academic years, and document records.
+              Sign in once and we will route you into the right experience, whether that is the admin workspace or the unified student and parent portal.
             </Typography>
           </Stack>
 

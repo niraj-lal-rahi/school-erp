@@ -37,6 +37,9 @@ class PermissionSeeder extends Seeder
             ['name' => 'Manage Reports', 'code' => 'reports.manage', 'module' => 'reports'],
             ['name' => 'Run Reports', 'code' => 'reports.run', 'module' => 'reports'],
             ['name' => 'Export Reports', 'code' => 'reports.export', 'module' => 'reports'],
+            ['name' => 'View Portal', 'code' => 'portal.view', 'module' => 'portal'],
+            ['name' => 'Manage Portal', 'code' => 'portal.manage', 'module' => 'portal'],
+            ['name' => 'Impersonate Portal', 'code' => 'portal.impersonate', 'module' => 'portal'],
         ];
 
         foreach ($permissions as $permission) {

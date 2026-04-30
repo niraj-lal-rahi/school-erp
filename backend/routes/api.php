@@ -93,6 +93,11 @@ use App\Http\Controllers\Api\V1\Reports\ReportDefinitionController;
 use App\Http\Controllers\Api\V1\Reports\ReportExportController;
 use App\Http\Controllers\Api\V1\Reports\ReportRunController;
 use App\Http\Controllers\Api\V1\Reports\ReportScheduleController;
+use App\Http\Controllers\Api\V1\Portal\PortalContextController;
+use App\Http\Controllers\Api\V1\Portal\PortalDashboardController;
+use App\Http\Controllers\Api\V1\Portal\PortalNotificationController;
+use App\Http\Controllers\Api\V1\Portal\PortalProfileController;
+use App\Http\Controllers\Api\V1\Portal\PortalStudentController;
 use App\Http\Controllers\Api\V1\SIS\StudentController;
 use App\Http\Controllers\Api\V1\SIS\StudentNoteController;
 use App\Http\Controllers\Api\V1\Timetable\TimetableEntryController;
@@ -856,6 +861,32 @@ Route::prefix('v1')->group(function (): void {
             Route::post('/schedules/{reportSchedule}/resume', [ReportScheduleController::class, 'resume'])->middleware('permission:reports.manage');
 
             Route::get('/exports/{reportExport}/download', [ReportExportController::class, 'download'])->middleware('permission:reports.export');
+        });
+
+        Route::prefix('portal')->group(function (): void {
+            Route::get('/context', [PortalContextController::class, 'context'])->middleware('permission:portal.view');
+            Route::post('/context/switch', [PortalContextController::class, 'switch'])->middleware('permission:portal.view');
+            Route::get('/profiles', [PortalContextController::class, 'profiles'])->middleware('permission:portal.view');
+            Route::get('/accessible-students', [PortalContextController::class, 'accessibleStudents'])->middleware('permission:portal.view');
+
+            Route::get('/dashboard', [PortalDashboardController::class, 'show'])->middleware('permission:portal.view');
+
+            Route::get('/students/{studentId}/overview', [PortalStudentController::class, 'overview'])->middleware('permission:portal.view');
+            Route::get('/students/{studentId}/attendance', [PortalStudentController::class, 'attendance'])->middleware('permission:portal.view');
+            Route::get('/students/{studentId}/fees', [PortalStudentController::class, 'fees'])->middleware('permission:portal.view');
+            Route::get('/students/{studentId}/results', [PortalStudentController::class, 'results'])->middleware('permission:portal.view');
+            Route::get('/students/{studentId}/timetable', [PortalStudentController::class, 'timetable'])->middleware('permission:portal.view');
+            Route::get('/students/{studentId}/assignments', [PortalStudentController::class, 'assignments'])->middleware('permission:portal.view');
+            Route::get('/students/{studentId}/transport', [PortalStudentController::class, 'transport'])->middleware('permission:portal.view');
+            Route::get('/students/{studentId}/documents', [PortalStudentController::class, 'documents'])->middleware('permission:portal.view');
+
+            Route::get('/notifications', [PortalNotificationController::class, 'index'])->middleware('permission:portal.view');
+            Route::post('/notifications/{notification}/read', [PortalNotificationController::class, 'markRead'])->middleware('permission:portal.view');
+            Route::post('/notifications/read-all', [PortalNotificationController::class, 'markAllRead'])->middleware('permission:portal.view');
+
+            Route::post('/profiles/link-student', [PortalProfileController::class, 'linkStudent'])->middleware('permission:portal.manage');
+            Route::post('/profiles/link-guardian', [PortalProfileController::class, 'linkGuardian'])->middleware('permission:portal.manage');
+            Route::put('/profiles/access/{id}', [PortalProfileController::class, 'updateAccess'])->middleware('permission:portal.manage');
         });
     });
 });

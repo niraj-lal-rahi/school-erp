@@ -41,6 +41,7 @@ import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined';
+import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
 import {
   Collapse,
   Divider,
@@ -201,6 +202,23 @@ const reportsChildren = [
   { label: 'Custom Builder', to: '/reports/custom-builder', icon: <TimelineOutlinedIcon />, permission: 'reports.manage' },
 ];
 
+const portalChildren = [
+  { label: 'Portal Home', to: '/portal', icon: <SchoolOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Unified Dashboard', to: '/portal/dashboard', icon: <DashboardOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Profile Switcher', to: '/portal/switcher', icon: <SwitchAccountOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Student Overview', to: '/portal/overview', icon: <PeopleAltOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Attendance', to: '/portal/attendance', icon: <AssignmentTurnedInOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Fees', to: '/portal/fees', icon: <CurrencyRupeeOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Results', to: '/portal/results', icon: <EmojiEventsOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Timetable', to: '/portal/timetable', icon: <ViewWeekOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Assignments', to: '/portal/assignments', icon: <LibraryBooksOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Transport', to: '/portal/transport', icon: <DirectionsBusFilledOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Documents', to: '/portal/documents', icon: <DescriptionOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Announcements & Messages', to: '/portal/messages', icon: <ForumOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Notifications', to: '/portal/notifications', icon: <NotificationsActiveOutlinedIcon />, permission: 'portal.view' },
+  { label: 'Profile Settings', to: '/portal/settings', icon: <PaletteOutlinedIcon />, permission: 'portal.view' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -263,6 +281,10 @@ export function SidebarNav() {
     () => reportsChildren.filter((item) => permissions.includes(item.permission) || (item.permission === 'reports.view' && permissions.includes('reports.manage'))),
     [permissions],
   );
+  const visiblePortalChildren = useMemo(
+    () => portalChildren.filter((item) => permissions.includes(item.permission) || (item.permission === 'portal.view' && permissions.includes('portal.manage'))),
+    [permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -284,6 +306,7 @@ export function SidebarNav() {
   const communicationRouteActive = location.pathname.startsWith('/communication');
   const examinationRouteActive = location.pathname.startsWith('/exams');
   const reportsRouteActive = location.pathname.startsWith('/reports');
+  const portalRouteActive = location.pathname.startsWith('/portal');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
@@ -294,6 +317,7 @@ export function SidebarNav() {
   const [communicationOpen, setCommunicationOpen] = useState(communicationRouteActive);
   const [examinationOpen, setExaminationOpen] = useState(examinationRouteActive);
   const [reportsOpen, setReportsOpen] = useState(reportsRouteActive);
+  const [portalOpen, setPortalOpen] = useState(portalRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -355,6 +379,12 @@ export function SidebarNav() {
     }
   }, [reportsRouteActive]);
 
+  useEffect(() => {
+    if (portalRouteActive) {
+      setPortalOpen(true);
+    }
+  }, [portalRouteActive]);
+
   return (
     <Paper
       elevation={0}
@@ -393,7 +423,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -721,6 +751,40 @@ export function SidebarNav() {
                 <Collapse in={reportsOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visibleReportsChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visiblePortalChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setPortalOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: portalRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <SwitchAccountOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Parent & Student Portal" />
+                  {portalOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={portalOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visiblePortalChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

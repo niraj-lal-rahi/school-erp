@@ -5,6 +5,7 @@ import { RequireAuth } from '../components/common/RequireAuth';
 
 const AdminLayout = lazy(() => import('../layouts/AdminLayout').then((module) => ({ default: module.AdminLayout })));
 const LoginPage = lazy(() => import('../features/auth/LoginPage').then((module) => ({ default: module.LoginPage })));
+const HomeRedirectPage = lazy(() => import('../features/auth/HomeRedirectPage').then((module) => ({ default: module.HomeRedirectPage })));
 const DashboardPage = lazy(() => import('../features/dashboard/DashboardPage').then((module) => ({ default: module.DashboardPage })));
 const StudentListPage = lazy(() => import('../features/students/pages/StudentListPage').then((module) => ({ default: module.StudentListPage })));
 const StudentCreatePage = lazy(() => import('../features/students/pages/StudentCreatePage').then((module) => ({ default: module.StudentCreatePage })));
@@ -122,6 +123,20 @@ const SavedReportsPage = lazy(() => import('../features/reports/pages/SavedRepor
 const ScheduleReportsPage = lazy(() => import('../features/reports/pages/ScheduleReportsPage').then((module) => ({ default: module.ScheduleReportsPage })));
 const ExportsPage = lazy(() => import('../features/reports/pages/ExportsPage').then((module) => ({ default: module.ExportsPage })));
 const CustomReportBuilderPage = lazy(() => import('../features/reports/pages/CustomReportBuilderPage').then((module) => ({ default: module.CustomReportBuilderPage })));
+const PortalContextResolverPage = lazy(() => import('../features/portal/pages/PortalContextResolverPage').then((module) => ({ default: module.PortalContextResolverPage })));
+const UnifiedDashboardPage = lazy(() => import('../features/portal/pages/UnifiedDashboardPage').then((module) => ({ default: module.UnifiedDashboardPage })));
+const ProfileSwitcherPage = lazy(() => import('../features/portal/pages/ProfileSwitcherPage').then((module) => ({ default: module.ProfileSwitcherPage })));
+const StudentOverviewPage = lazy(() => import('../features/portal/pages/StudentOverviewPage').then((module) => ({ default: module.StudentOverviewPage })));
+const PortalAttendancePage = lazy(() => import('../features/portal/pages/AttendancePage').then((module) => ({ default: module.AttendancePage })));
+const PortalFeesPage = lazy(() => import('../features/portal/pages/FeesPage').then((module) => ({ default: module.FeesPage })));
+const PortalResultsPage = lazy(() => import('../features/portal/pages/ResultsPage').then((module) => ({ default: module.ResultsPage })));
+const PortalTimetablePage = lazy(() => import('../features/portal/pages/TimetablePage').then((module) => ({ default: module.TimetablePage })));
+const PortalAssignmentsPage = lazy(() => import('../features/portal/pages/AssignmentsPage').then((module) => ({ default: module.AssignmentsPage })));
+const PortalTransportPage = lazy(() => import('../features/portal/pages/TransportPage').then((module) => ({ default: module.TransportPage })));
+const PortalDocumentsPage = lazy(() => import('../features/portal/pages/DocumentsPage').then((module) => ({ default: module.DocumentsPage })));
+const AnnouncementsMessagesPage = lazy(() => import('../features/portal/pages/AnnouncementsMessagesPage').then((module) => ({ default: module.AnnouncementsMessagesPage })));
+const PortalNotificationsPage = lazy(() => import('../features/portal/pages/NotificationsPage').then((module) => ({ default: module.NotificationsPage })));
+const ProfileSettingsPage = lazy(() => import('../features/portal/pages/ProfileSettingsPage').then((module) => ({ default: module.ProfileSettingsPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -141,7 +156,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="/dashboard" replace />,
+            element: withSuspense(<HomeRedirectPage />),
           },
           {
             path: 'dashboard',
@@ -610,6 +625,62 @@ export const router = createBrowserRouter([
           {
             path: 'reports/custom-builder',
             element: withSuspense(<CustomReportBuilderPage />),
+          },
+          {
+            path: 'portal',
+            element: withSuspense(<PortalContextResolverPage />),
+          },
+          {
+            path: 'portal/dashboard',
+            element: withSuspense(<UnifiedDashboardPage />),
+          },
+          {
+            path: 'portal/switcher',
+            element: withSuspense(<ProfileSwitcherPage />),
+          },
+          {
+            path: 'portal/overview',
+            element: withSuspense(<StudentOverviewPage />),
+          },
+          {
+            path: 'portal/attendance',
+            element: withSuspense(<PortalAttendancePage />),
+          },
+          {
+            path: 'portal/fees',
+            element: withSuspense(<PortalFeesPage />),
+          },
+          {
+            path: 'portal/results',
+            element: withSuspense(<PortalResultsPage />),
+          },
+          {
+            path: 'portal/timetable',
+            element: withSuspense(<PortalTimetablePage />),
+          },
+          {
+            path: 'portal/assignments',
+            element: withSuspense(<PortalAssignmentsPage />),
+          },
+          {
+            path: 'portal/transport',
+            element: withSuspense(<PortalTransportPage />),
+          },
+          {
+            path: 'portal/documents',
+            element: withSuspense(<PortalDocumentsPage />),
+          },
+          {
+            path: 'portal/messages',
+            element: withSuspense(<AnnouncementsMessagesPage />),
+          },
+          {
+            path: 'portal/notifications',
+            element: withSuspense(<PortalNotificationsPage />),
+          },
+          {
+            path: 'portal/settings',
+            element: withSuspense(<ProfileSettingsPage />),
           },
         ],
       },

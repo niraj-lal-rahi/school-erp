@@ -22,6 +22,7 @@ use Database\Seeders\SIS\SisSeeder;
 use Database\Seeders\Tenant\TenantSeeder;
 use Database\Seeders\Timetable\TimetableSeeder;
 use Database\Seeders\Transport\TransportSeeder;
+use Database\Seeders\Portal\PortalDemoSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -55,6 +56,7 @@ class DatabaseSeeder extends Seeder
             DemoExamSeeder::class,
             ReportDefinitionSeeder::class,
             DashboardWidgetSeeder::class,
+            PortalDemoSeeder::class,
         ]);
     }
 }
