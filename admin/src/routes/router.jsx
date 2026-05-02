@@ -137,6 +137,25 @@ const PortalDocumentsPage = lazy(() => import('../features/portal/pages/Document
 const AnnouncementsMessagesPage = lazy(() => import('../features/portal/pages/AnnouncementsMessagesPage').then((module) => ({ default: module.AnnouncementsMessagesPage })));
 const PortalNotificationsPage = lazy(() => import('../features/portal/pages/NotificationsPage').then((module) => ({ default: module.NotificationsPage })));
 const ProfileSettingsPage = lazy(() => import('../features/portal/pages/ProfileSettingsPage').then((module) => ({ default: module.ProfileSettingsPage })));
+const RbacRolesListPage = lazy(() => import('../features/rbac/pages/RolesListPage').then((module) => ({ default: module.RolesListPage })));
+const RbacRoleEditorPage = lazy(() => import('../features/rbac/pages/RoleEditorPage').then((module) => ({ default: module.RoleEditorPage })));
+const RbacPermissionMatrixPage = lazy(() => import('../features/rbac/pages/PermissionMatrixPage').then((module) => ({ default: module.PermissionMatrixPage })));
+const RbacAssignRolesPage = lazy(() => import('../features/rbac/pages/AssignRolesPage').then((module) => ({ default: module.AssignRolesPage })));
+const RbacPermissionsListPage = lazy(() => import('../features/rbac/pages/PermissionsListPage').then((module) => ({ default: module.PermissionsListPage })));
+const RbacMyPermissionsPage = lazy(() => import('../features/rbac/pages/MyPermissionsPage').then((module) => ({ default: module.MyPermissionsPage })));
+const RbacAuditLogsPage = lazy(() => import('../features/rbac/pages/AuditLogsPage').then((module) => ({ default: module.AuditLogsPage })));
+const SaasDashboardPage = lazy(() => import('../features/saas/pages/SaasDashboardPage').then((module) => ({ default: module.SaasDashboardPage })));
+const TenantListPage = lazy(() => import('../features/saas/pages/TenantListPage').then((module) => ({ default: module.TenantListPage })));
+const TenantCreateEditPage = lazy(() => import('../features/saas/pages/TenantCreateEditPage').then((module) => ({ default: module.TenantCreateEditPage })));
+const TenantDetailPage = lazy(() => import('../features/saas/pages/TenantDetailPage').then((module) => ({ default: module.TenantDetailPage })));
+const SchoolProfilePage = lazy(() => import('../features/saas/pages/SchoolProfilePage').then((module) => ({ default: module.SchoolProfilePage })));
+const SubscriptionPlansPage = lazy(() => import('../features/saas/pages/SubscriptionPlansPage').then((module) => ({ default: module.SubscriptionPlansPage })));
+const PlanFeatureMatrixPage = lazy(() => import('../features/saas/pages/PlanFeatureMatrixPage').then((module) => ({ default: module.PlanFeatureMatrixPage })));
+const TenantSubscriptionPage = lazy(() => import('../features/saas/pages/TenantSubscriptionPage').then((module) => ({ default: module.TenantSubscriptionPage })));
+const TenantUsagePage = lazy(() => import('../features/saas/pages/TenantUsagePage').then((module) => ({ default: module.TenantUsagePage })));
+const TenantBillingPage = lazy(() => import('../features/saas/pages/TenantBillingPage').then((module) => ({ default: module.TenantBillingPage })));
+const TenantDomainsPage = lazy(() => import('../features/saas/pages/TenantDomainsPage').then((module) => ({ default: module.TenantDomainsPage })));
+const SaasOnboardingPage = lazy(() => import('../features/saas/pages/SaasOnboardingPage').then((module) => ({ default: module.SaasOnboardingPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -681,6 +700,90 @@ export const router = createBrowserRouter([
           {
             path: 'portal/settings',
             element: withSuspense(<ProfileSettingsPage />),
+          },
+          {
+            path: 'rbac/roles',
+            element: withSuspense(<RbacRolesListPage />),
+          },
+          {
+            path: 'rbac/roles/new',
+            element: withSuspense(<RbacRoleEditorPage />),
+          },
+          {
+            path: 'rbac/roles/:roleId/edit',
+            element: withSuspense(<RbacRoleEditorPage />),
+          },
+          {
+            path: 'rbac/permissions/matrix',
+            element: withSuspense(<RbacPermissionMatrixPage />),
+          },
+          {
+            path: 'rbac/users/assign',
+            element: withSuspense(<RbacAssignRolesPage />),
+          },
+          {
+            path: 'rbac/permissions',
+            element: withSuspense(<RbacPermissionsListPage />),
+          },
+          {
+            path: 'rbac/me',
+            element: withSuspense(<RbacMyPermissionsPage />),
+          },
+          {
+            path: 'rbac/audit-logs',
+            element: withSuspense(<RbacAuditLogsPage />),
+          },
+          {
+            path: 'saas/dashboard',
+            element: withSuspense(<SaasDashboardPage />),
+          },
+          {
+            path: 'saas/tenants',
+            element: withSuspense(<TenantListPage />),
+          },
+          {
+            path: 'saas/tenants/new',
+            element: withSuspense(<TenantCreateEditPage />),
+          },
+          {
+            path: 'saas/tenants/:tenantId/edit',
+            element: withSuspense(<TenantCreateEditPage />),
+          },
+          {
+            path: 'saas/tenants/:tenantId',
+            element: withSuspense(<TenantDetailPage />),
+          },
+          {
+            path: 'saas/profile',
+            element: withSuspense(<SchoolProfilePage />),
+          },
+          {
+            path: 'saas/plans',
+            element: withSuspense(<SubscriptionPlansPage />),
+          },
+          {
+            path: 'saas/plan-features',
+            element: withSuspense(<PlanFeatureMatrixPage />),
+          },
+          {
+            path: 'saas/subscriptions',
+            element: withSuspense(<TenantSubscriptionPage />),
+          },
+          {
+            path: 'saas/usage',
+            element: withSuspense(<TenantUsagePage />),
+          },
+          {
+            path: 'saas/billing',
+            element: withSuspense(<TenantBillingPage />),
+          },
+          {
+            path: 'saas/domains',
+            element: withSuspense(<TenantDomainsPage />),
+          },
+          {
+            path: 'saas/onboarding',
+            element: withSuspense(<SaasOnboardingPage />),
           },
         ],
       },

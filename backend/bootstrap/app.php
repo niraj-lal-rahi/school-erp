@@ -13,8 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
+            'tenant.domain' => \App\Http\Middleware\ResolveTenantFromDomain::class,
             'tenant.resolve' => \App\Http\Middleware\ResolveTenant::class,
-            'permission' => \App\Http\Middleware\EnsureUserHasPermission::class,
+            'tenant.active' => \App\Http\Middleware\EnsureTenantActive::class,
+            'tenant.feature' => \App\Http\Middleware\CheckTenantFeature::class,
+            'tenant.limit' => \App\Http\Middleware\CheckTenantUsageLimit::class,
+            'permission' => \App\Http\Middleware\CheckPermission::class,
+            'role' => \App\Http\Middleware\CheckRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

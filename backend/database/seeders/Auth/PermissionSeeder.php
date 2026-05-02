@@ -3,14 +3,23 @@
 namespace Database\Seeders\Auth;
 
 use App\Models\Permission;
+use App\Services\Rbac\PermissionSyncService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class PermissionSeeder extends Seeder
 {
+    public function __construct(
+        protected PermissionSyncService $syncService,
+    ) {
+    }
+
     public function run(): void
     {
-        $permissions = [
+        $this->syncService->sync();
+
+        $permissions = collect([
             ['name' => 'View Students', 'code' => 'students.view', 'module' => 'sis'],
             ['name' => 'Create Students', 'code' => 'students.create', 'module' => 'sis'],
             ['name' => 'Update Students', 'code' => 'students.update', 'module' => 'sis'],
@@ -40,17 +49,66 @@ class PermissionSeeder extends Seeder
             ['name' => 'View Portal', 'code' => 'portal.view', 'module' => 'portal'],
             ['name' => 'Manage Portal', 'code' => 'portal.manage', 'module' => 'portal'],
             ['name' => 'Impersonate Portal', 'code' => 'portal.impersonate', 'module' => 'portal'],
-        ];
+            ['name' => 'View RBAC', 'code' => 'rbac.view', 'module' => 'rbac'],
+            ['name' => 'Manage RBAC', 'code' => 'rbac.manage', 'module' => 'rbac'],
+        ]);
 
-        foreach ($permissions as $permission) {
+        $permissions
+            ->merge($this->legacyModulePermissions())
+            ->unique('code')
+            ->each(function (array $permission): void {
             Permission::updateOrCreate(
                 ['code' => $permission['code']],
                 [
                     'uuid' => (string) Str::uuid(),
                     ...$permission,
                     'description' => $permission['name'].' permission',
+                    'action' => $permission['action'] ?? $this->deriveAction($permission['code']),
+                    'is_system' => true,
+                    'status' => 'active',
                 ]
             );
-        }
+            });
+    }
+
+    protected function legacyModulePermissions(): Collection
+    {
+        $modules = [
+            'academic-management' => 'Academic Management',
+            'communication' => 'Communication',
+            'attendance' => 'Attendance',
+            'finance' => 'Finance',
+            'hr' => 'HR',
+            'portal' => 'Portal',
+            'reports' => 'Reports',
+            'transport' => 'Transport',
+            'timetable' => 'Timetable',
+            'exams' => 'Examinations',
+            'rbac' => 'RBAC',
+        ];
+
+        return collect($modules)->flatMap(
+            fn (string $name, string $module): array => [
+                [
+                    'name' => "View {$name}",
+                    'code' => "{$module}.view",
+                    'module' => $module,
+                    'action' => 'view',
+                ],
+                [
+                    'name' => "Manage {$name}",
+                    'code' => "{$module}.manage",
+                    'module' => $module,
+                    'action' => 'manage',
+                ],
+            ]
+        )->values();
+    }
+
+    protected function deriveAction(string $code): string
+    {
+        $segments = explode('.', $code);
+
+        return end($segments) ?: 'view';
     }
 }

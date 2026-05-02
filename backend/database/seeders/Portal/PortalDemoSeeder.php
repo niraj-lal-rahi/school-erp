@@ -49,13 +49,18 @@ class PortalDemoSeeder extends Seeder
         $portalRole = Role::withoutGlobalScopes()->updateOrCreate(
             [
                 'school_id' => $school->id,
-                'slug' => 'portal-user',
+                'code' => 'portal_user',
             ],
             [
                 'uuid' => (string) Str::uuid(),
                 'name' => 'Portal User',
+                'code' => 'portal_user',
+                'slug' => 'portal-user',
                 'scope' => 'tenant',
                 'description' => 'Portal access for students and guardians.',
+                'role_type' => 'tenant',
+                'is_default' => false,
+                'status' => 'active',
             ]
         );
 

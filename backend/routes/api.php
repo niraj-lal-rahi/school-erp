@@ -98,6 +98,18 @@ use App\Http\Controllers\Api\V1\Portal\PortalDashboardController;
 use App\Http\Controllers\Api\V1\Portal\PortalNotificationController;
 use App\Http\Controllers\Api\V1\Portal\PortalProfileController;
 use App\Http\Controllers\Api\V1\Portal\PortalStudentController;
+use App\Http\Controllers\Api\V1\Rbac\AccessControlController;
+use App\Http\Controllers\Api\V1\Rbac\PermissionController as RbacPermissionController;
+use App\Http\Controllers\Api\V1\Rbac\RoleController as RbacRoleController;
+use App\Http\Controllers\Api\V1\Rbac\UserRoleController;
+use App\Http\Controllers\Api\V1\Saas\SubscriptionPlanController;
+use App\Http\Controllers\Api\V1\Saas\TenantBillingController;
+use App\Http\Controllers\Api\V1\Saas\TenantController;
+use App\Http\Controllers\Api\V1\Saas\TenantDomainController;
+use App\Http\Controllers\Api\V1\Saas\TenantFeatureController;
+use App\Http\Controllers\Api\V1\Saas\TenantOnboardingController;
+use App\Http\Controllers\Api\V1\Saas\TenantSubscriptionController;
+use App\Http\Controllers\Api\V1\Saas\TenantUsageController;
 use App\Http\Controllers\Api\V1\SIS\StudentController;
 use App\Http\Controllers\Api\V1\SIS\StudentNoteController;
 use App\Http\Controllers\Api\V1\Timetable\TimetableEntryController;
@@ -124,7 +136,44 @@ Route::prefix('v1')->group(function (): void {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
 
-    Route::middleware(['auth:api', 'tenant.resolve'])->group(function (): void {
+    Route::middleware(['auth:api'])->prefix('saas')->group(function (): void {
+        Route::get('/tenants', [TenantController::class, 'index']);
+        Route::post('/tenants', [TenantController::class, 'store']);
+        Route::get('/tenants/{id}', [TenantController::class, 'show']);
+        Route::put('/tenants/{id}', [TenantController::class, 'update']);
+        Route::post('/tenants/{id}/activate', [TenantController::class, 'activate']);
+        Route::post('/tenants/{id}/suspend', [TenantController::class, 'suspend']);
+        Route::post('/tenants/{id}/cancel', [TenantController::class, 'cancel']);
+
+        Route::post('/onboard-school', [TenantOnboardingController::class, 'store']);
+
+        Route::get('/plans', [SubscriptionPlanController::class, 'index']);
+        Route::post('/plans', [SubscriptionPlanController::class, 'store']);
+        Route::put('/plans/{id}', [SubscriptionPlanController::class, 'update']);
+        Route::delete('/plans/{id}', [SubscriptionPlanController::class, 'destroy']);
+        Route::post('/plans/{id}/features', [SubscriptionPlanController::class, 'addFeature']);
+
+        Route::post('/tenants/{id}/subscribe', [TenantSubscriptionController::class, 'subscribe']);
+        Route::post('/tenants/{id}/change-plan', [TenantSubscriptionController::class, 'changePlan']);
+        Route::post('/tenants/{id}/renew', [TenantSubscriptionController::class, 'renew']);
+        Route::post('/tenants/{id}/cancel-subscription', [TenantSubscriptionController::class, 'cancel']);
+
+        Route::get('/tenants/{id}/features', [TenantFeatureController::class, 'index']);
+        Route::put('/tenants/{id}/features', [TenantFeatureController::class, 'update']);
+
+        Route::get('/tenants/{id}/usage', [TenantUsageController::class, 'show']);
+        Route::post('/tenants/{id}/sync-usage', [TenantUsageController::class, 'sync']);
+
+        Route::get('/tenants/{id}/billing', [TenantBillingController::class, 'index']);
+        Route::post('/billing/{id}/mark-paid', [TenantBillingController::class, 'markPaid']);
+        Route::post('/billing/{id}/mark-failed', [TenantBillingController::class, 'markFailed']);
+
+        Route::get('/tenants/{id}/domains', [TenantDomainController::class, 'index']);
+        Route::post('/tenants/{id}/domains', [TenantDomainController::class, 'store']);
+        Route::post('/domains/{id}/verify', [TenantDomainController::class, 'verify']);
+    });
+
+    Route::middleware(['auth:api', 'tenant.domain', 'tenant.resolve', 'tenant.active'])->group(function (): void {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/dashboard/overview', [DashboardController::class, 'overview'])->middleware('permission:students.view');
@@ -887,6 +936,27 @@ Route::prefix('v1')->group(function (): void {
             Route::post('/profiles/link-student', [PortalProfileController::class, 'linkStudent'])->middleware('permission:portal.manage');
             Route::post('/profiles/link-guardian', [PortalProfileController::class, 'linkGuardian'])->middleware('permission:portal.manage');
             Route::put('/profiles/access/{id}', [PortalProfileController::class, 'updateAccess'])->middleware('permission:portal.manage');
+        });
+
+        Route::prefix('rbac')->group(function (): void {
+            Route::get('/permissions', [RbacPermissionController::class, 'index'])->middleware('permission:rbac.view');
+            Route::get('/permissions/grouped', [RbacPermissionController::class, 'grouped'])->middleware('permission:rbac.view');
+            Route::post('/permissions/sync', [RbacPermissionController::class, 'sync'])->middleware('permission:rbac.manage');
+
+            Route::get('/roles', [RbacRoleController::class, 'index'])->middleware('permission:rbac.view');
+            Route::post('/roles', [RbacRoleController::class, 'store'])->middleware('permission:rbac.manage');
+            Route::put('/roles/{id}', [RbacRoleController::class, 'update'])->middleware('permission:rbac.manage');
+            Route::delete('/roles/{id}', [RbacRoleController::class, 'destroy'])->middleware('permission:rbac.manage');
+            Route::post('/roles/{id}/permissions', [RbacRoleController::class, 'syncPermissions'])->middleware('permission:rbac.manage');
+            Route::post('/roles/{id}/clone', [RbacRoleController::class, 'clone'])->middleware('permission:rbac.manage');
+
+            Route::get('/users/{id}/roles', [UserRoleController::class, 'index'])->middleware('permission:rbac.view');
+            Route::post('/users/{id}/roles', [UserRoleController::class, 'store'])->middleware('permission:rbac.manage');
+            Route::delete('/users/{id}/roles/{roleId}', [UserRoleController::class, 'destroy'])->middleware('permission:rbac.manage');
+
+            Route::get('/me/permissions', [AccessControlController::class, 'myPermissions']);
+            Route::get('/me/roles', [AccessControlController::class, 'myRoles']);
+            Route::post('/check-permission', [AccessControlController::class, 'checkPermission']);
         });
     });
 });

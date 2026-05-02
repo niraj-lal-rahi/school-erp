@@ -41,6 +41,9 @@ import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined';
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
+import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
+import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
 import {
   Collapse,
@@ -219,6 +222,30 @@ const portalChildren = [
   { label: 'Profile Settings', to: '/portal/settings', icon: <PaletteOutlinedIcon />, permission: 'portal.view' },
 ];
 
+const rbacChildren = [
+  { label: 'Roles List', to: '/rbac/roles', icon: <AdminPanelSettingsOutlinedIcon />, permission: 'rbac.view' },
+  { label: 'Create / Edit Role', to: '/rbac/roles/new', icon: <PersonAddAltOutlinedIcon />, permission: 'rbac.manage' },
+  { label: 'Permission Matrix', to: '/rbac/permissions/matrix', icon: <ViewKanbanOutlinedIcon />, permission: 'rbac.manage' },
+  { label: 'Assign Roles to Users', to: '/rbac/users/assign', icon: <PeopleAltOutlinedIcon />, permission: 'rbac.manage' },
+  { label: 'Permissions List', to: '/rbac/permissions', icon: <LibraryBooksOutlinedIcon />, permission: 'rbac.view' },
+  { label: 'My Permissions', to: '/rbac/me', icon: <FactCheckOutlinedIcon />, permission: 'rbac.view' },
+  { label: 'Audit Logs', to: '/rbac/audit-logs', icon: <TimelineOutlinedIcon />, permission: 'rbac.manage' },
+];
+
+const saasChildren = [
+  { label: 'SaaS Dashboard', to: '/saas/dashboard', icon: <DashboardOutlinedIcon />, permission: 'saas.view' },
+  { label: 'Tenant List', to: '/saas/tenants', icon: <ApartmentOutlinedIcon />, permission: 'saas.view' },
+  { label: 'Create Tenant', to: '/saas/tenants/new', icon: <PersonAddAltOutlinedIcon />, permission: 'saas.manage' },
+  { label: 'School Profile', to: '/saas/profile', icon: <SchoolOutlinedIcon />, permission: 'saas.view' },
+  { label: 'Subscription Plans', to: '/saas/plans', icon: <PaymentsOutlinedIcon />, permission: 'saas.manage' },
+  { label: 'Plan Feature Matrix', to: '/saas/plan-features', icon: <ViewKanbanOutlinedIcon />, permission: 'saas.manage' },
+  { label: 'Tenant Subscription', to: '/saas/subscriptions', icon: <AutorenewOutlinedIcon />, permission: 'saas.manage' },
+  { label: 'Tenant Usage', to: '/saas/usage', icon: <TimelineOutlinedIcon />, permission: 'saas.view' },
+  { label: 'Tenant Billing', to: '/saas/billing', icon: <ReceiptLongOutlinedIcon />, permission: 'saas.manage' },
+  { label: 'Tenant Domains', to: '/saas/domains', icon: <LocationOnOutlinedIcon />, permission: 'saas.view' },
+  { label: 'SaaS Onboarding', to: '/saas/onboarding', icon: <CampaignOutlinedIcon />, permission: 'saas.manage' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -233,7 +260,11 @@ function itemStyles(isChild = false) {
 
 export function SidebarNav() {
   const permissions = useAppSelector((state) => state.auth.user?.permissions || []);
+  const roles = useAppSelector((state) => state.auth.user?.roles || []);
   const location = useLocation();
+  const roleCodes = useMemo(() => roles.map((role) => role.code || role.slug).filter(Boolean), [roles]);
+  const isSuperAdmin = roleCodes.includes('super_admin');
+  const isTenantAdmin = roleCodes.includes('tenant_admin') || roleCodes.includes('school-admin');
 
   const visibleCoreItems = useMemo(
     () => coreItems.filter((item) => permissions.includes(item.permission)),
@@ -285,6 +316,19 @@ export function SidebarNav() {
     () => portalChildren.filter((item) => permissions.includes(item.permission) || (item.permission === 'portal.view' && permissions.includes('portal.manage'))),
     [permissions],
   );
+  const visibleRbacChildren = useMemo(
+    () => rbacChildren.filter((item) => permissions.includes(item.permission) || (item.permission === 'rbac.view' && permissions.includes('rbac.manage'))),
+    [permissions],
+  );
+  const visibleSaasChildren = useMemo(
+    () => saasChildren.filter((item) => (
+      isSuperAdmin
+      || (item.permission === 'saas.view' && isTenantAdmin)
+      || permissions.includes(item.permission)
+      || (item.permission === 'saas.view' && permissions.includes('saas.manage'))
+    )),
+    [isSuperAdmin, isTenantAdmin, permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -307,6 +351,8 @@ export function SidebarNav() {
   const examinationRouteActive = location.pathname.startsWith('/exams');
   const reportsRouteActive = location.pathname.startsWith('/reports');
   const portalRouteActive = location.pathname.startsWith('/portal');
+  const rbacRouteActive = location.pathname.startsWith('/rbac');
+  const saasRouteActive = location.pathname.startsWith('/saas');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
@@ -318,6 +364,8 @@ export function SidebarNav() {
   const [examinationOpen, setExaminationOpen] = useState(examinationRouteActive);
   const [reportsOpen, setReportsOpen] = useState(reportsRouteActive);
   const [portalOpen, setPortalOpen] = useState(portalRouteActive);
+  const [rbacOpen, setRbacOpen] = useState(rbacRouteActive);
+  const [saasOpen, setSaasOpen] = useState(saasRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -385,6 +433,18 @@ export function SidebarNav() {
     }
   }, [portalRouteActive]);
 
+  useEffect(() => {
+    if (rbacRouteActive) {
+      setRbacOpen(true);
+    }
+  }, [rbacRouteActive]);
+
+  useEffect(() => {
+    if (saasRouteActive) {
+      setSaasOpen(true);
+    }
+  }, [saasRouteActive]);
+
   return (
     <Paper
       elevation={0}
@@ -423,7 +483,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -785,6 +845,74 @@ export function SidebarNav() {
                 <Collapse in={portalOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visiblePortalChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleRbacChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setRbacOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: rbacRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <AdminPanelSettingsOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="RBAC & Access" />
+                  {rbacOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={rbacOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleRbacChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleSaasChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setSaasOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: saasRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <ApartmentOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="SaaS Tenancy" />
+                  {saasOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={saasOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleSaasChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

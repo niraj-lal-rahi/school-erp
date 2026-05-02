@@ -75,8 +75,9 @@ class User extends Authenticatable
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class)
-            ->withPivot('school_id')
+        return $this->belongsToMany(Role::class, 'user_roles')
+            ->using(UserRole::class)
+            ->withPivot(['id', 'school_id', 'assigned_by'])
             ->withTimestamps();
     }
 
@@ -88,10 +89,7 @@ class User extends Authenticatable
     public function hasPermission(string $permission): bool
     {
         return $this->roles()
-            ->where(function ($query): void {
-                $query->whereNull('roles.school_id')
-                    ->orWhere('roles.school_id', $this->school_id);
-            })
+            ->visibleInTenant($this->school_id)
             ->whereHas('permissions', fn ($query) => $query->where('permissions.code', $permission))
             ->exists();
     }
