@@ -156,6 +156,15 @@ const TenantUsagePage = lazy(() => import('../features/saas/pages/TenantUsagePag
 const TenantBillingPage = lazy(() => import('../features/saas/pages/TenantBillingPage').then((module) => ({ default: module.TenantBillingPage })));
 const TenantDomainsPage = lazy(() => import('../features/saas/pages/TenantDomainsPage').then((module) => ({ default: module.TenantDomainsPage })));
 const SaasOnboardingPage = lazy(() => import('../features/saas/pages/SaasOnboardingPage').then((module) => ({ default: module.SaasOnboardingPage })));
+const PaymentGatewaySettingsPage = lazy(() => import('../features/payments/pages/PaymentGatewaySettingsPage').then((module) => ({ default: module.PaymentGatewaySettingsPage })));
+const PaymentTransactionsPage = lazy(() => import('../features/payments/pages/PaymentTransactionsPage').then((module) => ({ default: module.PaymentTransactionsPage })));
+const InitiatePaymentPage = lazy(() => import('../features/payments/pages/InitiatePaymentPage').then((module) => ({ default: module.InitiatePaymentPage })));
+const UpiPaymentVerificationPage = lazy(() => import('../features/payments/pages/UpiPaymentVerificationPage').then((module) => ({ default: module.UpiPaymentVerificationPage })));
+const ManualPaymentApprovalPage = lazy(() => import('../features/payments/pages/ManualPaymentApprovalPage').then((module) => ({ default: module.ManualPaymentApprovalPage })));
+const RefundManagementPage = lazy(() => import('../features/payments/pages/RefundManagementPage').then((module) => ({ default: module.RefundManagementPage })));
+const WebhookLogsPage = lazy(() => import('../features/payments/pages/WebhookLogsPage').then((module) => ({ default: module.WebhookLogsPage })));
+const ReconciliationPage = lazy(() => import('../features/payments/pages/ReconciliationPage').then((module) => ({ default: module.ReconciliationPage })));
+const PaymentReportsPage = lazy(() => import('../features/payments/pages/PaymentReportsPage').then((module) => ({ default: module.PaymentReportsPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -784,6 +793,42 @@ export const router = createBrowserRouter([
           {
             path: 'saas/onboarding',
             element: withSuspense(<SaasOnboardingPage />),
+          },
+          {
+            path: 'payments/gateways',
+            element: withSuspense(<PaymentGatewaySettingsPage />),
+          },
+          {
+            path: 'payments/transactions',
+            element: withSuspense(<PaymentTransactionsPage />),
+          },
+          {
+            path: 'payments/initiate',
+            element: withSuspense(<InitiatePaymentPage />),
+          },
+          {
+            path: 'payments/upi-verification',
+            element: withSuspense(<UpiPaymentVerificationPage />),
+          },
+          {
+            path: 'payments/manual-approval',
+            element: withSuspense(<ManualPaymentApprovalPage />),
+          },
+          {
+            path: 'payments/refunds',
+            element: withSuspense(<RefundManagementPage />),
+          },
+          {
+            path: 'payments/webhook-logs',
+            element: withSuspense(<WebhookLogsPage />),
+          },
+          {
+            path: 'payments/reconciliation',
+            element: withSuspense(<ReconciliationPage />),
+          },
+          {
+            path: 'payments/reports',
+            element: withSuspense(<PaymentReportsPage />),
           },
         ],
       },

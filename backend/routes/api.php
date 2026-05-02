@@ -98,6 +98,12 @@ use App\Http\Controllers\Api\V1\Portal\PortalDashboardController;
 use App\Http\Controllers\Api\V1\Portal\PortalNotificationController;
 use App\Http\Controllers\Api\V1\Portal\PortalProfileController;
 use App\Http\Controllers\Api\V1\Portal\PortalStudentController;
+use App\Http\Controllers\Api\V1\Payments\PaymentGatewayController;
+use App\Http\Controllers\Api\V1\Payments\PaymentReconciliationController;
+use App\Http\Controllers\Api\V1\Payments\PaymentRefundController;
+use App\Http\Controllers\Api\V1\Payments\PaymentTransactionController;
+use App\Http\Controllers\Api\V1\Payments\PaymentWebhookController;
+use App\Http\Controllers\Api\V1\Payments\UpiPaymentController;
 use App\Http\Controllers\Api\V1\Rbac\AccessControlController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionController as RbacPermissionController;
 use App\Http\Controllers\Api\V1\Rbac\RoleController as RbacRoleController;
@@ -135,6 +141,10 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function (): void {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+    Route::prefix('payments')->group(function (): void {
+        Route::post('/webhooks/razorpay', [PaymentWebhookController::class, 'razorpay']);
+        Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe']);
+    });
 
     Route::middleware(['auth:api'])->prefix('saas')->group(function (): void {
         Route::get('/tenants', [TenantController::class, 'index']);
@@ -957,6 +967,37 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/me/permissions', [AccessControlController::class, 'myPermissions']);
             Route::get('/me/roles', [AccessControlController::class, 'myRoles']);
             Route::post('/check-permission', [AccessControlController::class, 'checkPermission']);
+        });
+
+        Route::prefix('payments')->group(function (): void {
+            Route::get('/gateways', [PaymentGatewayController::class, 'index']);
+            Route::post('/gateways', [PaymentGatewayController::class, 'store']);
+            Route::put('/gateways/{id}', [PaymentGatewayController::class, 'update']);
+            Route::delete('/gateways/{id}', [PaymentGatewayController::class, 'destroy']);
+
+            Route::post('/initiate', [PaymentTransactionController::class, 'initiate']);
+            Route::post('/verify', [PaymentTransactionController::class, 'verify']);
+            Route::get('/transactions', [PaymentTransactionController::class, 'index']);
+            Route::get('/transactions/{id}', [PaymentTransactionController::class, 'show']);
+            Route::post('/transactions/{id}/manual-approve', [PaymentTransactionController::class, 'manualApprove']);
+            Route::post('/transactions/{id}/cancel', [PaymentTransactionController::class, 'cancel']);
+
+            Route::post('/upi/initiate', [UpiPaymentController::class, 'initiate']);
+            Route::post('/upi/verify', [UpiPaymentController::class, 'verify']);
+            Route::get('/upi/{transactionId}', [UpiPaymentController::class, 'show']);
+            Route::post('/upi/{transactionId}/manual-verify', [UpiPaymentController::class, 'manualVerify']);
+            Route::post('/upi/{transactionId}/expire', [UpiPaymentController::class, 'expire']);
+
+            Route::post('/transactions/{id}/refund', [PaymentRefundController::class, 'store']);
+            Route::get('/refunds', [PaymentRefundController::class, 'index']);
+            Route::post('/refunds/{id}/process', [PaymentRefundController::class, 'process']);
+
+            Route::get('/reconciliations', [PaymentReconciliationController::class, 'index']);
+            Route::post('/transactions/{id}/reconcile', [PaymentReconciliationController::class, 'reconcile']);
+
+            Route::get('/reports/payment-summary', [PaymentTransactionController::class, 'paymentSummary']);
+            Route::get('/reports/upipayments', [UpiPaymentController::class, 'report']);
+            Route::get('/reports/failed-transactions', [PaymentTransactionController::class, 'failedTransactions']);
         });
     });
 });

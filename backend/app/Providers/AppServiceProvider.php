@@ -408,6 +408,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TenantBillingRepositoryInterface::class, TenantBillingRepository::class);
         $this->app->bind(TenantDomainRepositoryInterface::class, TenantDomainRepository::class);
         $this->app->bind(TenantAuditRepositoryInterface::class, TenantAuditRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Payments\PaymentGatewayRepositoryInterface::class, \App\Repositories\Eloquent\Payments\PaymentGatewayRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Payments\PaymentTransactionRepositoryInterface::class, \App\Repositories\Eloquent\Payments\PaymentTransactionRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Payments\PaymentWebhookRepositoryInterface::class, \App\Repositories\Eloquent\Payments\PaymentWebhookRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Payments\PaymentRefundRepositoryInterface::class, \App\Repositories\Eloquent\Payments\PaymentRefundRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Payments\PaymentReconciliationRepositoryInterface::class, \App\Repositories\Eloquent\Payments\PaymentReconciliationRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Payments\UpiPaymentRequestRepositoryInterface::class, \App\Repositories\Eloquent\Payments\UpiPaymentRequestRepository::class);
         $this->app->bind(TimetableRoomRepositoryInterface::class, TimetableRoomRepository::class);
         $this->app->bind(TimetableVersionRepositoryInterface::class, TimetableVersionRepository::class);
         $this->app->bind(TimetablePublishLogRepositoryInterface::class, TimetablePublishLogRepository::class);
@@ -569,6 +575,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(SubscriptionPlan::class, SubscriptionPlanPolicy::class);
         Gate::policy(TenantSubscription::class, TenantSubscriptionPolicy::class);
         Gate::policy(TenantBillingRecord::class, TenantBillingPolicy::class);
+        Gate::policy(\App\Models\Payments\PaymentGateway::class, \App\Policies\Payments\PaymentGatewayPolicy::class);
+        Gate::policy(\App\Models\Payments\PaymentTransaction::class, \App\Policies\Payments\PaymentTransactionPolicy::class);
+        Gate::policy(\App\Models\Payments\PaymentRefund::class, \App\Policies\Payments\PaymentRefundPolicy::class);
+        Gate::policy(\App\Models\Payments\PaymentReconciliation::class, \App\Policies\Payments\PaymentReconciliationPolicy::class);
         Gate::policy(Exam::class, ExamPolicy::class);
         Gate::policy(ExamMark::class, ExamMarkPolicy::class);
         Gate::policy(StudentResult::class, ResultPolicy::class);

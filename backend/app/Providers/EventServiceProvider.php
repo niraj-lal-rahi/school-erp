@@ -15,6 +15,12 @@ use App\Events\Examination\ResultsPublished;
 use App\Events\Finance\InvoicePaid;
 use App\Events\Finance\PaymentSuccessful;
 use App\Events\Finance\ReceiptGenerated;
+use App\Events\Payments\PaymentFailed as GatewayPaymentFailed;
+use App\Events\Payments\PaymentInitiated;
+use App\Events\Payments\PaymentRefunded;
+use App\Events\Payments\PaymentSuccessful as GatewayPaymentSuccessful;
+use App\Events\Payments\UpiPaymentManuallyVerified;
+use App\Events\Payments\UpiPaymentPendingVerification;
 use App\Events\Reports\ReportRunCompleted;
 use App\Events\SIS\StudentCreated;
 use App\Events\Timetable\TimetableVersionPublished;
@@ -30,6 +36,10 @@ use App\Listeners\Examination\SendResultNotifications;
 use App\Listeners\Finance\GenerateReceiptForSuccessfulPayment;
 use App\Listeners\Finance\LogInvoicePaid;
 use App\Listeners\Finance\LogReceiptGenerated;
+use App\Listeners\Payments\GenerateReceipt;
+use App\Listeners\Payments\SendPaymentNotification;
+use App\Listeners\Payments\SyncFinancePayment;
+use App\Listeners\Payments\SyncSaaSBilling;
 use App\Listeners\Reports\CacheReportResults;
 use App\Listeners\Reports\SendScheduledReport;
 use App\Listeners\SIS\DispatchStudentProvisioningWorkflow;
@@ -68,6 +78,29 @@ class EventServiceProvider extends ServiceProvider
         ],
         PaymentSuccessful::class => [
             GenerateReceiptForSuccessfulPayment::class,
+        ],
+        PaymentInitiated::class => [
+            SendPaymentNotification::class,
+        ],
+        GatewayPaymentSuccessful::class => [
+            SyncFinancePayment::class,
+            SyncSaaSBilling::class,
+            SendPaymentNotification::class,
+            GenerateReceipt::class,
+        ],
+        GatewayPaymentFailed::class => [
+            SendPaymentNotification::class,
+        ],
+        PaymentRefunded::class => [
+            SyncFinancePayment::class,
+            SyncSaaSBilling::class,
+            SendPaymentNotification::class,
+        ],
+        UpiPaymentPendingVerification::class => [
+            SendPaymentNotification::class,
+        ],
+        UpiPaymentManuallyVerified::class => [
+            SendPaymentNotification::class,
         ],
         InvoicePaid::class => [
             LogInvoicePaid::class,

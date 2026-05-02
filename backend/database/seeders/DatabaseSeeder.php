@@ -27,6 +27,8 @@ use Database\Seeders\Tenant\TenantSeeder;
 use Database\Seeders\Timetable\TimetableSeeder;
 use Database\Seeders\Transport\TransportSeeder;
 use Database\Seeders\Portal\PortalDemoSeeder;
+use Database\Seeders\Payments\DemoPaymentTransactionSeeder;
+use Database\Seeders\Payments\PaymentGatewaySeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -53,6 +55,8 @@ class DatabaseSeeder extends Seeder
             TimetableSeeder::class,
             SisSeeder::class,
             FinanceSeeder::class,
+            PaymentGatewaySeeder::class,
+            DemoPaymentTransactionSeeder::class,
             AttendanceSeeder::class,
             TransportSeeder::class,
             CommunicationChannelSeeder::class,

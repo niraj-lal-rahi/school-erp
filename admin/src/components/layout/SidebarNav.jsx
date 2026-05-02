@@ -246,6 +246,18 @@ const saasChildren = [
   { label: 'SaaS Onboarding', to: '/saas/onboarding', icon: <CampaignOutlinedIcon />, permission: 'saas.manage' },
 ];
 
+const paymentsChildren = [
+  { label: 'Gateway Settings', to: '/payments/gateways', icon: <PaymentsOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Payment Transactions', to: '/payments/transactions', icon: <ReceiptLongOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Initiate Payment', to: '/payments/initiate', icon: <PersonAddAltOutlinedIcon />, permission: 'finance.view' },
+  { label: 'UPI Verification', to: '/payments/upi-verification', icon: <FactCheckOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Manual Approval', to: '/payments/manual-approval', icon: <AssignmentTurnedInOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Refund Management', to: '/payments/refunds', icon: <AutorenewOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Webhook Logs', to: '/payments/webhook-logs', icon: <NotificationsActiveOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Reconciliation', to: '/payments/reconciliation', icon: <PlaylistAddCheckOutlinedIcon />, permission: 'finance.view' },
+  { label: 'Payment Reports', to: '/payments/reports', icon: <TimelineOutlinedIcon />, permission: 'finance.view' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -265,6 +277,7 @@ export function SidebarNav() {
   const roleCodes = useMemo(() => roles.map((role) => role.code || role.slug).filter(Boolean), [roles]);
   const isSuperAdmin = roleCodes.includes('super_admin');
   const isTenantAdmin = roleCodes.includes('tenant_admin') || roleCodes.includes('school-admin');
+  const isAccountant = roleCodes.includes('accountant');
 
   const visibleCoreItems = useMemo(
     () => coreItems.filter((item) => permissions.includes(item.permission)),
@@ -329,6 +342,18 @@ export function SidebarNav() {
     )),
     [isSuperAdmin, isTenantAdmin, permissions],
   );
+  const visiblePaymentsChildren = useMemo(
+    () => paymentsChildren.filter((item) => (
+      isSuperAdmin
+      || isTenantAdmin
+      || isAccountant
+      || permissions.includes(item.permission)
+      || permissions.includes('finance.manage')
+      || permissions.includes('payments.view')
+      || permissions.includes('payments.manage')
+    )),
+    [isSuperAdmin, isTenantAdmin, isAccountant, permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -353,6 +378,7 @@ export function SidebarNav() {
   const portalRouteActive = location.pathname.startsWith('/portal');
   const rbacRouteActive = location.pathname.startsWith('/rbac');
   const saasRouteActive = location.pathname.startsWith('/saas');
+  const paymentsRouteActive = location.pathname.startsWith('/payments');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
@@ -366,6 +392,7 @@ export function SidebarNav() {
   const [portalOpen, setPortalOpen] = useState(portalRouteActive);
   const [rbacOpen, setRbacOpen] = useState(rbacRouteActive);
   const [saasOpen, setSaasOpen] = useState(saasRouteActive);
+  const [paymentsOpen, setPaymentsOpen] = useState(paymentsRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -445,6 +472,12 @@ export function SidebarNav() {
     }
   }, [saasRouteActive]);
 
+  useEffect(() => {
+    if (paymentsRouteActive) {
+      setPaymentsOpen(true);
+    }
+  }, [paymentsRouteActive]);
+
   return (
     <Paper
       elevation={0}
@@ -483,7 +516,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length || visiblePaymentsChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -913,6 +946,40 @@ export function SidebarNav() {
                 <Collapse in={saasOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visibleSaasChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visiblePaymentsChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setPaymentsOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: paymentsRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <PaymentsOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Payments & Gateways" />
+                  {paymentsOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={paymentsOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visiblePaymentsChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

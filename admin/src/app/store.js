@@ -9,6 +9,7 @@ import examinationReducer from '../features/examination/store/examinationSlice';
 import financeReducer from '../features/finance/store/financeSlice';
 import hrReducer from '../features/hr/store/hrSlice';
 import masterDataReducer from '../features/masterData/store/masterDataSlice';
+import paymentsReducer from '../features/payments/store/paymentsSlice';
 import portalReducer from '../features/portal/store/portalSlice';
 import rbacReducer from '../features/rbac/store/rbacSlice';
 import reportsReducer from '../features/reports/store/reportsSlice';
@@ -29,6 +30,7 @@ export const store = configureStore({
     hr: hrReducer,
     examination: examinationReducer,
     masterData: masterDataReducer,
+    payments: paymentsReducer,
     portal: portalReducer,
     rbac: rbacReducer,
     reports: reportsReducer,
