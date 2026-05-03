@@ -165,6 +165,18 @@ const RefundManagementPage = lazy(() => import('../features/payments/pages/Refun
 const WebhookLogsPage = lazy(() => import('../features/payments/pages/WebhookLogsPage').then((module) => ({ default: module.WebhookLogsPage })));
 const ReconciliationPage = lazy(() => import('../features/payments/pages/ReconciliationPage').then((module) => ({ default: module.ReconciliationPage })));
 const PaymentReportsPage = lazy(() => import('../features/payments/pages/PaymentReportsPage').then((module) => ({ default: module.PaymentReportsPage })));
+const DocumentDashboardPage = lazy(() => import('../features/documents/pages/DocumentDashboardPage').then((module) => ({ default: module.DocumentDashboardPage })));
+const DocumentListPage = lazy(() => import('../features/documents/pages/DocumentListPage').then((module) => ({ default: module.DocumentListPage })));
+const UploadDocumentPage = lazy(() => import('../features/documents/pages/UploadDocumentPage').then((module) => ({ default: module.UploadDocumentPage })));
+const DocumentDetailPage = lazy(() => import('../features/documents/pages/DocumentDetailPage').then((module) => ({ default: module.DocumentDetailPage })));
+const VersionHistoryPage = lazy(() => import('../features/documents/pages/VersionHistoryPage').then((module) => ({ default: module.VersionHistoryPage })));
+const FolderManagementPage = lazy(() => import('../features/documents/pages/FolderManagementPage').then((module) => ({ default: module.FolderManagementPage })));
+const CategoryManagementPage = lazy(() => import('../features/documents/pages/CategoryManagementPage').then((module) => ({ default: module.CategoryManagementPage })));
+const TagsManagementPage = lazy(() => import('../features/documents/pages/TagsManagementPage').then((module) => ({ default: module.TagsManagementPage })));
+const VerificationQueuePage = lazy(() => import('../features/documents/pages/VerificationQueuePage').then((module) => ({ default: module.VerificationQueuePage })));
+const ExpiringDocumentsPage = lazy(() => import('../features/documents/pages/ExpiringDocumentsPage').then((module) => ({ default: module.ExpiringDocumentsPage })));
+const BulkUploadPage = lazy(() => import('../features/documents/pages/BulkUploadPage').then((module) => ({ default: module.BulkUploadPage })));
+const StorageUsageReportsPage = lazy(() => import('../features/documents/pages/StorageUsageReportsPage').then((module) => ({ default: module.StorageUsageReportsPage })));
 const WorkflowDefinitionsPage = lazy(() => import('../features/workflows/pages/WorkflowDefinitionsPage').then((module) => ({ default: module.WorkflowDefinitionsPage })));
 const WorkflowBuilderPage = lazy(() => import('../features/workflows/pages/WorkflowBuilderPage').then((module) => ({ default: module.WorkflowBuilderPage })));
 const WorkflowInstancesPage = lazy(() => import('../features/workflows/pages/WorkflowInstancesPage').then((module) => ({ default: module.WorkflowInstancesPage })));
@@ -837,6 +849,54 @@ export const router = createBrowserRouter([
           {
             path: 'payments/reports',
             element: withSuspense(<PaymentReportsPage />),
+          },
+          {
+            path: 'documents/dashboard',
+            element: withSuspense(<DocumentDashboardPage />),
+          },
+          {
+            path: 'documents',
+            element: withSuspense(<DocumentListPage />),
+          },
+          {
+            path: 'documents/upload',
+            element: withSuspense(<UploadDocumentPage />),
+          },
+          {
+            path: 'documents/folders',
+            element: withSuspense(<FolderManagementPage />),
+          },
+          {
+            path: 'documents/categories',
+            element: withSuspense(<CategoryManagementPage />),
+          },
+          {
+            path: 'documents/tags',
+            element: withSuspense(<TagsManagementPage />),
+          },
+          {
+            path: 'documents/verification',
+            element: withSuspense(<VerificationQueuePage />),
+          },
+          {
+            path: 'documents/expiring',
+            element: withSuspense(<ExpiringDocumentsPage />),
+          },
+          {
+            path: 'documents/bulk-upload',
+            element: withSuspense(<BulkUploadPage />),
+          },
+          {
+            path: 'documents/reports/storage-usage',
+            element: withSuspense(<StorageUsageReportsPage />),
+          },
+          {
+            path: 'documents/:documentId',
+            element: withSuspense(<DocumentDetailPage />),
+          },
+          {
+            path: 'documents/:documentId/versions',
+            element: withSuspense(<VersionHistoryPage />),
           },
           {
             path: 'workflows/definitions',

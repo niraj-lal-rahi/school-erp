@@ -407,6 +407,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\Contracts\Workflows\AutomationRunRepositoryInterface::class, \App\Repositories\Eloquent\Workflows\AutomationRunRepository::class);
         $this->app->bind(\App\Repositories\Contracts\Workflows\ApprovalRequestRepositoryInterface::class, \App\Repositories\Eloquent\Workflows\ApprovalRequestRepository::class);
         $this->app->bind(\App\Repositories\Contracts\Workflows\ReminderRuleRepositoryInterface::class, \App\Repositories\Eloquent\Workflows\ReminderRuleRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Documents\DocumentCategoryRepositoryInterface::class, \App\Repositories\Eloquent\Documents\DocumentCategoryRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Documents\DocumentFolderRepositoryInterface::class, \App\Repositories\Eloquent\Documents\DocumentFolderRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Documents\DocumentRepositoryInterface::class, \App\Repositories\Eloquent\Documents\DocumentRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Documents\DocumentFileRepositoryInterface::class, \App\Repositories\Eloquent\Documents\DocumentFileRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Documents\DocumentPermissionRepositoryInterface::class, \App\Repositories\Eloquent\Documents\DocumentPermissionRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Documents\DocumentVerificationRepositoryInterface::class, \App\Repositories\Eloquent\Documents\DocumentVerificationRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Documents\DocumentTagRepositoryInterface::class, \App\Repositories\Eloquent\Documents\DocumentTagRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Documents\DocumentAuditRepositoryInterface::class, \App\Repositories\Eloquent\Documents\DocumentAuditRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\Documents\DocumentBulkUploadRepositoryInterface::class, \App\Repositories\Eloquent\Documents\DocumentBulkUploadRepository::class);
         $this->app->bind(TenantRepositoryInterface::class, TenantRepository::class);
         $this->app->bind(SubscriptionPlanRepositoryInterface::class, SubscriptionPlanRepository::class);
         $this->app->bind(TenantSubscriptionRepositoryInterface::class, TenantSubscriptionRepository::class);
@@ -592,6 +601,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\Workflows\WorkflowStepInstance::class, \App\Policies\Workflows\WorkflowPolicy::class);
         Gate::policy(\App\Models\Workflows\AutomationRule::class, \App\Policies\Workflows\AutomationPolicy::class);
         Gate::policy(\App\Models\Workflows\AutomationRun::class, \App\Policies\Workflows\AutomationPolicy::class);
+        Gate::policy(\App\Models\Documents\Document::class, \App\Policies\Documents\DocumentPolicy::class);
+        Gate::policy(\App\Models\Documents\DocumentCategory::class, \App\Policies\Documents\DocumentCategoryPolicy::class);
+        Gate::policy(\App\Models\Documents\DocumentFolder::class, \App\Policies\Documents\DocumentFolderPolicy::class);
+        Gate::policy(\App\Models\Documents\DocumentVerification::class, \App\Policies\Documents\DocumentVerificationPolicy::class);
         Gate::policy(\App\Models\Workflows\ApprovalRequest::class, \App\Policies\Workflows\ApprovalPolicy::class);
         Gate::policy(\App\Models\Workflows\ReminderRule::class, \App\Policies\Workflows\ReminderPolicy::class);
         Gate::policy(\App\Models\Workflows\ReminderLog::class, \App\Policies\Workflows\ReminderPolicy::class);

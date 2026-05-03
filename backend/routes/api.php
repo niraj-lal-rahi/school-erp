@@ -41,6 +41,14 @@ use App\Http\Controllers\Api\V1\Communication\NotificationController as Communic
 use App\Http\Controllers\Api\V1\Communication\NotificationPreferenceController;
 use App\Http\Controllers\Api\V1\Communication\ScheduledMessageController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
+use App\Http\Controllers\Api\V1\Documents\DocumentBulkUploadController;
+use App\Http\Controllers\Api\V1\Documents\DocumentCategoryController;
+use App\Http\Controllers\Api\V1\Documents\DocumentController as DocumentManagementController;
+use App\Http\Controllers\Api\V1\Documents\DocumentFileController;
+use App\Http\Controllers\Api\V1\Documents\DocumentFolderController;
+use App\Http\Controllers\Api\V1\Documents\DocumentPermissionController;
+use App\Http\Controllers\Api\V1\Documents\DocumentTagController;
+use App\Http\Controllers\Api\V1\Documents\DocumentVerificationController;
 use App\Http\Controllers\Api\V1\Examination\ExamController as ExaminationExamController;
 use App\Http\Controllers\Api\V1\Examination\ExamMarkController;
 use App\Http\Controllers\Api\V1\Examination\ExamSubjectController;
@@ -149,12 +157,12 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function (): void {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
-    Route::prefix('payments')->group(function (): void {
-        Route::post('/webhooks/razorpay', [PaymentWebhookController::class, 'razorpay']);
-        Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe']);
-    });
+        Route::prefix('payments')->group(function (): void {
+            Route::post('/webhooks/razorpay', [PaymentWebhookController::class, 'razorpay']);
+            Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe']);
+        });
 
-    Route::middleware(['auth:api'])->prefix('saas')->group(function (): void {
+        Route::middleware(['auth:api'])->prefix('saas')->group(function (): void {
         Route::get('/tenants', [TenantController::class, 'index']);
         Route::post('/tenants', [TenantController::class, 'store']);
         Route::get('/tenants/{id}', [TenantController::class, 'show']);
@@ -189,9 +197,54 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/tenants/{id}/domains', [TenantDomainController::class, 'index']);
         Route::post('/tenants/{id}/domains', [TenantDomainController::class, 'store']);
         Route::post('/domains/{id}/verify', [TenantDomainController::class, 'verify']);
-    });
+        });
 
     Route::middleware(['auth:api', 'tenant.domain', 'tenant.resolve', 'tenant.active'])->group(function (): void {
+        Route::prefix('documents')->group(function (): void {
+            Route::get('/categories', [DocumentCategoryController::class, 'index'])->middleware('permission:documents.view');
+            Route::post('/categories', [DocumentCategoryController::class, 'store'])->middleware('permission:documents.manage');
+            Route::put('/categories/{id}', [DocumentCategoryController::class, 'update'])->middleware('permission:documents.manage');
+            Route::delete('/categories/{id}', [DocumentCategoryController::class, 'destroy'])->middleware('permission:documents.manage');
+
+            Route::get('/folders', [DocumentFolderController::class, 'index'])->middleware('permission:documents.view');
+            Route::post('/folders', [DocumentFolderController::class, 'store'])->middleware('permission:documents.manage');
+            Route::put('/folders/{id}', [DocumentFolderController::class, 'update'])->middleware('permission:documents.manage');
+            Route::delete('/folders/{id}', [DocumentFolderController::class, 'destroy'])->middleware('permission:documents.manage');
+
+            Route::get('/verification/pending', [DocumentVerificationController::class, 'pending'])->middleware('permission:documents.verify');
+
+            Route::get('/tags', [DocumentTagController::class, 'index'])->middleware('permission:documents.view');
+            Route::post('/tags', [DocumentTagController::class, 'store'])->middleware('permission:documents.manage');
+            Route::delete('/tags/{id}', [DocumentTagController::class, 'destroy'])->middleware('permission:documents.manage');
+
+            Route::post('/bulk-upload', [DocumentBulkUploadController::class, 'store'])->middleware('permission:documents.manage');
+            Route::get('/bulk-upload/{id}', [DocumentBulkUploadController::class, 'show'])->middleware('permission:documents.manage');
+
+            Route::get('/reports/expiring', [DocumentManagementController::class, 'expiringReport'])->middleware('permission:documents.view');
+            Route::get('/reports/expired', [DocumentManagementController::class, 'expiredReport'])->middleware('permission:documents.view');
+            Route::get('/reports/verification-status', [DocumentManagementController::class, 'verificationStatusReport'])->middleware('permission:documents.view');
+            Route::get('/reports/storage-usage', [DocumentManagementController::class, 'storageUsageReport'])->middleware('permission:documents.view');
+
+            Route::get('/', [DocumentManagementController::class, 'index'])->middleware('permission:documents.view');
+            Route::post('/', [DocumentManagementController::class, 'store'])->middleware('permission:documents.manage');
+            Route::get('/{id}', [DocumentManagementController::class, 'show'])->middleware('permission:documents.view');
+            Route::put('/{id}', [DocumentManagementController::class, 'update'])->middleware('permission:documents.manage');
+            Route::delete('/{id}', [DocumentManagementController::class, 'destroy'])->middleware('permission:documents.manage');
+            Route::post('/{id}/restore', [DocumentManagementController::class, 'restore'])->middleware('permission:documents.manage');
+            Route::get('/{id}/download', [DocumentFileController::class, 'download'])->middleware('permission:documents.view')->name('documents.download');
+            Route::post('/{id}/versions', [DocumentFileController::class, 'uploadVersion'])->middleware('permission:documents.manage');
+            Route::get('/{id}/versions', [DocumentFileController::class, 'versions'])->middleware('permission:documents.view');
+            Route::get('/{id}/audit-logs', [DocumentManagementController::class, 'auditLogs'])->middleware('permission:documents.view');
+
+            Route::get('/{id}/permissions', [DocumentPermissionController::class, 'index'])->middleware('permission:documents.manage');
+            Route::post('/{id}/permissions', [DocumentPermissionController::class, 'store'])->middleware('permission:documents.manage');
+            Route::put('/permissions/{id}', [DocumentPermissionController::class, 'update'])->middleware('permission:documents.manage');
+            Route::delete('/permissions/{id}', [DocumentPermissionController::class, 'destroy'])->middleware('permission:documents.manage');
+
+            Route::post('/{id}/verify', [DocumentVerificationController::class, 'verify'])->middleware('permission:documents.verify');
+            Route::post('/{id}/reject', [DocumentVerificationController::class, 'reject'])->middleware('permission:documents.verify');
+        });
+
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/dashboard/overview', [DashboardController::class, 'overview'])->middleware('permission:students.view');

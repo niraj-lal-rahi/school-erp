@@ -26,6 +26,7 @@ import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
+import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import HailOutlinedIcon from '@mui/icons-material/HailOutlined';
 import InputOutlinedIcon from '@mui/icons-material/InputOutlined';
 import ManageHistoryOutlinedIcon from '@mui/icons-material/ManageHistoryOutlined';
@@ -259,6 +260,19 @@ const paymentsChildren = [
   { label: 'Payment Reports', to: '/payments/reports', icon: <TimelineOutlinedIcon />, permission: 'finance.view' },
 ];
 
+const documentsChildren = [
+  { label: 'Document Dashboard', to: '/documents/dashboard', icon: <DashboardOutlinedIcon />, permission: 'documents.view' },
+  { label: 'Document List', to: '/documents', icon: <DescriptionOutlinedIcon />, permission: 'documents.view' },
+  { label: 'Upload Document', to: '/documents/upload', icon: <PersonAddAltOutlinedIcon />, permission: 'documents.manage' },
+  { label: 'Folder Management', to: '/documents/folders', icon: <FolderOutlinedIcon />, permission: 'documents.manage' },
+  { label: 'Category Management', to: '/documents/categories', icon: <LibraryBooksOutlinedIcon />, permission: 'documents.manage' },
+  { label: 'Tags Management', to: '/documents/tags', icon: <PaletteOutlinedIcon />, permission: 'documents.manage' },
+  { label: 'Verification Queue', to: '/documents/verification', icon: <FactCheckOutlinedIcon />, permission: 'documents.verify' },
+  { label: 'Expiring Documents', to: '/documents/expiring', icon: <EventAvailableOutlinedIcon />, permission: 'documents.view' },
+  { label: 'Bulk Upload', to: '/documents/bulk-upload', icon: <InputOutlinedIcon />, permission: 'documents.manage' },
+  { label: 'Storage Usage Reports', to: '/documents/reports/storage-usage', icon: <TimelineOutlinedIcon />, permission: 'documents.view' },
+];
+
 const workflowsChildren = [
   { label: 'Workflow Definitions', to: '/workflows/definitions', icon: <AccountTreeOutlinedIcon />, permission: 'workflows.view' },
   { label: 'Workflow Builder', to: '/workflows/builder', icon: <PlaylistAddCheckOutlinedIcon />, permission: 'workflows.manage' },
@@ -366,6 +380,16 @@ export function SidebarNav() {
     )),
     [isSuperAdmin, isTenantAdmin, isAccountant, permissions],
   );
+  const visibleDocumentsChildren = useMemo(
+    () => documentsChildren.filter((item) => (
+      isSuperAdmin
+      || isTenantAdmin
+      || permissions.includes(item.permission)
+      || (item.permission === 'documents.view' && permissions.includes('documents.manage'))
+      || (item.permission === 'documents.verify' && permissions.includes('documents.manage'))
+    )),
+    [isSuperAdmin, isTenantAdmin, permissions],
+  );
   const visibleWorkflowsChildren = useMemo(
     () => workflowsChildren.filter((item) => (
       isSuperAdmin
@@ -401,6 +425,7 @@ export function SidebarNav() {
   const rbacRouteActive = location.pathname.startsWith('/rbac');
   const saasRouteActive = location.pathname.startsWith('/saas');
   const paymentsRouteActive = location.pathname.startsWith('/payments');
+  const documentsRouteActive = location.pathname.startsWith('/documents');
   const workflowsRouteActive = location.pathname.startsWith('/workflows');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
@@ -416,6 +441,7 @@ export function SidebarNav() {
   const [rbacOpen, setRbacOpen] = useState(rbacRouteActive);
   const [saasOpen, setSaasOpen] = useState(saasRouteActive);
   const [paymentsOpen, setPaymentsOpen] = useState(paymentsRouteActive);
+  const [documentsOpen, setDocumentsOpen] = useState(documentsRouteActive);
   const [workflowsOpen, setWorkflowsOpen] = useState(workflowsRouteActive);
 
   useEffect(() => {
@@ -503,6 +529,12 @@ export function SidebarNav() {
   }, [paymentsRouteActive]);
 
   useEffect(() => {
+    if (documentsRouteActive) {
+      setDocumentsOpen(true);
+    }
+  }, [documentsRouteActive]);
+
+  useEffect(() => {
     if (workflowsRouteActive) {
       setWorkflowsOpen(true);
     }
@@ -546,7 +578,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length || visiblePaymentsChildren.length || visibleWorkflowsChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length || visiblePaymentsChildren.length || visibleDocumentsChildren.length || visibleWorkflowsChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -1010,6 +1042,40 @@ export function SidebarNav() {
                 <Collapse in={paymentsOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visiblePaymentsChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleDocumentsChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setDocumentsOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: documentsRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <FolderOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Document Management" />
+                  {documentsOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={documentsOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleDocumentsChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

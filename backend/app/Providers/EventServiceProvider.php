@@ -11,6 +11,11 @@ use App\Events\Communication\AnnouncementPublished;
 use App\Events\Communication\MessageSent;
 use App\Events\Communication\NotificationFailed;
 use App\Events\Communication\ScheduledMessageProcessed;
+use App\Events\Documents\DocumentDownloaded;
+use App\Events\Documents\DocumentExpired;
+use App\Events\Documents\DocumentRejected;
+use App\Events\Documents\DocumentUploaded;
+use App\Events\Documents\DocumentVerified;
 use App\Events\Examination\ResultsPublished;
 use App\Events\Finance\InvoicePaid;
 use App\Events\Finance\PaymentSuccessful;
@@ -38,6 +43,9 @@ use App\Listeners\Attendance\LogBiometricLogsQueued;
 use App\Listeners\Communication\HandleNotificationFailure;
 use App\Listeners\Communication\LogMessageSent;
 use App\Listeners\Communication\QueueAnnouncementNotifications;
+use App\Listeners\Documents\LogDocumentAction;
+use App\Listeners\Documents\NotifyDocumentVerificationResult;
+use App\Listeners\Documents\SendDocumentExpiryReminder;
 use App\Listeners\Examination\SendResultNotifications;
 use App\Listeners\Finance\GenerateReceiptForSuccessfulPayment;
 use App\Listeners\Finance\LogInvoicePaid;
@@ -160,6 +168,24 @@ class EventServiceProvider extends ServiceProvider
         ReminderDue::class => [
             SendWorkflowNotification::class,
             LogWorkflowActivity::class,
+        ],
+        DocumentUploaded::class => [
+            LogDocumentAction::class,
+        ],
+        DocumentDownloaded::class => [
+            LogDocumentAction::class,
+        ],
+        DocumentVerified::class => [
+            LogDocumentAction::class,
+            NotifyDocumentVerificationResult::class,
+        ],
+        DocumentRejected::class => [
+            LogDocumentAction::class,
+            NotifyDocumentVerificationResult::class,
+        ],
+        DocumentExpired::class => [
+            LogDocumentAction::class,
+            SendDocumentExpiryReminder::class,
         ],
     ];
 }

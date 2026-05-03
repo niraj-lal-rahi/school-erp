@@ -12,6 +12,9 @@ use Database\Seeders\Communication\CommunicationChannelSeeder;
 use Database\Seeders\Communication\CommunicationDemoSeeder;
 use Database\Seeders\Communication\CommunicationGroupSeeder;
 use Database\Seeders\Communication\MessageTemplateSeeder;
+use Database\Seeders\Documents\DocumentCategorySeeder;
+use Database\Seeders\Documents\DocumentTagSeeder;
+use Database\Seeders\Documents\DemoDocumentSeeder;
 use Database\Seeders\Examination\DemoExamSeeder;
 use Database\Seeders\Examination\ExamTypeSeeder;
 use Database\Seeders\Examination\GradingSystemSeeder;
@@ -75,6 +78,9 @@ class DatabaseSeeder extends Seeder
             DefaultWorkflowSeeder::class,
             DefaultAutomationRuleSeeder::class,
             DefaultReminderRuleSeeder::class,
+            DocumentCategorySeeder::class,
+            DocumentTagSeeder::class,
+            DemoDocumentSeeder::class,
         ]);
     }
 }

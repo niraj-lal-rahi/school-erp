@@ -33,6 +33,9 @@ class RolePermissionSeeder extends Seeder
                 'portal.view',
                 'workflows.view',
                 'workflows.approve',
+                'documents.view',
+                'documents.manage',
+                'documents.verify',
             ]),
             'teacher' => $this->permissionIdsForCodes([
                 'academic-management.view',
@@ -46,6 +49,7 @@ class RolePermissionSeeder extends Seeder
                 'exams.view',
                 'exams.manage',
                 'portal.view',
+                'documents.view',
             ]),
             'accountant' => $this->permissionIdsForCodes([
                 'students.view',
@@ -57,6 +61,8 @@ class RolePermissionSeeder extends Seeder
                 'reports.export',
                 'workflows.view',
                 'workflows.approve',
+                'documents.view',
+                'documents.verify',
             ]),
             'receptionist' => $this->permissionIdsForCodes([
                 'students.view',
@@ -67,6 +73,7 @@ class RolePermissionSeeder extends Seeder
                 'communication.manage',
                 'transport.view',
                 'portal.view',
+                'documents.view',
             ]),
         ];
 

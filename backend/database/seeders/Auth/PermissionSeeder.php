@@ -54,6 +54,9 @@ class PermissionSeeder extends Seeder
             ['name' => 'View Workflows', 'code' => 'workflows.view', 'module' => 'workflows'],
             ['name' => 'Manage Workflows', 'code' => 'workflows.manage', 'module' => 'workflows'],
             ['name' => 'Approve Workflows', 'code' => 'workflows.approve', 'module' => 'workflows'],
+            ['name' => 'View Documents', 'code' => 'documents.view', 'module' => 'documents'],
+            ['name' => 'Manage Documents', 'code' => 'documents.manage', 'module' => 'documents'],
+            ['name' => 'Verify Documents', 'code' => 'documents.verify', 'module' => 'documents'],
         ]);
 
         $permissions
@@ -89,6 +92,7 @@ class PermissionSeeder extends Seeder
             'exams' => 'Examinations',
             'rbac' => 'RBAC',
             'workflows' => 'Workflows',
+            'documents' => 'Documents',
         ];
 
         return collect($modules)->flatMap(
