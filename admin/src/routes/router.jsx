@@ -5,6 +5,7 @@ import { RequireAuth } from '../components/common/RequireAuth';
 
 const AdminLayout = lazy(() => import('../layouts/AdminLayout').then((module) => ({ default: module.AdminLayout })));
 const LoginPage = lazy(() => import('../features/auth/LoginPage').then((module) => ({ default: module.LoginPage })));
+const PlatformLoginPage = lazy(() => import('../features/auth/PlatformLoginPage').then((module) => ({ default: module.PlatformLoginPage })));
 const HomeRedirectPage = lazy(() => import('../features/auth/HomeRedirectPage').then((module) => ({ default: module.HomeRedirectPage })));
 const DashboardPage = lazy(() => import('../features/dashboard/DashboardPage').then((module) => ({ default: module.DashboardPage })));
 const StudentListPage = lazy(() => import('../features/students/pages/StudentListPage').then((module) => ({ default: module.StudentListPage })));
@@ -197,6 +198,13 @@ const FeatureFlagsPage = lazy(() => import('../features/settings/pages/FeatureFl
 const IntegrationSettingsPage = lazy(() => import('../features/settings/pages/IntegrationSettingsPage').then((module) => ({ default: module.IntegrationSettingsPage })));
 const SettingsAuditLogsPage = lazy(() => import('../features/settings/pages/AuditLogsPage').then((module) => ({ default: module.AuditLogsPage })));
 const PublicConfigPreviewPage = lazy(() => import('../features/settings/pages/PublicConfigPreviewPage').then((module) => ({ default: module.PublicConfigPreviewPage })));
+const PlatformTenantListPage = lazy(() => import('../features/platform/pages/TenantListPage').then((module) => ({ default: module.TenantListPage })));
+const PlatformTenantDetailPage = lazy(() => import('../features/platform/pages/TenantDetailPage').then((module) => ({ default: module.TenantDetailPage })));
+const PlatformTenantDatabaseConnectionPage = lazy(() => import('../features/platform/pages/TenantDatabaseConnectionPage').then((module) => ({ default: module.TenantDatabaseConnectionPage })));
+const PlatformTenantProvisioningStatusPage = lazy(() => import('../features/platform/pages/TenantProvisioningStatusPage').then((module) => ({ default: module.TenantProvisioningStatusPage })));
+const PlatformTenantSecuritySettingsPage = lazy(() => import('../features/platform/pages/TenantSecuritySettingsPage').then((module) => ({ default: module.TenantSecuritySettingsPage })));
+const PlatformAuditLogsPage = lazy(() => import('../features/platform/pages/PlatformAuditLogsPage').then((module) => ({ default: module.PlatformAuditLogsPage })));
+const PlatformDatabaseHealthCheckPage = lazy(() => import('../features/platform/pages/DatabaseHealthCheckPage').then((module) => ({ default: module.DatabaseHealthCheckPage })));
 
 function withSuspense(element) {
   return <LazyRoute>{element}</LazyRoute>;
@@ -206,6 +214,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: withSuspense(<LoginPage />),
+  },
+  {
+    path: '/platform/login',
+    element: withSuspense(<PlatformLoginPage />),
   },
   {
     element: <RequireAuth />,
@@ -989,6 +1001,34 @@ export const router = createBrowserRouter([
           {
             path: 'settings/public-config',
             element: withSuspense(<PublicConfigPreviewPage />),
+          },
+          {
+            path: 'platform/tenants',
+            element: withSuspense(<PlatformTenantListPage />),
+          },
+          {
+            path: 'platform/tenants/:tenantId',
+            element: withSuspense(<PlatformTenantDetailPage />),
+          },
+          {
+            path: 'platform/tenants/:tenantId/database',
+            element: withSuspense(<PlatformTenantDatabaseConnectionPage />),
+          },
+          {
+            path: 'platform/tenants/:tenantId/provisioning',
+            element: withSuspense(<PlatformTenantProvisioningStatusPage />),
+          },
+          {
+            path: 'platform/tenants/:tenantId/security',
+            element: withSuspense(<PlatformTenantSecuritySettingsPage />),
+          },
+          {
+            path: 'platform/audit-logs',
+            element: withSuspense(<PlatformAuditLogsPage />),
+          },
+          {
+            path: 'platform/health',
+            element: withSuspense(<PlatformDatabaseHealthCheckPage />),
           },
         ],
       },

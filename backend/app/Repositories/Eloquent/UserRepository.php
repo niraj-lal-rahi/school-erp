@@ -15,4 +15,13 @@ class UserRepository implements UserRepositoryInterface
             ->where('school_id', $schoolId)
             ->first();
     }
+
+    public function findPlatformUserForLogin(string $email): ?User
+    {
+        return User::query()
+            ->withoutGlobalScopes()
+            ->where('email', $email)
+            ->whereNull('school_id')
+            ->first();
+    }
 }

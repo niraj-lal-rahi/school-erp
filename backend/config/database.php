@@ -64,6 +64,45 @@ return [
             ]) : [],
         ],
 
+        'platform' => [
+            'driver' => env('PLATFORM_DB_DRIVER', 'mysql'),
+            'url' => env('PLATFORM_DB_URL'),
+            'host' => env('PLATFORM_DB_HOST', env('DB_HOST', '127.0.0.1')),
+            'port' => env('PLATFORM_DB_PORT', env('DB_PORT', '3306')),
+            'database' => env('PLATFORM_DB_DATABASE', env('DB_DATABASE', 'laravel')),
+            'username' => env('PLATFORM_DB_USERNAME', env('DB_USERNAME', 'root')),
+            'password' => env('PLATFORM_DB_PASSWORD', env('DB_PASSWORD', '')),
+            'unix_socket' => env('PLATFORM_DB_SOCKET', env('DB_SOCKET', '')),
+            'charset' => env('PLATFORM_DB_CHARSET', env('DB_CHARSET', 'utf8mb4')),
+            'collation' => env('PLATFORM_DB_COLLATION', env('DB_COLLATION', 'utf8mb4_unicode_ci')),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('PLATFORM_MYSQL_ATTR_SSL_CA', env('MYSQL_ATTR_SSL_CA')),
+            ]) : [],
+        ],
+
+        'tenant' => [
+            'driver' => env('TENANT_DB_DRIVER', 'mysql'),
+            'host' => env('TENANT_DB_HOST', '127.0.0.1'),
+            'port' => env('TENANT_DB_PORT', '3306'),
+            'database' => env('TENANT_DB_DATABASE', 'tenant_placeholder'),
+            'username' => env('TENANT_DB_USERNAME', 'root'),
+            'password' => env('TENANT_DB_PASSWORD', ''),
+            'unix_socket' => env('TENANT_DB_SOCKET', ''),
+            'charset' => env('TENANT_DB_CHARSET', env('DB_CHARSET', 'utf8mb4')),
+            'collation' => env('TENANT_DB_COLLATION', env('DB_COLLATION', 'utf8mb4_unicode_ci')),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('TENANT_MYSQL_ATTR_SSL_CA', env('MYSQL_ATTR_SSL_CA')),
+            ]) : [],
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

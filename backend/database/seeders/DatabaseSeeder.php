@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Database\Seeders\Auth\PermissionSeeder;
+use Database\Seeders\Auth\PlatformAdminSeeder;
 use Database\Seeders\Auth\RoleSeeder;
 use Database\Seeders\Auth\RolePermissionSeeder;
 use Database\Seeders\Auth\UserSeeder;
@@ -60,6 +61,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             RolePermissionSeeder::class,
+            PlatformAdminSeeder::class,
             UserSeeder::class,
             DemoTenantSeeder::class,
             SettingGroupSeeder::class,

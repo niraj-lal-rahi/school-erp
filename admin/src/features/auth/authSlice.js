@@ -15,6 +15,15 @@ export const login = createAsyncThunk('auth/login', async (payload, thunkApi) =>
   }
 });
 
+export const platformLogin = createAsyncThunk('auth/platformLogin', async (payload, thunkApi) => {
+  try {
+    const response = await authApi.platformLogin(payload);
+    return response.data.data;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error.response?.data?.message || 'Platform login failed.');
+  }
+});
+
 export const bootstrapSession = createAsyncThunk('auth/bootstrapSession', async (_, thunkApi) => {
   try {
     const response = await authApi.me();
@@ -83,7 +92,29 @@ const authSlice = createSlice({
         };
         state.accessToken = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
-        state.tenantCode = action.payload.tenant?.code || persistedTenantCode;
+        state.tenantCode = action.payload.tenant?.code || '';
+      })
+      .addCase(platformLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(platformLogin.fulfilled, (state, action) => {
+        const permissions = flattenPermissions(action.payload.user);
+        state.loading = false;
+        state.initialized = true;
+        state.user = {
+          ...action.payload.user,
+          permissions,
+          role: action.payload.user.roles?.[0]?.slug || 'user',
+        };
+        state.accessToken = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
+        state.tenantCode = '';
+      })
+      .addCase(platformLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.initialized = true;
+        state.error = action.payload;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -102,7 +133,7 @@ const authSlice = createSlice({
           permissions,
           role: action.payload.roles?.[0]?.slug || 'user',
         };
-        state.tenantCode = action.payload.school?.code || state.tenantCode;
+        state.tenantCode = action.payload.school?.code || '';
       })
       .addCase(bootstrapSession.rejected, (state) => {
         state.loading = false;

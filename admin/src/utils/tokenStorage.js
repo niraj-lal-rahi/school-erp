@@ -13,7 +13,11 @@ export function getTenantCode() {
 export function persistSession({ accessToken, refreshToken, tenantCode }) {
   if (accessToken) localStorage.setItem('access_token', accessToken);
   if (refreshToken) localStorage.setItem('refresh_token', refreshToken);
-  if (tenantCode) localStorage.setItem('tenant_code', tenantCode);
+  if (tenantCode) {
+    localStorage.setItem('tenant_code', tenantCode);
+  } else {
+    localStorage.removeItem('tenant_code');
+  }
 }
 
 export function clearStoredSession() {

@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
+            'platform.tenant.resolve' => \App\Http\Middleware\ResolvePlatformTenant::class,
+            'switch.tenant.database' => \App\Http\Middleware\SwitchTenantDatabase::class,
+            'ensure.platform.admin' => \App\Http\Middleware\EnsurePlatformAdmin::class,
             'tenant.domain' => \App\Http\Middleware\ResolveTenantFromDomain::class,
             'tenant.resolve' => \App\Http\Middleware\ResolveTenant::class,
             'tenant.audit' => \App\Http\Middleware\TenantIsolationAuditMiddleware::class,

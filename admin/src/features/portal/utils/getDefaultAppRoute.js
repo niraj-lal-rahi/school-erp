@@ -1,5 +1,12 @@
 export function getDefaultAppRoute(user) {
   const permissions = user?.permissions || [];
+  const roles = user?.roles || [];
+  const roleCodes = roles.map((role) => role.code || role.slug).filter(Boolean);
+
+  if (roleCodes.includes('super_admin')) {
+    return '/platform/tenants';
+  }
+
   const hasPortalOnlyAccess = permissions.includes('portal.view')
     && !permissions.some((permission) => [
       'students.view',

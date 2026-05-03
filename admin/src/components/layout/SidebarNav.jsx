@@ -52,6 +52,7 @@ import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
 import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
 import CloudOutlinedIcon from '@mui/icons-material/CloudOutlined';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import {
   Collapse,
@@ -304,6 +305,12 @@ const settingsChildren = [
   { label: 'Public Config Preview', to: '/settings/public-config', icon: <VisibilityOutlinedIcon />, permission: 'settings.view' },
 ];
 
+const platformChildren = [
+  { label: 'Tenant List', to: '/platform/tenants', icon: <ApartmentOutlinedIcon />, permission: 'saas.view' },
+  { label: 'Platform Audit Logs', to: '/platform/audit-logs', icon: <TimelineOutlinedIcon />, permission: 'saas.manage' },
+  { label: 'Database Health Check', to: '/platform/health', icon: <StorageOutlinedIcon />, permission: 'saas.manage' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -429,6 +436,12 @@ export function SidebarNav() {
     )),
     [isSuperAdmin, isTenantAdmin, permissions],
   );
+  const visiblePlatformChildren = useMemo(
+    () => platformChildren.filter((item) => (
+      isSuperAdmin || permissions.includes(item.permission)
+    )),
+    [isSuperAdmin, permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -457,6 +470,7 @@ export function SidebarNav() {
   const documentsRouteActive = location.pathname.startsWith('/documents');
   const workflowsRouteActive = location.pathname.startsWith('/workflows');
   const settingsRouteActive = location.pathname.startsWith('/settings');
+  const platformRouteActive = location.pathname.startsWith('/platform');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
@@ -474,6 +488,7 @@ export function SidebarNav() {
   const [documentsOpen, setDocumentsOpen] = useState(documentsRouteActive);
   const [workflowsOpen, setWorkflowsOpen] = useState(workflowsRouteActive);
   const [settingsOpen, setSettingsOpen] = useState(settingsRouteActive);
+  const [platformOpen, setPlatformOpen] = useState(platformRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -577,6 +592,12 @@ export function SidebarNav() {
     }
   }, [settingsRouteActive]);
 
+  useEffect(() => {
+    if (platformRouteActive) {
+      setPlatformOpen(true);
+    }
+  }, [platformRouteActive]);
+
   return (
     <Paper
       elevation={0}
@@ -615,7 +636,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length || visiblePaymentsChildren.length || visibleDocumentsChildren.length || visibleWorkflowsChildren.length || visibleSettingsChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length || visiblePaymentsChildren.length || visibleDocumentsChildren.length || visibleWorkflowsChildren.length || visibleSettingsChildren.length || visiblePlatformChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -1181,6 +1202,40 @@ export function SidebarNav() {
                 <Collapse in={settingsOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visibleSettingsChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visiblePlatformChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setPlatformOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: platformRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <StorageOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Platform Control" />
+                  {platformOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={platformOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visiblePlatformChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

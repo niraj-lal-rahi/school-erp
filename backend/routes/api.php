@@ -165,13 +165,48 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('api.rate:login');
+    Route::post('/platform/auth/login', [AuthController::class, 'platformLogin'])->middleware('api.rate:login');
     Route::post('/auth/refresh', [AuthController::class, 'refresh'])->middleware('api.rate:login');
-        Route::prefix('payments')->group(function (): void {
-            Route::post('/webhooks/razorpay', [PaymentWebhookController::class, 'razorpay'])->middleware('api.rate:webhook');
-            Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->middleware('api.rate:webhook');
-        });
+    Route::prefix('payments')->group(function (): void {
+        Route::post('/webhooks/razorpay', [PaymentWebhookController::class, 'razorpay'])->middleware('api.rate:webhook');
+        Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->middleware('api.rate:webhook');
+    });
 
-        Route::middleware(['auth:api'])->prefix('saas')->group(function (): void {
+    Route::middleware(['auth:api', 'ensure.platform.admin', 'api.rate:api'])->prefix('platform')->group(function (): void {
+        Route::get('/tenants', [TenantController::class, 'index']);
+        Route::post('/tenants', [TenantController::class, 'store']);
+        Route::get('/tenants/{id}', [TenantController::class, 'show']);
+        Route::put('/tenants/{id}', [TenantController::class, 'update']);
+        Route::post('/tenants/{id}/activate', [TenantController::class, 'activate']);
+        Route::post('/tenants/{id}/suspend', [TenantController::class, 'suspend']);
+        Route::post('/tenants/{id}/cancel', [TenantController::class, 'cancel']);
+
+        Route::post('/tenants/onboard-school', [TenantOnboardingController::class, 'store']);
+
+        Route::get('/subscriptions/plans', [SubscriptionPlanController::class, 'index']);
+        Route::post('/subscriptions/plans', [SubscriptionPlanController::class, 'store']);
+        Route::put('/subscriptions/plans/{id}', [SubscriptionPlanController::class, 'update']);
+        Route::delete('/subscriptions/plans/{id}', [SubscriptionPlanController::class, 'destroy']);
+        Route::post('/subscriptions/plans/{id}/features', [SubscriptionPlanController::class, 'addFeature']);
+        Route::post('/subscriptions/tenants/{id}/subscribe', [TenantSubscriptionController::class, 'subscribe']);
+        Route::post('/subscriptions/tenants/{id}/change-plan', [TenantSubscriptionController::class, 'changePlan']);
+        Route::post('/subscriptions/tenants/{id}/renew', [TenantSubscriptionController::class, 'renew']);
+        Route::post('/subscriptions/tenants/{id}/cancel', [TenantSubscriptionController::class, 'cancel']);
+
+        Route::get('/billing/tenants/{id}', [TenantBillingController::class, 'index']);
+        Route::post('/billing/{id}/mark-paid', [TenantBillingController::class, 'markPaid']);
+        Route::post('/billing/{id}/mark-failed', [TenantBillingController::class, 'markFailed']);
+
+        Route::get('/security/tenants/{id}/features', [TenantFeatureController::class, 'index']);
+        Route::put('/security/tenants/{id}/features', [TenantFeatureController::class, 'update']);
+        Route::get('/security/tenants/{id}/usage', [TenantUsageController::class, 'show']);
+        Route::post('/security/tenants/{id}/sync-usage', [TenantUsageController::class, 'sync']);
+        Route::get('/security/tenants/{id}/domains', [TenantDomainController::class, 'index']);
+        Route::post('/security/tenants/{id}/domains', [TenantDomainController::class, 'store']);
+        Route::post('/security/domains/{id}/verify', [TenantDomainController::class, 'verify']);
+    });
+
+    Route::middleware(['auth:api'])->prefix('saas')->group(function (): void {
         Route::get('/tenants', [TenantController::class, 'index']);
         Route::post('/tenants', [TenantController::class, 'store']);
         Route::get('/tenants/{id}', [TenantController::class, 'show']);
@@ -206,9 +241,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/tenants/{id}/domains', [TenantDomainController::class, 'index']);
         Route::post('/tenants/{id}/domains', [TenantDomainController::class, 'store']);
         Route::post('/domains/{id}/verify', [TenantDomainController::class, 'verify']);
-        });
+    });
 
-    Route::middleware(['auth:api', 'tenant.domain', 'tenant.resolve', 'tenant.audit', 'tenant.active', 'api.rate:api'])->group(function (): void {
+    Route::middleware(['auth:api', 'platform.tenant.resolve', 'switch.tenant.database', 'tenant.audit', 'tenant.active', 'tenant.localization', 'api.rate:api'])->group(function (): void {
         Route::prefix('documents')->group(function (): void {
             Route::get('/categories', [DocumentCategoryController::class, 'index'])->middleware('permission:documents.view');
             Route::post('/categories', [DocumentCategoryController::class, 'store'])->middleware('permission:documents.manage');

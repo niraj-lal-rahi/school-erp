@@ -4,6 +4,9 @@ export const authApi = {
   login(payload) {
     return axiosClient.post('/auth/login', payload);
   },
+  platformLogin(payload) {
+    return axiosClient.post('/platform/auth/login', payload);
+  },
   me() {
     return axiosClient.get('/auth/me');
   },
