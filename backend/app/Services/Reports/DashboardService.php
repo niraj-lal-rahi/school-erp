@@ -3,10 +3,12 @@
 namespace App\Services\Reports;
 
 use App\Models\Examination\Exam;
-use App\Models\Student;
-use App\Repositories\Contracts\Reports\DashboardRepositoryInterface;
 use App\Models\Reports\DashboardWidget;
 use App\Models\Reports\UserDashboardLayout;
+use App\Models\Student;
+use App\Repositories\Contracts\Reports\DashboardRepositoryInterface;
+use App\Services\Cache\CacheInvalidationService;
+use App\Services\Cache\TenantCacheService;
 
 class DashboardService
 {
@@ -18,6 +20,8 @@ class DashboardService
         protected TransportReportService $transportReports,
         protected CommunicationReportService $communicationReports,
         protected ReportCacheService $cache,
+        protected TenantCacheService $tenantCache,
+        protected CacheInvalidationService $invalidator,
     ) {
     }
 
@@ -27,11 +31,42 @@ class DashboardService
         $cacheKey = $this->cache->buildKey('reports.dashboard.overview', $filters);
 
         return $schoolId
-            ? $this->cache->remember($schoolId, $cacheKey, fn () => $this->computeOverview($filters), 600)
+            ? $this->tenantCache->remember(
+                'dashboard-overview',
+                $schoolId,
+                ['filters', md5($cacheKey)],
+                now()->addMinutes(10),
+                fn () => $this->cache->remember($schoolId, $cacheKey, fn () => $this->computeOverview($filters), 600)
+            )
             : $this->computeOverview($filters);
     }
 
     public function widgets(?string $userType = null, ?int $userId = null, array $filters = []): array
+    {
+        $schoolId = $filters['school_id'] ?? null;
+
+        if (! $schoolId || ! $userId) {
+            return $this->buildWidgets($userType, $userId, $filters);
+        }
+
+        return $this->tenantCache->remember(
+            'dashboard-widgets',
+            $schoolId,
+            ['user', $userId, 'type', $userType, 'filters', md5(json_encode($filters, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))],
+            now()->addMinutes(10),
+            fn () => $this->buildWidgets($userType, $userId, $filters)
+        );
+    }
+
+    public function updateLayout(string $userType, int $userId, array $layout, int $schoolId): UserDashboardLayout
+    {
+        $saved = $this->dashboard->upsertLayout($userType, $userId, $layout, $schoolId);
+        $this->invalidator->dashboard($schoolId, $userId);
+
+        return $saved;
+    }
+
+    protected function buildWidgets(?string $userType = null, ?int $userId = null, array $filters = []): array
     {
         $widgets = $this->dashboard->allWidgets([
             'module' => $filters['module'] ?? null,
@@ -56,11 +91,6 @@ class DashboardService
                 'data' => $this->resolveWidgetData($widget, $filters),
             ])->values()->all(),
         ];
-    }
-
-    public function updateLayout(string $userType, int $userId, array $layout, int $schoolId): UserDashboardLayout
-    {
-        return $this->dashboard->upsertLayout($userType, $userId, $layout, $schoolId);
     }
 
     protected function computeOverview(array $filters): array

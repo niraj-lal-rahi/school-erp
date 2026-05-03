@@ -1,15 +1,17 @@
 import { useMemo } from 'react';
-import { useAppSelector } from '../../../hooks/redux';
+import { usePermission } from '../../../hooks/usePermission';
 
 export function usePaymentsAccess() {
-  const permissions = useAppSelector((state) => state.auth.user?.permissions || []);
-  const roles = useAppSelector((state) => state.auth.user?.roles || []);
+  const {
+    permissions,
+    roles,
+    isSuperAdmin,
+    isTenantAdmin,
+    hasRole,
+  } = usePermission();
 
   return useMemo(() => {
-    const roleCodes = roles.map((role) => role.code || role.slug).filter(Boolean);
-    const isSuperAdmin = roleCodes.includes('super_admin');
-    const isTenantAdmin = roleCodes.includes('tenant_admin') || roleCodes.includes('school-admin');
-    const isAccountant = roleCodes.includes('accountant');
+    const isAccountant = hasRole('accountant');
 
     const canView = isSuperAdmin
       || isTenantAdmin
@@ -34,5 +36,5 @@ export function usePaymentsAccess() {
       canReconcile: canManage || permissions.includes('payments.reconcile.manage'),
       canApproveManual: isSuperAdmin || isTenantAdmin || isAccountant || permissions.includes('payments.verify.manage'),
     };
-  }, [permissions, roles]);
+  }, [hasRole, isSuperAdmin, isTenantAdmin, permissions, roles]);
 }

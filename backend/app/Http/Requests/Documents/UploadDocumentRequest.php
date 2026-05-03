@@ -23,7 +23,7 @@ class UploadDocumentRequest extends DocumentRequest
             'expiry_date' => ['nullable', 'date', 'after_or_equal:issue_date'],
             'verification_status' => ['nullable', Rule::in(['pending', 'verified', 'rejected', 'expired'])],
             'status' => ['nullable', Rule::in(['active', 'archived', 'deleted'])],
-            'disk' => ['nullable', Rule::in(['local', 'public', 's3'])],
+            'disk' => ['nullable', Rule::in(['private', 'local', 'public', 's3'])],
             'tags' => ['nullable', 'array'],
             'tags.*' => ['integer', $this->existsForSchool('document_tags', 'id', $schoolId)],
             'permissions' => $this->permissionRules($schoolId),

@@ -6,6 +6,7 @@ use App\Models\Workflows\ApprovalRequest;
 use App\Models\Workflows\WorkflowInstance;
 use App\Models\Workflows\WorkflowStepInstance;
 use App\Repositories\Contracts\Workflows\WorkflowInstanceRepositoryInterface;
+use App\Support\Pagination\PaginationDefaults;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -14,7 +15,7 @@ class WorkflowInstanceRepository implements WorkflowInstanceRepositoryInterface
 {
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->query()
+        return $this->listQuery()
             ->when($filters['module'] ?? null, function (Builder $query, string $value): void {
                 $query->whereHas('workflowDefinition', fn (Builder $definitionQuery) => $definitionQuery->where('module', $value));
             })
@@ -25,12 +26,12 @@ class WorkflowInstanceRepository implements WorkflowInstanceRepositoryInterface
             ->when($filters['date_from'] ?? null, fn (Builder $query, string $value) => $query->whereDate('started_at', '>=', $value))
             ->when($filters['date_to'] ?? null, fn (Builder $query, string $value) => $query->whereDate('created_at', '<=', $value))
             ->latest('id')
-            ->paginate($perPage);
+            ->paginate(PaginationDefaults::resolvePerPage($perPage));
     }
 
     public function findOrFail(int $id): WorkflowInstance
     {
-        return $this->query()->findOrFail($id);
+        return $this->detailQuery()->findOrFail($id);
     }
 
     public function create(array $attributes): WorkflowInstance
@@ -85,9 +86,38 @@ class WorkflowInstanceRepository implements WorkflowInstanceRepositoryInterface
             ->get();
     }
 
-    protected function query(): Builder
+    protected function baseQuery(): Builder
     {
-        return WorkflowInstance::query()->with([
+        return WorkflowInstance::query()->select([
+            'workflow_instances.id',
+            'workflow_instances.school_id',
+            'workflow_instances.workflow_definition_id',
+            'workflow_instances.reference_type',
+            'workflow_instances.reference_id',
+            'workflow_instances.current_step_id',
+            'workflow_instances.status',
+            'workflow_instances.started_by',
+            'workflow_instances.started_at',
+            'workflow_instances.completed_at',
+            'workflow_instances.metadata',
+            'workflow_instances.created_at',
+            'workflow_instances.updated_at',
+            'workflow_instances.deleted_at',
+        ]);
+    }
+
+    protected function listQuery(): Builder
+    {
+        return $this->baseQuery()->with([
+            'workflowDefinition:id,name,code,module,trigger_type,status',
+            'currentStep:id,workflow_definition_id,step_name,step_type,sequence,status',
+            'starter:id,name,email',
+        ]);
+    }
+
+    protected function detailQuery(): Builder
+    {
+        return $this->baseQuery()->with([
             'workflowDefinition',
             'currentStep',
             'starter',

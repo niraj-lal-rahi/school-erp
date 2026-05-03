@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api\V1\Documents;
 use App\Http\Requests\Documents\UpdateDocumentRequest;
 use App\Http\Requests\Documents\UploadDocumentRequest;
 use App\Http\Resources\Documents\DocumentAuditLogResource;
+use App\Http\Resources\Documents\DocumentListResource;
 use App\Http\Resources\Documents\DocumentResource;
 use App\Models\Documents\Document;
 use App\Services\Documents\DocumentExpiryService;
 use App\Services\Documents\DocumentPermissionService;
 use App\Services\Documents\DocumentService;
 use App\Services\Documents\DocumentStorageUsageService;
+use App\Support\Api\ApiPaginationHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -28,8 +30,8 @@ class DocumentController extends BaseDocumentController
     {
         $this->authorize('viewAny', Document::class);
 
-        return response()->json([
-            'data' => DocumentResource::collection($this->documents->paginate(
+        return response()->json(ApiPaginationHelper::fromResourceCollection(
+            DocumentListResource::collection($this->documents->paginate(
                 $request->only([
                     'search',
                     'owner_type',
@@ -43,8 +45,8 @@ class DocumentController extends BaseDocumentController
                     'tags',
                 ]),
                 (int) $request->integer('per_page', 15),
-            )->getCollection()),
-        ]);
+            ))
+        ));
     }
 
     public function store(UploadDocumentRequest $request): JsonResponse

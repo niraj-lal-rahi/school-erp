@@ -164,11 +164,11 @@ use App\Http\Controllers\Api\V1\Workflows\WorkflowStepController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
-    Route::post('/auth/login', [AuthController::class, 'login']);
-    Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('api.rate:login');
+    Route::post('/auth/refresh', [AuthController::class, 'refresh'])->middleware('api.rate:login');
         Route::prefix('payments')->group(function (): void {
-            Route::post('/webhooks/razorpay', [PaymentWebhookController::class, 'razorpay']);
-            Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe']);
+            Route::post('/webhooks/razorpay', [PaymentWebhookController::class, 'razorpay'])->middleware('api.rate:webhook');
+            Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->middleware('api.rate:webhook');
         });
 
         Route::middleware(['auth:api'])->prefix('saas')->group(function (): void {
@@ -208,7 +208,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/domains/{id}/verify', [TenantDomainController::class, 'verify']);
         });
 
-    Route::middleware(['auth:api', 'tenant.domain', 'tenant.resolve', 'tenant.active'])->group(function (): void {
+    Route::middleware(['auth:api', 'tenant.domain', 'tenant.resolve', 'tenant.audit', 'tenant.active', 'api.rate:api'])->group(function (): void {
         Route::prefix('documents')->group(function (): void {
             Route::get('/categories', [DocumentCategoryController::class, 'index'])->middleware('permission:documents.view');
             Route::post('/categories', [DocumentCategoryController::class, 'store'])->middleware('permission:documents.manage');
@@ -240,7 +240,7 @@ Route::prefix('v1')->group(function (): void {
             Route::put('/{id}', [DocumentManagementController::class, 'update'])->middleware('permission:documents.manage');
             Route::delete('/{id}', [DocumentManagementController::class, 'destroy'])->middleware('permission:documents.manage');
             Route::post('/{id}/restore', [DocumentManagementController::class, 'restore'])->middleware('permission:documents.manage');
-            Route::get('/{id}/download', [DocumentFileController::class, 'download'])->middleware('permission:documents.view')->name('documents.download');
+            Route::get('/{id}/download', [DocumentFileController::class, 'download'])->middleware(['permission:documents.view', 'api.rate:downloads'])->name('documents.download');
             Route::post('/{id}/versions', [DocumentFileController::class, 'uploadVersion'])->middleware('permission:documents.manage');
             Route::get('/{id}/versions', [DocumentFileController::class, 'versions'])->middleware('permission:documents.view');
             Route::get('/{id}/audit-logs', [DocumentManagementController::class, 'auditLogs'])->middleware('permission:documents.view');
@@ -989,7 +989,7 @@ Route::prefix('v1')->group(function (): void {
             Route::post('/schedules/{reportSchedule}/pause', [ReportScheduleController::class, 'pause'])->middleware('permission:reports.manage');
             Route::post('/schedules/{reportSchedule}/resume', [ReportScheduleController::class, 'resume'])->middleware('permission:reports.manage');
 
-            Route::get('/exports/{reportExport}/download', [ReportExportController::class, 'download'])->middleware('permission:reports.export');
+            Route::get('/exports/{reportExport}/download', [ReportExportController::class, 'download'])->middleware(['permission:reports.export', 'api.rate:downloads']);
         });
 
         Route::prefix('workflows')->group(function (): void {

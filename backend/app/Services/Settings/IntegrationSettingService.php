@@ -4,6 +4,8 @@ namespace App\Services\Settings;
 
 use App\Models\Settings\IntegrationSetting;
 use App\Repositories\Contracts\Settings\IntegrationSettingRepositoryInterface;
+use App\Services\Cache\CacheInvalidationService;
+use App\Services\Cache\TenantCacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
@@ -13,12 +15,22 @@ class IntegrationSettingService
     public function __construct(
         protected IntegrationSettingRepositoryInterface $integrations,
         protected SettingAuditService $audits,
+        protected TenantCacheService $cache,
+        protected CacheInvalidationService $invalidator,
     ) {
     }
 
     public function list(array $filters = []): Collection
     {
-        return $this->integrations->list($filters)->map(fn (IntegrationSetting $setting) => $this->sanitize($setting));
+        $schoolId = $filters['school_id'] ?? null;
+
+        return $this->cache->remember(
+            'integrations',
+            $schoolId,
+            ['list', $filters],
+            now()->addMinutes(15),
+            fn () => $this->integrations->list($filters)->map(fn (IntegrationSetting $setting) => $this->sanitize($setting))
+        );
     }
 
     public function findOrFail(int $id): IntegrationSetting
@@ -30,6 +42,7 @@ class IntegrationSettingService
     {
         $attributes = $this->prepareAttributes($attributes);
         $integration = $this->integrations->create($attributes);
+        $this->invalidator->integration($integration->school_id);
 
         $this->audits->log('integration', $integration->integration_type, null, $this->sanitize($integration)->toArray(), $actor, $request, $integration->school_id, true);
 
@@ -40,6 +53,7 @@ class IntegrationSettingService
     {
         $original = $integration->toArray();
         $updated = $this->integrations->update($integration, $this->prepareAttributes($attributes));
+        $this->invalidator->integration($updated->school_id);
 
         $this->audits->log('integration', $updated->integration_type, $original, $this->sanitize($updated)->toArray(), $actor, $request, $updated->school_id, true);
 
@@ -50,6 +64,7 @@ class IntegrationSettingService
     {
         $this->audits->log('integration', $integration->integration_type, $this->sanitize($integration)->toArray(), null, $actor, $request, $integration->school_id, true);
         $this->integrations->delete($integration);
+        $this->invalidator->integration($integration->school_id);
     }
 
     public function safeConfig(IntegrationSetting $integration): array

@@ -1,6 +1,6 @@
-import { Suspense, lazy } from 'react';
+import { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { FullScreenLoader } from '../components/common/FullScreenLoader';
+import { LazyRoute } from '../components/common/LazyRoute';
 import { RequireAuth } from '../components/common/RequireAuth';
 
 const AdminLayout = lazy(() => import('../layouts/AdminLayout').then((module) => ({ default: module.AdminLayout })));
@@ -199,7 +199,7 @@ const SettingsAuditLogsPage = lazy(() => import('../features/settings/pages/Audi
 const PublicConfigPreviewPage = lazy(() => import('../features/settings/pages/PublicConfigPreviewPage').then((module) => ({ default: module.PublicConfigPreviewPage })));
 
 function withSuspense(element) {
-  return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
+  return <LazyRoute>{element}</LazyRoute>;
 }
 
 export const router = createBrowserRouter([

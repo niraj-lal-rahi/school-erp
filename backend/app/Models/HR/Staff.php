@@ -6,6 +6,7 @@ use App\Models\AcademicManagement\HomeworkAssignment;
 use App\Models\AcademicManagement\LessonPlan;
 use App\Models\AcademicManagement\TeacherAssignment;
 use App\Models\Concerns\BelongsToSchool;
+use App\Models\Concerns\OptimizesQueryFilters;
 use App\Models\Timetable\TimetableEntry;
 use App\Models\Timetable\TimetableSubstitution;
 use App\Models\Transport\StaffTransportAllocation;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Staff extends Model
 {
     use BelongsToSchool;
+    use OptimizesQueryFilters;
     use SoftDeletes;
 
     protected $table = 'staff';

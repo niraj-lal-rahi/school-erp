@@ -6,6 +6,7 @@ use App\DataTransferObjects\Finance\FeeInvoiceData;
 use App\Models\Finance\FeeInvoice;
 use App\Models\Finance\FeeInvoiceItem;
 use App\Repositories\Contracts\Finance\FeeInvoiceRepositoryInterface;
+use App\Support\Pagination\PaginationDefaults;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -14,7 +15,7 @@ class FeeInvoiceRepository implements FeeInvoiceRepositoryInterface
 {
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->query()
+        return $this->listQuery()
             ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
                 $query->where(function (Builder $invoiceQuery) use ($search): void {
                     $invoiceQuery->where('invoice_no', 'like', "%{$search}%")
@@ -30,12 +31,12 @@ class FeeInvoiceRepository implements FeeInvoiceRepositoryInterface
             ->when($filters['due_date_from'] ?? null, fn (Builder $query, string $value) => $query->whereDate('due_date', '>=', $value))
             ->when($filters['due_date_to'] ?? null, fn (Builder $query, string $value) => $query->whereDate('due_date', '<=', $value))
             ->latest('id')
-            ->paginate($perPage);
+            ->paginate(PaginationDefaults::resolvePerPage($perPage));
     }
 
     public function findOrFail(int $id): FeeInvoice
     {
-        return $this->query()->findOrFail($id);
+        return $this->detailQuery()->findOrFail($id);
     }
 
     public function create(FeeInvoiceData $data, array $items): FeeInvoice
@@ -78,9 +79,43 @@ class FeeInvoiceRepository implements FeeInvoiceRepositoryInterface
             ->pluck('fee_installment_id');
     }
 
-    protected function query(): Builder
+    protected function baseQuery(): Builder
     {
-        return FeeInvoice::query()->with([
+        return FeeInvoice::query()->select([
+            'finance_fee_invoices.id',
+            'finance_fee_invoices.school_id',
+            'finance_fee_invoices.invoice_no',
+            'finance_fee_invoices.student_id',
+            'finance_fee_invoices.academic_year_id',
+            'finance_fee_invoices.issue_date',
+            'finance_fee_invoices.due_date',
+            'finance_fee_invoices.subtotal',
+            'finance_fee_invoices.discount_total',
+            'finance_fee_invoices.fine_total',
+            'finance_fee_invoices.tax_total',
+            'finance_fee_invoices.grand_total',
+            'finance_fee_invoices.paid_amount',
+            'finance_fee_invoices.balance_amount',
+            'finance_fee_invoices.status',
+            'finance_fee_invoices.notes',
+            'finance_fee_invoices.created_by',
+            'finance_fee_invoices.created_at',
+            'finance_fee_invoices.updated_at',
+        ]);
+    }
+
+    protected function listQuery(): Builder
+    {
+        return $this->baseQuery()->with([
+            'student:id,full_name,admission_no',
+            'academicYear:id,name,code',
+            'creator:id,name,email',
+        ]);
+    }
+
+    protected function detailQuery(): Builder
+    {
+        return $this->baseQuery()->with([
             'student',
             'academicYear',
             'creator',

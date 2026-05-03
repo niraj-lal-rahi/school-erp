@@ -391,6 +391,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(TenantContext::class);
         $this->app->singleton(JwtManager::class);
+        $this->app->singleton(\App\Contracts\Storage\FileScanInterface::class, \App\Services\Security\Scanning\NullFileScanner::class);
         $this->app->bind(\App\Contracts\Communication\EmailProviderInterface::class, \App\Services\Communication\Providers\LogEmailProvider::class);
         $this->app->bind(\App\Contracts\Communication\SmsProviderInterface::class, \App\Services\Communication\Providers\LogSmsProvider::class);
         $this->app->bind(\App\Contracts\Communication\PushProviderInterface::class, \App\Services\Communication\Providers\LogPushProvider::class);

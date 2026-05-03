@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1\Reports;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Reports\RunReportRequest;
+use App\Models\Reports\ReportDefinition;
 use App\Models\Reports\ReportRun;
 use App\Services\Reports\ReportExecutionService;
+use App\Support\Multitenancy\TenantOwnershipValidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -13,6 +15,7 @@ class ReportRunController extends Controller
 {
     public function __construct(
         protected ReportExecutionService $reports,
+        protected TenantOwnershipValidator $tenantOwnership,
     ) {
     }
 
@@ -36,9 +39,16 @@ class ReportRunController extends Controller
     public function run(RunReportRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        $reportDefinition = ReportDefinition::query()->findOrFail((int) $validated['report_definition_id']);
+        $this->tenantOwnership->assertUserOwnsModel(
+            $request->user(),
+            $reportDefinition,
+            'school_id',
+            'You cannot execute reports from another tenant.'
+        );
 
         $reportRun = $this->reports->runReport(
-            ['report_definition_id' => (int) $validated['report_definition_id']],
+            ['report_definition_id' => $reportDefinition->id],
             $validated['parameters'] ?? [],
             $validated['file_type'],
             'manual',

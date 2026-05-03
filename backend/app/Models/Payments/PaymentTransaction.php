@@ -3,6 +3,7 @@
 namespace App\Models\Payments;
 
 use App\Models\Concerns\BelongsToSchool;
+use App\Models\Concerns\OptimizesQueryFilters;
 use App\Models\Saas\TenantSubscription;
 use App\Models\Student;
 use App\Models\User;
@@ -16,6 +17,7 @@ class PaymentTransaction extends Model
 {
     use SoftDeletes;
     use BelongsToSchool;
+    use OptimizesQueryFilters;
 
     protected $table = 'payment_transactions';
 

@@ -123,7 +123,7 @@ class DocumentService
 
         $this->recordDownload($document, $actor, $request, ['document_file_id' => $file->id, 'version_no' => $file->version_no]);
 
-        return $this->storage->downloadResponse($file);
+        return $this->storage->downloadResponse($file, $request);
     }
 
     public function archive(Document $document, ?User $actor = null, ?Request $request = null): Document

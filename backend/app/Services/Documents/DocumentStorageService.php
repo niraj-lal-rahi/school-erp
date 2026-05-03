@@ -3,20 +3,32 @@
 namespace App\Services\Documents;
 
 use App\Models\Documents\DocumentFile;
+use App\Services\Security\FileSecurityService;
+use App\Services\Security\SecureFileDownloadService;
+use App\Services\Storage\StoragePathBuilder;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DocumentStorageService
 {
+    public function __construct(
+        protected SecureFileDownloadService $downloads,
+        protected FileSecurityService $security,
+        protected StoragePathBuilder $paths,
+    ) {
+    }
+
     public function uploadFile(UploadedFile $file, array $context, string $disk = 'local'): array
     {
+        $disk = $this->security->resolveDisk($disk);
+        $this->security->assertUploadIsSafe($file, $context);
+
         $extension = $file->getClientOriginalExtension();
         $generatedName = Str::uuid()->toString().($extension ? '.'.$extension : '');
-        $path = $this->buildPrivatePath($context, $generatedName);
+        $path = $this->paths->documentPath($context, $generatedName);
 
         Storage::disk($disk)->putFileAs(dirname($path), $file, basename($path));
 
@@ -33,33 +45,17 @@ class DocumentStorageService
 
     public function temporaryDownloadUrl(DocumentFile $documentFile, int $minutes = 15): ?string
     {
-        $disk = Storage::disk($documentFile->disk);
-
-        if (method_exists($disk, 'temporaryUrl')) {
-            return $disk->temporaryUrl($documentFile->file_path, now()->addMinutes($minutes));
-        }
-
-        if ($documentFile->disk === 'public') {
-            return $disk->url($documentFile->file_path);
-        }
-
-        if (Route::has('documents.download')) {
-            return URL::temporarySignedRoute('documents.download', now()->addMinutes($minutes), ['id' => $documentFile->document_id]);
-        }
-
-        return null;
+        return $this->security->temporaryDownloadUrl($documentFile, $minutes);
     }
 
-    public function downloadResponse(DocumentFile $documentFile): StreamedResponse
+    public function downloadResponse(DocumentFile $documentFile, ?Request $request = null): StreamedResponse
     {
-        return Storage::disk($documentFile->disk)->download($documentFile->file_path, $documentFile->original_file_name);
+        return $this->security->download($documentFile, $request);
     }
 
     public function delete(DocumentFile $documentFile): void
     {
-        if (Storage::disk($documentFile->disk)->exists($documentFile->file_path)) {
-            Storage::disk($documentFile->disk)->delete($documentFile->file_path);
-        }
+        $this->security->deletePhysicalFile($documentFile);
     }
 
     public function exists(DocumentFile $documentFile): bool
@@ -72,20 +68,4 @@ class DocumentStorageService
         return hash_file('sha256', $file->getRealPath());
     }
 
-    protected function buildPrivatePath(array $context, string $generatedName): string
-    {
-        $schoolId = $context['school_id'] ?? 'shared';
-        $ownerType = $context['owner_type'] ?? 'general';
-        $ownerId = $context['owner_id'] ?? '0';
-        $documentId = $context['document_id'] ?? 'new';
-
-        return sprintf(
-            'documents/%s/%s/%s/%s/%s',
-            $schoolId,
-            $ownerType,
-            $ownerId,
-            $documentId,
-            $generatedName
-        );
-    }
 }

@@ -4,6 +4,7 @@ namespace App\Models\Finance;
 
 use App\Models\AcademicYear;
 use App\Models\Concerns\BelongsToSchool;
+use App\Models\Concerns\OptimizesQueryFilters;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class FeeInvoice extends Model
 {
     use BelongsToSchool;
+    use OptimizesQueryFilters;
     use SoftDeletes;
 
     protected $table = 'finance_fee_invoices';

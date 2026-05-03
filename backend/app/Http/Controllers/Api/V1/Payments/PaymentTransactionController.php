@@ -6,9 +6,11 @@ use App\Http\Requests\Payments\InitiatePaymentRequest;
 use App\Http\Requests\Payments\ManualPaymentApprovalRequest;
 use App\Http\Requests\Payments\VerifyPaymentRequest;
 use App\Http\Resources\Payments\PaymentGatewayResource;
+use App\Http\Resources\Payments\PaymentListResource;
 use App\Http\Resources\Payments\PaymentTransactionResource;
 use App\Models\Payments\PaymentTransaction;
 use App\Services\Payments\PaymentTransactionService;
+use App\Support\Api\ApiPaginationHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -50,8 +52,8 @@ class PaymentTransactionController extends PaymentController
     {
         $this->authorize('viewAny', PaymentTransaction::class);
 
-        return response()->json([
-            'data' => PaymentTransactionResource::collection($this->transactions->paginate(
+        return response()->json(ApiPaginationHelper::fromResourceCollection(
+            PaymentListResource::collection($this->transactions->paginate(
                 $request->only([
                     'school_id',
                     'provider',
@@ -64,8 +66,8 @@ class PaymentTransactionController extends PaymentController
                     'date_to',
                 ]),
                 (int) $request->integer('per_page', 15),
-            )->getCollection()),
-        ]);
+            ))
+        ));
     }
 
     public function show(int $id): JsonResponse
@@ -142,8 +144,8 @@ class PaymentTransactionController extends PaymentController
             'date_to',
         ]), ['status' => 'failed']);
 
-        return response()->json([
-            'data' => $this->transactions->paginate($filters, (int) $request->integer('per_page', 15)),
-        ]);
+        return response()->json(ApiPaginationHelper::fromResourceCollection(
+            PaymentListResource::collection($this->transactions->paginate($filters, (int) $request->integer('per_page', 15)))
+        ));
     }
 }

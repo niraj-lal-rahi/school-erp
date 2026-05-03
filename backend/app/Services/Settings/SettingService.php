@@ -4,9 +4,10 @@ namespace App\Services\Settings;
 
 use App\Models\Settings\Setting;
 use App\Repositories\Contracts\Settings\SettingRepositoryInterface;
+use App\Services\Cache\CacheInvalidationService;
+use App\Services\Cache\TenantCacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 
 class SettingService
@@ -14,6 +15,8 @@ class SettingService
     public function __construct(
         protected SettingRepositoryInterface $settings,
         protected SettingAuditService $audits,
+        protected TenantCacheService $cache,
+        protected CacheInvalidationService $invalidator,
     ) {
     }
 
@@ -24,13 +27,19 @@ class SettingService
 
     public function getByKey(string $key, ?int $schoolId = null, mixed $default = null): mixed
     {
-        $cacheKey = $this->cacheKey($key, $schoolId);
+        $globalVersion = $this->cache->namespaceVersion('settings', null);
 
-        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($key, $schoolId, $default) {
-            $setting = $this->settings->findByKey($key, $schoolId);
+        return $this->cache->remember(
+            'settings',
+            $schoolId,
+            ['key', $key, 'global-version', $globalVersion],
+            now()->addMinutes(30),
+            function () use ($key, $schoolId, $default) {
+                $setting = $this->settings->findByKey($key, $schoolId);
 
-            return $setting?->getTypedValue() ?? $default;
-        });
+                return $setting?->getTypedValue() ?? $default;
+            }
+        );
     }
 
     public function findOrFail(int $id): Setting
@@ -99,13 +108,24 @@ class SettingService
 
     public function clearCache(string $key, ?int $schoolId = null): void
     {
-        Cache::forget($this->cacheKey($key, $schoolId));
-        Cache::forget($this->cacheKey($key, null));
+        $this->invalidator->setting($schoolId, $key);
+
+        if ($schoolId === null) {
+            $this->invalidator->setting(null);
+        }
     }
 
     public function publicSettings(?int $schoolId = null): Collection
     {
-        return $this->settings->allPublic($schoolId)->map(fn (Setting $setting) => $this->sanitizeSetting($setting));
+        $globalVersion = $this->cache->namespaceVersion('settings-public', null);
+
+        return $this->cache->remember(
+            'settings-public',
+            $schoolId,
+            ['global-version', $globalVersion],
+            now()->addMinutes(30),
+            fn () => $this->settings->allPublic($schoolId)->map(fn (Setting $setting) => $this->sanitizeSetting($setting))
+        );
     }
 
     protected function prepareValueForStorage(mixed $value, string $valueType, bool $isSensitive): ?string
@@ -140,10 +160,5 @@ class SettingService
         }
 
         return $setting;
-    }
-
-    protected function cacheKey(string $key, ?int $schoolId = null): string
-    {
-        return sprintf('settings.%s.%s', $schoolId ?? 'global', $key);
     }
 }

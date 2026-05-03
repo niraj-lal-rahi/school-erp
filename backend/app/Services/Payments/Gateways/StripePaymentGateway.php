@@ -42,12 +42,20 @@ class StripePaymentGateway extends AbstractPaymentGateway implements SupportsRef
 
     public function processWebhook(array $payload, ?string $signature = null): array
     {
+        $secret = (string) $this->config('webhook_secret', '');
+        $expected = $secret !== ''
+            ? hash_hmac('sha256', json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $secret)
+            : null;
+        $isValid = $signature !== null && $signature !== '' && $expected !== null
+            ? hash_equals($expected, $signature)
+            : false;
+
         return [
             'provider' => 'stripe',
             'event_id' => $payload['id'] ?? null,
             'event_type' => $payload['type'] ?? 'unknown',
             'signature' => $signature,
-            'is_valid' => true,
+            'is_valid' => $isValid,
             'payload' => $payload,
         ];
     }

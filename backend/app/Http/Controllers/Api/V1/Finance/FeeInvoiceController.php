@@ -7,11 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\ApplyInvoiceDiscountRequest;
 use App\Http\Requests\Finance\ApplyInvoiceFineRequest;
 use App\Http\Requests\Finance\UpsertFeeInvoiceRequest;
+use App\Http\Resources\Finance\InvoiceListResource;
 use App\Http\Resources\Finance\FeeInvoiceResource;
 use App\Models\Finance\FeeInvoice;
 use App\Models\Finance\FineRule;
 use App\Models\Finance\StudentDiscount;
 use App\Services\Finance\FeeInvoiceService;
+use App\Support\Api\ApiPaginationHelper;
+use App\Support\Multitenancy\TenantOwnershipValidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -19,6 +22,7 @@ class FeeInvoiceController extends Controller
 {
     public function __construct(
         protected FeeInvoiceService $invoices,
+        protected TenantOwnershipValidator $tenantOwnership,
     ) {
     }
 
@@ -27,10 +31,10 @@ class FeeInvoiceController extends Controller
         $this->authorize('viewAny', FeeInvoice::class);
 
         return response()->json(
-            FeeInvoiceResource::collection($this->invoices->paginate(
+            ApiPaginationHelper::fromResourceCollection(InvoiceListResource::collection($this->invoices->paginate(
                 $request->only(['search', 'student_id', 'academic_year_id', 'status', 'due_date_from', 'due_date_to']),
                 (int) $request->integer('per_page', 15),
-            ))->response()->getData(true)
+            )))
         );
     }
 
@@ -104,6 +108,12 @@ class FeeInvoiceController extends Controller
     public function applyDiscount(FeeInvoice $feeInvoice, ApplyInvoiceDiscountRequest $request): JsonResponse
     {
         $discount = StudentDiscount::query()->findOrFail((int) $request->validated('student_discount_id'));
+        $this->tenantOwnership->assertUserOwnsModel(
+            $request->user(),
+            $discount,
+            'school_id',
+            'You cannot apply a discount from another tenant.'
+        );
         $invoice = $this->invoices->applyDiscount($feeInvoice, $discount);
 
         return response()->json([
@@ -115,6 +125,12 @@ class FeeInvoiceController extends Controller
     public function applyFine(FeeInvoice $feeInvoice, ApplyInvoiceFineRequest $request): JsonResponse
     {
         $fineRule = FineRule::query()->findOrFail((int) $request->validated('fine_rule_id'));
+        $this->tenantOwnership->assertUserOwnsModel(
+            $request->user(),
+            $fineRule,
+            'school_id',
+            'You cannot apply a fine rule from another tenant.'
+        );
         $invoice = $this->invoices->applyFine($feeInvoice, $fineRule);
 
         return response()->json([

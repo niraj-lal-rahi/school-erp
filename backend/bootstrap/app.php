@@ -15,11 +15,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tenant.domain' => \App\Http\Middleware\ResolveTenantFromDomain::class,
             'tenant.resolve' => \App\Http\Middleware\ResolveTenant::class,
+            'tenant.audit' => \App\Http\Middleware\TenantIsolationAuditMiddleware::class,
             'tenant.active' => \App\Http\Middleware\EnsureTenantActive::class,
             'tenant.feature' => \App\Http\Middleware\CheckTenantFeature::class,
             'tenant.limit' => \App\Http\Middleware\CheckTenantUsageLimit::class,
             'tenant.localization' => \App\Http\Middleware\ApplyTenantLocalization::class,
             'feature' => \App\Http\Middleware\CheckFeatureFlag::class,
+            'api.rate' => \App\Http\Middleware\ApiRateLimitMiddleware::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);

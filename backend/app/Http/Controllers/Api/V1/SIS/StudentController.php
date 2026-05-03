@@ -11,11 +11,13 @@ use App\Http\Requests\SIS\StoreStudentRequest;
 use App\Http\Requests\SIS\UpdateStudentRequest;
 use App\Http\Requests\SIS\UploadStudentDocumentRequest;
 use App\Http\Resources\SIS\GuardianResource;
+use App\Http\Resources\SIS\StudentListResource;
 use App\Http\Resources\SIS\StudentStatusHistoryResource;
 use App\Http\Resources\SIS\StudentResource;
 use App\Models\Student;
 use App\Services\SIS\StudentLifecycleService;
 use App\Services\SIS\StudentService;
+use App\Support\Api\ApiPaginationHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -32,7 +34,7 @@ class StudentController extends Controller
         $this->authorize('viewAny', Student::class);
 
         return response()->json(
-            StudentResource::collection($this->students->paginate(
+            ApiPaginationHelper::fromResourceCollection(StudentListResource::collection($this->students->paginate(
                 filters: $request->only([
                     'search',
                     'status',
@@ -44,7 +46,7 @@ class StudentController extends Controller
                     'house_id',
                 ]),
                 perPage: (int) $request->integer('per_page', 15),
-            ))->response()->getData(true)
+            )))
         );
     }
 

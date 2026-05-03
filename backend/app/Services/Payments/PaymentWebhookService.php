@@ -7,9 +7,10 @@ use App\Jobs\Payments\ProcessPaymentWebhookJob;
 use App\Models\Payments\PaymentGateway;
 use App\Models\Payments\PaymentWebhookEvent;
 use App\Repositories\Contracts\Payments\PaymentWebhookRepositoryInterface;
+use App\Services\Security\SensitiveActionAuditService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class PaymentWebhookService
@@ -18,6 +19,7 @@ class PaymentWebhookService
         protected PaymentWebhookRepositoryInterface $webhooks,
         protected PaymentGatewayService $gateways,
         protected PaymentTransactionService $transactions,
+        protected SensitiveActionAuditService $audit,
     ) {
     }
 
@@ -71,6 +73,21 @@ class PaymentWebhookService
             }
 
             $result = $implementation->processWebhook($payload, $event->signature);
+
+            if (($result['is_valid'] ?? false) !== true) {
+                $this->audit->log('payment.webhook.invalid_signature', [
+                    'provider' => $event->provider,
+                    'webhook_event_id' => $event->id,
+                    'event_id' => $event->event_id,
+                ], null, 'warning');
+
+                return $this->webhooks->update($event, [
+                    'processed' => true,
+                    'processed_at' => now(),
+                    'error_message' => 'Invalid webhook signature.',
+                ]);
+            }
+
             $transaction = null;
             $gatewayOrderId = $this->extractGatewayOrderId($payload);
             $gatewayPaymentId = $this->extractGatewayPaymentId($payload);

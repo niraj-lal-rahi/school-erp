@@ -3,6 +3,7 @@
 namespace App\Models\Documents;
 
 use App\Models\Concerns\BelongsToSchool;
+use App\Models\Concerns\OptimizesQueryFilters;
 use App\Models\Communication\MessageTemplate;
 use App\Models\Guardian;
 use App\Models\HR\Staff;
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Document extends Model
 {
     use BelongsToSchool;
+    use OptimizesQueryFilters;
     use SoftDeletes;
 
     protected $table = 'documents';

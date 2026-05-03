@@ -5,6 +5,8 @@ namespace App\Services\Saas;
 use App\Models\Saas\SubscriptionPlan;
 use App\Models\Saas\Tenant;
 use App\Repositories\Contracts\Saas\TenantFeatureRepositoryInterface;
+use App\Services\Cache\CacheInvalidationService;
+use App\Services\Cache\TenantCacheService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -14,18 +16,28 @@ class TenantFeatureService
         protected TenantFeatureRepositoryInterface $features,
         protected TenantUsageService $usage,
         protected TenantAuditService $audit,
+        protected TenantCacheService $cache,
+        protected CacheInvalidationService $invalidator,
     ) {
     }
 
     public function checkFeatureAccess(Tenant $tenant, string $featureCode): bool
     {
-        $feature = $this->features->findByTenantAndCode($tenant->id, $featureCode);
+        return $this->cache->remember(
+            'tenant-features',
+            $tenant->id,
+            ['access', $featureCode],
+            now()->addMinutes(15),
+            function () use ($tenant, $featureCode): bool {
+                $feature = $this->features->findByTenantAndCode($tenant->id, $featureCode);
 
-        if ($feature !== null) {
-            return (bool) $feature->is_enabled;
-        }
+                if ($feature !== null) {
+                    return (bool) $feature->is_enabled;
+                }
 
-        return $tenant->hasFeature($featureCode);
+                return $tenant->hasFeature($featureCode);
+            }
+        );
     }
 
     public function enableFeature(Tenant $tenant, array $featureData, $performedBy = null, ?string $ipAddress = null)
@@ -44,7 +56,7 @@ class TenantFeatureService
             $plan->loadMissing('planFeatures');
             $this->features->deleteByTenant($tenant->id);
 
-            return $plan->planFeatures->map(function ($feature) use ($tenant) {
+            $applied = $plan->planFeatures->map(function ($feature) use ($tenant) {
                 return $this->features->create([
                     'school_id' => $tenant->id,
                     'feature_code' => $feature->feature_code,
@@ -53,12 +65,22 @@ class TenantFeatureService
                     'limit_value' => $feature->limit_value,
                 ]);
             });
+
+            $this->invalidator->tenantFeatures($tenant->id);
+
+            return $applied;
         });
     }
 
     public function listFeatures(Tenant $tenant, array $filters = []): Collection
     {
-        return $this->features->listByTenant($tenant->id, $filters);
+        return $this->cache->remember(
+            'tenant-features',
+            $tenant->id,
+            ['list', $filters],
+            now()->addMinutes(15),
+            fn () => $this->features->listByTenant($tenant->id, $filters)
+        );
     }
 
     protected function upsertFeature(Tenant $tenant, array $featureData, $performedBy = null, ?string $ipAddress = null)
@@ -80,6 +102,7 @@ class TenantFeatureService
                     'limit_value' => $featureData['limit_value'] ?? null,
                 ]);
 
+            $this->invalidator->tenantFeatures($tenant->id);
             $this->audit->log('tenant.feature.updated', $tenant->id, 'Tenant feature access updated.', $existing?->toArray() ?? [], $feature->toArray(), $performedBy, $ipAddress);
 
             return $feature;

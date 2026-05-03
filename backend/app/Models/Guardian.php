@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToSchool;
+use App\Models\Concerns\OptimizesQueryFilters;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,6 +13,7 @@ class Guardian extends Model
 {
     use BelongsToSchool;
     use HasFactory;
+    use OptimizesQueryFilters;
     use SoftDeletes;
 
     protected $fillable = [

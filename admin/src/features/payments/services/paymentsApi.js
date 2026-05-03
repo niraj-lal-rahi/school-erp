@@ -1,17 +1,20 @@
 import { axiosClient } from '../../../api/axiosClient';
+import { createCrudApi } from '../../../api/createCrudApi';
 
 const basePath = '/payments';
+const gatewayApi = createCrudApi(`${basePath}/gateways`);
+const transactionApi = createCrudApi(`${basePath}/transactions`);
 
 export const paymentsApi = {
-  getGateways: (params) => axiosClient.get(`${basePath}/gateways`, { params }),
-  createGateway: (payload) => axiosClient.post(`${basePath}/gateways`, payload),
-  updateGateway: (id, payload) => axiosClient.put(`${basePath}/gateways/${id}`, payload),
-  deleteGateway: (id) => axiosClient.delete(`${basePath}/gateways/${id}`),
+  getGateways: gatewayApi.list,
+  createGateway: gatewayApi.create,
+  updateGateway: gatewayApi.update,
+  deleteGateway: gatewayApi.remove,
 
   initiatePayment: (payload) => axiosClient.post(`${basePath}/initiate`, payload),
   verifyPayment: (payload) => axiosClient.post(`${basePath}/verify`, payload),
-  getTransactions: (params) => axiosClient.get(`${basePath}/transactions`, { params }),
-  getTransaction: (id) => axiosClient.get(`${basePath}/transactions/${id}`),
+  getTransactions: transactionApi.list,
+  getTransaction: transactionApi.show,
   manualApproveTransaction: (id, payload) => axiosClient.post(`${basePath}/transactions/${id}/manual-approve`, payload),
   cancelTransaction: (id, payload) => axiosClient.post(`${basePath}/transactions/${id}/cancel`, payload),
 

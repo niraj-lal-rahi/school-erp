@@ -60,12 +60,20 @@ class RazorpayPaymentGateway extends AbstractPaymentGateway implements SupportsR
 
     public function processWebhook(array $payload, ?string $signature = null): array
     {
+        $secret = (string) $this->config('webhook_secret', $this->config('key_secret', ''));
+        $expected = $secret !== ''
+            ? hash_hmac('sha256', json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $secret)
+            : null;
+        $isValid = $signature !== null && $signature !== '' && $expected !== null
+            ? hash_equals($expected, $signature)
+            : false;
+
         return [
             'provider' => 'razorpay',
             'event_id' => Arr::get($payload, 'payload.payment.entity.id') ?? Arr::get($payload, 'account_id'),
             'event_type' => Arr::get($payload, 'event', 'unknown'),
             'signature' => $signature,
-            'is_valid' => true,
+            'is_valid' => $isValid,
             'payload' => $payload,
         ];
     }

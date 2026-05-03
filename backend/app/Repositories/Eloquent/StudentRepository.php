@@ -10,31 +10,35 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use App\Support\Pagination\PaginationDefaults;
 
 class StudentRepository implements StudentRepositoryInterface
 {
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->baseQuery()
+        return $this->listQuery()
             ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
                 $query->where(function (Builder $studentQuery) use ($search): void {
-                    $studentQuery->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('middle_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('full_name', 'like', "%{$search}%")
-                        ->orWhere('admission_no', 'like', "%{$search}%")
-                        ->orWhere('roll_no', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhereHas('guardians', function (Builder $guardianQuery) use ($search): void {
-                            $guardianQuery->where('full_name', 'like', "%{$search}%")
-                                ->orWhere('first_name', 'like', "%{$search}%")
-                                ->orWhere('last_name', 'like', "%{$search}%")
-                                ->orWhere('phone', 'like', "%{$search}%");
-                        });
+                    $studentQuery->searchAcross($search, [
+                        'students.first_name',
+                        'students.middle_name',
+                        'students.last_name',
+                        'students.full_name',
+                        'students.admission_no',
+                        'students.roll_no',
+                        'students.phone',
+                        'students.email',
+                    ])->orWhereHas('guardians', function (Builder $guardianQuery) use ($search): void {
+                        $guardianQuery->searchAcross($search, [
+                            'guardians.full_name',
+                            'guardians.first_name',
+                            'guardians.last_name',
+                            'guardians.phone',
+                        ]);
+                    });
                 });
             })
-            ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('current_status', $status))
+            ->whereStatus($filters['status'] ?? null, 'current_status')
             ->when($filters['category_id'] ?? null, fn (Builder $query, int|string $categoryId) => $query->where('category_id', $categoryId))
             ->when($filters['house_id'] ?? null, fn (Builder $query, int|string $houseId) => $query->where('house_id', $houseId))
             ->when($filters['guardian_id'] ?? null, function (Builder $query, int|string $guardianId): void {
@@ -54,12 +58,12 @@ class StudentRepository implements StudentRepositoryInterface
                 }
             )
             ->latest('id')
-            ->paginate($perPage);
+            ->paginate(PaginationDefaults::resolvePerPage($perPage));
     }
 
     public function findOrFail(int $id): Student
     {
-        return $this->baseQuery()->findOrFail($id);
+        return $this->detailQuery()->findOrFail($id);
     }
 
     public function create(StudentData $data): Student
@@ -132,7 +136,53 @@ class StudentRepository implements StudentRepositoryInterface
 
     protected function baseQuery(): Builder
     {
-        return Student::query()->with([
+        return Student::query()->select([
+            'students.id',
+            'students.school_id',
+            'students.user_id',
+            'students.uuid',
+            'students.admission_no',
+            'students.roll_no',
+            'students.first_name',
+            'students.middle_name',
+            'students.last_name',
+            'students.full_name',
+            'students.preferred_name',
+            'students.email',
+            'students.phone',
+            'students.gender',
+            'students.date_of_birth',
+            'students.admission_date',
+            'students.joining_date',
+            'students.blood_group',
+            'students.photo_path',
+            'students.religion',
+            'students.current_status',
+            'students.notes',
+            'students.address',
+            'students.medical_notes',
+            'students.category_id',
+            'students.house_id',
+            'students.created_at',
+            'students.updated_at',
+        ]);
+    }
+
+    protected function listQuery(): Builder
+    {
+        return $this->baseQuery()->with([
+            'guardians:id,first_name,last_name,full_name,phone',
+            'enrollments:id,student_id,school_class_id,section_id,academic_year_id,is_current',
+            'enrollments.schoolClass:id,name,code',
+            'enrollments.section:id,name,school_class_id',
+            'category:id,name,code',
+            'house:id,name,code,color',
+        ]);
+    }
+
+    protected function detailQuery(): Builder
+    {
+        return $this->baseQuery()->with([
             'guardians',
             'enrollments.schoolClass',
             'enrollments.section',

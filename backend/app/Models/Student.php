@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToSchool;
+use App\Models\Concerns\OptimizesQueryFilters;
 use App\Models\Finance\FeeInvoice;
 use App\Models\Finance\Payment;
 use App\Models\Finance\Receipt;
@@ -22,6 +23,7 @@ class Student extends Model
 {
     use BelongsToSchool;
     use HasFactory;
+    use OptimizesQueryFilters;
     use SoftDeletes;
 
     protected $fillable = [

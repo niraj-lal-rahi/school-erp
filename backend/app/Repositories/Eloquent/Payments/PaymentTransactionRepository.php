@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent\Payments;
 
 use App\Models\Payments\PaymentTransaction;
 use App\Repositories\Contracts\Payments\PaymentTransactionRepositoryInterface;
+use App\Support\Pagination\PaginationDefaults;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -14,12 +15,12 @@ class PaymentTransactionRepository implements PaymentTransactionRepositoryInterf
     {
         return $this->query($filters)
             ->latest('id')
-            ->paginate($perPage);
+            ->paginate(PaginationDefaults::resolvePerPage($perPage));
     }
 
     public function findOrFail(int $id): PaymentTransaction
     {
-        return $this->baseQuery()->withTrashed()->findOrFail($id);
+        return $this->detailQuery()->withTrashed()->findOrFail($id);
     }
 
     public function create(array $attributes): PaymentTransaction
@@ -72,7 +73,7 @@ class PaymentTransactionRepository implements PaymentTransactionRepositoryInterf
 
     protected function query(array $filters = []): Builder
     {
-        return $this->baseQuery()
+        return $this->listQuery()
             ->when($filters['school_id'] ?? null, fn (Builder $query, $value) => $query->where('school_id', $value))
             ->when($filters['provider'] ?? null, fn (Builder $query, string $value) => $query->where('provider', $value))
             ->when($filters['payment_method'] ?? null, fn (Builder $query, string $value) => $query->where('payment_method', $value))
@@ -86,15 +87,58 @@ class PaymentTransactionRepository implements PaymentTransactionRepositoryInterf
 
     protected function baseQuery(): Builder
     {
-        return PaymentTransaction::withoutGlobalScopes()
-            ->with([
-                'gateway',
-                'student',
-                'tenantSubscription.subscriptionPlan',
-                'verifier',
-                'refunds',
-                'reconciliations',
-                'upiPaymentRequest',
-            ]);
+        return PaymentTransaction::withoutGlobalScopes()->select([
+            'payment_transactions.id',
+            'payment_transactions.school_id',
+            'payment_transactions.transaction_no',
+            'payment_transactions.payable_type',
+            'payment_transactions.payable_id',
+            'payment_transactions.student_id',
+            'payment_transactions.tenant_subscription_id',
+            'payment_transactions.gateway_id',
+            'payment_transactions.provider',
+            'payment_transactions.payment_method',
+            'payment_transactions.amount',
+            'payment_transactions.currency',
+            'payment_transactions.gateway_order_id',
+            'payment_transactions.gateway_payment_id',
+            'payment_transactions.upi_vpa',
+            'payment_transactions.upi_reference_no',
+            'payment_transactions.upi_qr_payload',
+            'payment_transactions.status',
+            'payment_transactions.verification_status',
+            'payment_transactions.paid_at',
+            'payment_transactions.verified_at',
+            'payment_transactions.verified_by',
+            'payment_transactions.failure_reason',
+            'payment_transactions.metadata',
+            'payment_transactions.created_at',
+            'payment_transactions.updated_at',
+            'payment_transactions.deleted_at',
+        ]);
+    }
+
+    protected function listQuery(): Builder
+    {
+        return $this->baseQuery()->with([
+            'gateway:id,name,code,provider,mode,status',
+            'student:id,full_name,admission_no,roll_no',
+            'tenantSubscription:id,subscription_plan_id,billing_cycle,status',
+            'verifier:id,name,email',
+            'upiPaymentRequest:id,transaction_id,upi_vpa,amount,currency,status,expires_at',
+        ]);
+    }
+
+    protected function detailQuery(): Builder
+    {
+        return $this->baseQuery()->with([
+            'gateway',
+            'student',
+            'tenantSubscription.subscriptionPlan',
+            'verifier',
+            'refunds',
+            'reconciliations',
+            'upiPaymentRequest',
+        ]);
     }
 }

@@ -10,7 +10,7 @@ class UploadDocumentVersionRequest extends DocumentRequest
     {
         return [
             'school_id' => ['required', 'integer', Rule::exists('schools', 'id')],
-            'disk' => ['nullable', Rule::in(['local', 'public', 's3'])],
+            'disk' => ['nullable', Rule::in(['private', 'local', 'public', 's3'])],
             'file' => $this->fileRules(true),
         ];
     }

@@ -4,15 +4,18 @@ namespace App\Services\Settings;
 
 use App\Models\Settings\FeatureFlag;
 use App\Repositories\Contracts\Settings\FeatureFlagRepositoryInterface;
+use App\Services\Cache\CacheInvalidationService;
+use App\Services\Cache\TenantCacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 
 class FeatureFlagService
 {
     public function __construct(
         protected FeatureFlagRepositoryInterface $features,
         protected SettingAuditService $audits,
+        protected TenantCacheService $cache,
+        protected CacheInvalidationService $invalidator,
     ) {
     }
 
@@ -28,17 +31,17 @@ class FeatureFlagService
 
     public function checkFeatureEnabled(string $featureCode, string $module, ?int $schoolId = null): bool
     {
-        return Cache::remember(
-            sprintf('feature-flags.%s.%s.%s', $schoolId ?? 'global', $module, $featureCode),
+        $globalVersion = $this->cache->namespaceVersion('feature-flags', null);
+
+        return $this->cache->remember(
+            'feature-flags',
+            $schoolId,
+            [$module, $featureCode, 'global-version', $globalVersion],
             now()->addMinutes(15),
             function () use ($featureCode, $module, $schoolId): bool {
                 $feature = $this->features->findByCode($featureCode, $module, $schoolId);
 
-                if ($feature === null) {
-                    return false;
-                }
-
-                if (! $feature->is_enabled) {
+                if ($feature === null || ! $feature->is_enabled) {
                     return false;
                 }
 
@@ -72,6 +75,10 @@ class FeatureFlagService
 
     protected function clearCache(FeatureFlag $featureFlag): void
     {
-        Cache::forget(sprintf('feature-flags.%s.%s.%s', $featureFlag->school_id ?? 'global', $featureFlag->module, $featureFlag->feature_code));
+        $this->invalidator->featureFlags($featureFlag->school_id, $featureFlag->module, $featureFlag->feature_code);
+
+        if ($featureFlag->school_id === null) {
+            $this->invalidator->featureFlags(null);
+        }
     }
 }

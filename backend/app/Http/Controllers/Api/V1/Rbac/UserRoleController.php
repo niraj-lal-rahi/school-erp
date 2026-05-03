@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\UserRole;
 use App\Services\Rbac\AccessControlService;
 use App\Services\Rbac\RoleAssignmentService;
+use App\Support\Multitenancy\TenantOwnershipValidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -19,6 +20,7 @@ class UserRoleController extends Controller
     public function __construct(
         protected RoleAssignmentService $assignments,
         protected AccessControlService $accessControl,
+        protected TenantOwnershipValidator $tenantOwnership,
     ) {
     }
 
@@ -87,7 +89,14 @@ class UserRoleController extends Controller
             return;
         }
 
-        if ($performedBy->school_id !== $targetUser->school_id) {
+        try {
+            $this->tenantOwnership->assertUserOwnsModel(
+                $performedBy,
+                $targetUser,
+                'school_id',
+                'You cannot manage roles for a user from another tenant.'
+            );
+        } catch (\App\Exceptions\CrossTenantAccessException) {
             throw ValidationException::withMessages([
                 'user_id' => ['You cannot manage roles for a user from another tenant.'],
             ]);

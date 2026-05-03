@@ -6,9 +6,12 @@ use App\Contracts\Communication\EmailProviderInterface;
 use App\Events\Communication\NotificationFailed;
 use App\Models\Communication\NotificationLog;
 use App\Repositories\Contracts\Communication\NotificationRepositoryInterface;
+use App\Support\Queue\JobRetryProfile;
+use App\Support\Queue\QueueNames;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Throwable;
 
@@ -18,9 +21,27 @@ class SendEmailNotificationJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    public int $tries = 3;
+    public int $timeout = 90;
+
     public function __construct(
         public int $notificationLogId,
     ) {
+        $this->onQueue(config('queue.routing.notifications', QueueNames::NOTIFICATIONS));
+    }
+
+    public function backoff(): array
+    {
+        return JobRetryProfile::notifications();
+    }
+
+    public function middleware(): array
+    {
+        return [
+            (new WithoutOverlapping('notification-email:'.$this->notificationLogId))
+                ->releaseAfter(15)
+                ->expireAfter(180),
+        ];
     }
 
     public function handle(
@@ -29,7 +50,7 @@ class SendEmailNotificationJob implements ShouldQueue
     ): void {
         $log = NotificationLog::withoutGlobalScopes()->find($this->notificationLogId);
 
-        if (! $log) {
+        if (! $log || in_array($log->status, ['sent', 'delivered'], true)) {
             return;
         }
 

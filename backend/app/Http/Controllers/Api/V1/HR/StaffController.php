@@ -8,10 +8,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\HR\StoreStaffRequest;
 use App\Http\Requests\HR\StaffStatusActionRequest;
 use App\Http\Requests\HR\UpdateStaffRequest;
+use App\Http\Resources\HR\StaffListResource;
 use App\Http\Resources\HR\StaffResource;
 use App\Models\HR\Staff;
 use App\Services\HR\StaffLifecycleService;
 use App\Services\HR\StaffService;
+use App\Support\Api\ApiPaginationHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -28,7 +30,7 @@ class StaffController extends Controller
         $this->authorize('viewAny', Staff::class);
 
         return response()->json(
-            StaffResource::collection($this->staff->paginate(
+            ApiPaginationHelper::fromResourceCollection(StaffListResource::collection($this->staff->paginate(
                 filters: $request->only([
                     'search',
                     'department_id',
@@ -38,7 +40,7 @@ class StaffController extends Controller
                     'current_status',
                 ]),
                 perPage: (int) $request->integer('per_page', 15),
-            ))->response()->getData(true)
+            )))
         );
     }
 

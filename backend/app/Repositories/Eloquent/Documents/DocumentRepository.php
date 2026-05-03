@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent\Documents;
 
 use App\Models\Documents\Document;
 use App\Repositories\Contracts\Documents\DocumentRepositoryInterface;
+use App\Support\Pagination\PaginationDefaults;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -13,7 +14,7 @@ class DocumentRepository implements DocumentRepositoryInterface
 {
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->query()
+        return $this->listQuery()
             ->when($filters['owner_type'] ?? null, fn (Builder $query, string $value) => $query->where('owner_type', $value))
             ->when($filters['owner_id'] ?? null, fn (Builder $query, int $value) => $query->where('owner_id', $value))
             ->when($filters['category_id'] ?? null, fn (Builder $query, int $value) => $query->where('category_id', $value))
@@ -33,12 +34,12 @@ class DocumentRepository implements DocumentRepositoryInterface
                 });
             })
             ->latest('id')
-            ->paginate($perPage);
+            ->paginate(PaginationDefaults::resolvePerPage($perPage));
     }
 
     public function findOrFail(int $id): Document
     {
-        return $this->query()->findOrFail($id);
+        return $this->detailQuery()->findOrFail($id);
     }
 
     public function create(array $attributes): Document
@@ -98,9 +99,43 @@ class DocumentRepository implements DocumentRepositoryInterface
         ];
     }
 
-    protected function query(): Builder
+    protected function baseQuery(): Builder
     {
-        return Document::query()->with([
+        return Document::query()->select([
+            'documents.id',
+            'documents.school_id',
+            'documents.category_id',
+            'documents.folder_id',
+            'documents.owner_type',
+            'documents.owner_id',
+            'documents.title',
+            'documents.description',
+            'documents.document_no',
+            'documents.issue_date',
+            'documents.expiry_date',
+            'documents.verification_status',
+            'documents.status',
+            'documents.created_by',
+            'documents.created_at',
+            'documents.updated_at',
+            'documents.deleted_at',
+        ]);
+    }
+
+    protected function listQuery(): Builder
+    {
+        return $this->baseQuery()->with([
+            'category:id,name,code,applies_to,status',
+            'folder:id,name,code,visibility,parent_id',
+            'creator:id,name,email',
+            'currentFile:id,document_id,version_no,file_name,original_file_name,disk,mime_type,file_size,is_current,created_at',
+            'tags:id,name,code',
+        ]);
+    }
+
+    protected function detailQuery(): Builder
+    {
+        return $this->baseQuery()->with([
             'category',
             'folder',
             'creator',

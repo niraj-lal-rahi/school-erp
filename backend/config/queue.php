@@ -126,4 +126,18 @@ return [
         'table' => 'failed_jobs',
     ],
 
+    'routing' => [
+        'high' => env('QUEUE_NAME_HIGH', 'high'),
+        'default' => env('QUEUE_NAME_DEFAULT', 'default'),
+        'notifications' => env('QUEUE_NAME_NOTIFICATIONS', 'notifications'),
+        'payments' => env('QUEUE_NAME_PAYMENTS', 'payments'),
+        'reports' => env('QUEUE_NAME_REPORTS', 'reports'),
+        'documents' => env('QUEUE_NAME_DOCUMENTS', 'documents'),
+        'automation' => env('QUEUE_NAME_AUTOMATION', 'automation'),
+    ],
+
+    'monitoring' => [
+        'failed_summary_window_hours' => (int) env('QUEUE_FAILED_SUMMARY_WINDOW_HOURS', 24),
+    ],
+
 ];

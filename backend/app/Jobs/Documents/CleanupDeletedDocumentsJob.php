@@ -2,8 +2,7 @@
 
 namespace App\Jobs\Documents;
 
-use App\Models\Documents\DocumentFile;
-use App\Services\Documents\DocumentStorageService;
+use App\Jobs\Storage\FileCleanupJob;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -22,17 +21,8 @@ class CleanupDeletedDocumentsJob implements ShouldQueue
     ) {
     }
 
-    public function handle(DocumentStorageService $storage): void
+    public function handle(): void
     {
-        DocumentFile::withTrashed()
-            ->whereNotNull('deleted_at')
-            ->where('deleted_at', '<=', now()->subDays($this->olderThanDays))
-            ->chunkById(100, function ($files) use ($storage): void {
-                foreach ($files as $file) {
-                    if ($storage->exists($file)) {
-                        $storage->delete($file);
-                    }
-                }
-            });
+        FileCleanupJob::dispatch($this->olderThanDays);
     }
 }

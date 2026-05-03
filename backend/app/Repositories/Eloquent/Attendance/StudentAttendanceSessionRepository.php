@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent\Attendance;
 use App\DataTransferObjects\Attendance\StudentAttendanceSessionData;
 use App\Models\Attendance\StudentAttendanceSession;
 use App\Repositories\Contracts\Attendance\StudentAttendanceSessionRepositoryInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class StudentAttendanceSessionRepository implements StudentAttendanceSessionRepositoryInterface
@@ -12,7 +13,34 @@ class StudentAttendanceSessionRepository implements StudentAttendanceSessionRepo
     public function all(array $filters = []): Collection
     {
         return StudentAttendanceSession::query()
-            ->with(['academicYear', 'schoolClass', 'section', 'period', 'subject', 'teacher', 'marker'])
+            ->select([
+                'attendance_student_sessions.id',
+                'attendance_student_sessions.school_id',
+                'attendance_student_sessions.academic_year_id',
+                'attendance_student_sessions.school_class_id',
+                'attendance_student_sessions.section_id',
+                'attendance_student_sessions.attendance_date',
+                'attendance_student_sessions.session_type',
+                'attendance_student_sessions.attendance_period_id',
+                'attendance_student_sessions.session_slot',
+                'attendance_student_sessions.subject_id',
+                'attendance_student_sessions.teacher_id',
+                'attendance_student_sessions.status',
+                'attendance_student_sessions.marked_by',
+                'attendance_student_sessions.submitted_at',
+                'attendance_student_sessions.locked_at',
+                'attendance_student_sessions.created_at',
+                'attendance_student_sessions.updated_at',
+            ])
+            ->with([
+                'academicYear:id,name,code',
+                'schoolClass:id,name,code',
+                'section:id,name,school_class_id',
+                'period:id,name,code,sequence',
+                'subject:id,name,code',
+                'teacher:id,full_name,employee_code',
+                'marker:id,name,email',
+            ])
             ->withCount('records')
             ->when($filters['academic_year_id'] ?? null, fn ($query, int|string $id) => $query->where('academic_year_id', $id))
             ->when($filters['class_id'] ?? null, fn ($query, int|string $id) => $query->where('school_class_id', $id))

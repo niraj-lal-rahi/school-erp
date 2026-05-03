@@ -4,6 +4,8 @@ namespace App\Services\Saas;
 
 use App\Models\Saas\SubscriptionPlan;
 use App\Repositories\Contracts\Saas\SubscriptionPlanRepositoryInterface;
+use App\Services\Cache\CacheInvalidationService;
+use App\Services\Cache\TenantCacheService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -15,6 +17,8 @@ class SubscriptionPlanService
     public function __construct(
         protected SubscriptionPlanRepositoryInterface $plans,
         protected TenantAuditService $audit,
+        protected TenantCacheService $cache,
+        protected CacheInvalidationService $invalidator,
     ) {
     }
 
@@ -33,11 +37,27 @@ class SubscriptionPlanService
         return $this->plans->findOrFail($id);
     }
 
+    public function cachedPlanFeatures(SubscriptionPlan $plan): Collection
+    {
+        return $this->cache->remember(
+            'subscription-plan-features',
+            null,
+            ['plan', $plan->id],
+            now()->addMinutes(30),
+            function () use ($plan): Collection {
+                $plan->loadMissing('planFeatures');
+
+                return $plan->planFeatures->values();
+            }
+        );
+    }
+
     public function deletePlan(SubscriptionPlan $plan, $performedBy = null, ?string $ipAddress = null): void
     {
         DB::transaction(function () use ($plan, $performedBy, $ipAddress): void {
             $oldValues = $plan->toArray();
             $this->plans->delete($plan);
+            $this->invalidator->subscriptionPlanFeatures($plan->id);
             $this->audit->log('plan.deleted', null, 'Subscription plan deleted.', $oldValues, [], $performedBy, $ipAddress);
         });
     }
@@ -52,6 +72,7 @@ class SubscriptionPlanService
                 $this->syncFeatures($plan, $features);
             }
 
+            $this->invalidator->subscriptionPlanFeatures($plan->id);
             $this->audit->log('plan.created', null, 'Subscription plan created.', [], $plan->toArray(), $performedBy, $ipAddress);
 
             return $this->plans->findOrFail($plan->id);
@@ -70,6 +91,7 @@ class SubscriptionPlanService
                 $this->syncFeatures($plan, $features);
             }
 
+            $this->invalidator->subscriptionPlanFeatures($plan->id);
             $this->audit->log('plan.updated', null, 'Subscription plan updated.', $oldValues, $plan->toArray(), $performedBy, $ipAddress);
 
             return $this->plans->findOrFail($plan->id);
@@ -101,6 +123,7 @@ class SubscriptionPlanService
                 'limit_value' => $feature->limit_value,
             ])->all());
 
+            $this->invalidator->subscriptionPlanFeatures($cloned->id);
             $this->audit->log('plan.cloned', null, 'Subscription plan cloned.', $sourcePlan->toArray(), $cloned->toArray(), $performedBy, $ipAddress);
 
             return $this->plans->findOrFail($cloned->id);
@@ -111,6 +134,7 @@ class SubscriptionPlanService
     {
         return DB::transaction(function () use ($plan, $features): SubscriptionPlan {
             $this->syncFeatures($plan, $features);
+            $this->invalidator->subscriptionPlanFeatures($plan->id);
 
             return $this->plans->findOrFail($plan->id);
         });

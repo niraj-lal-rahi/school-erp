@@ -6,13 +6,16 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Contracts\Rbac\PermissionRepositoryInterface;
+use App\Services\Cache\CacheInvalidationService;
+use App\Services\Cache\TenantCacheService;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 
 class AccessControlService
 {
     public function __construct(
         protected PermissionRepositoryInterface $permissions,
+        protected TenantCacheService $cache,
+        protected CacheInvalidationService $invalidator,
     ) {
     }
 
@@ -43,8 +46,10 @@ class AccessControlService
 
     public function resolvePermissions(User $user): Collection
     {
-        return Cache::remember(
-            $this->permissionsCacheKey($user),
+        return $this->cache->remember(
+            'rbac-permissions',
+            $user->school_id,
+            ['user', $user->id],
             now()->addMinutes(30),
             fn () => $this->resolveRoles($user)
                 ->flatMap(fn (Role $role) => $role->permissions)
@@ -63,8 +68,10 @@ class AccessControlService
 
     public function resolveRoles(User $user): Collection
     {
-        return Cache::remember(
-            $this->rolesCacheKey($user),
+        return $this->cache->remember(
+            'rbac-roles',
+            $user->school_id,
+            ['user', $user->id],
             now()->addMinutes(30),
             fn () => $user->roles()
                 ->with(['permissions'])
@@ -77,9 +84,9 @@ class AccessControlService
     public function clearUserCache(User|int $user): void
     {
         $userId = $user instanceof User ? $user->id : $user;
+        $schoolId = $user instanceof User ? $user->school_id : null;
 
-        Cache::forget("rbac:user:{$userId}:roles");
-        Cache::forget("rbac:user:{$userId}:permissions");
+        $this->invalidator->permissions($userId, $schoolId);
     }
 
     public function clearUsersCacheByRole(Role $role): void
@@ -89,15 +96,5 @@ class AccessControlService
         foreach ($role->users as $user) {
             $this->clearUserCache($user);
         }
-    }
-
-    protected function permissionsCacheKey(User $user): string
-    {
-        return "rbac:user:{$user->id}:permissions";
-    }
-
-    protected function rolesCacheKey(User $user): string
-    {
-        return "rbac:user:{$user->id}:roles";
     }
 }

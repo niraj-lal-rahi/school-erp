@@ -2,6 +2,8 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Alert, Button, Chip, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { AppDataTable } from '../../../components/common/AppDataTable';
+import { useDebounce } from '../../../hooks/useDebounce';
+import { usePaginatedQuery } from '../../../hooks/usePaginatedQuery';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux';
 import { PaymentStatusChip } from '../components/PaymentStatusChip';
 import { PaymentsPageShell } from '../components/PaymentsPageShell';
@@ -13,27 +15,26 @@ export function PaymentTransactionsPage() {
   const { canManage } = usePaymentsAccess();
   const { transactions, transactionsPagination, loading, saving, error } = useAppSelector((state) => state.payments);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
     provider: '',
     payment_method: '',
     status: '',
   });
+  const debouncedSearch = useDebounce(search, 350);
 
   useEffect(() => {
-    dispatch(fetchPaymentTransactions({
+    setPage(1);
+  }, [debouncedSearch, filters.payment_method, filters.provider, filters.status]);
+
+  const { requestPage } = usePaginatedQuery({
+    queryAction: fetchPaymentTransactions,
+    page,
+    perPage: 20,
+    params: {
       ...filters,
-      per_page: 20,
-      page: transactionsPagination.page,
-    }));
-  }, [dispatch, filters, transactionsPagination.page]);
-
-  const rows = transactions.filter((row) => {
-    if (!search) {
-      return true;
-    }
-
-    const haystack = `${row.transaction_no} ${row.gateway_payment_id || ''} ${row.upi_reference_no || ''}`.toLowerCase();
-    return haystack.includes(search.toLowerCase());
+      search: debouncedSearch || undefined,
+    },
   });
 
   return (
@@ -45,17 +46,17 @@ export function PaymentTransactionsPage() {
 
       <AppDataTable
         title="Transactions"
-        rows={rows}
+        rows={transactions}
         loading={loading}
         searchValue={search}
         onSearchChange={setSearch}
         pagination={{
           ...transactionsPagination,
-          onPageChange: (page) => dispatch(fetchPaymentTransactions({
-            ...filters,
-            page,
-            per_page: 20,
-          })),
+          page,
+          onPageChange: (nextPage) => {
+            setPage(nextPage);
+            requestPage(nextPage);
+          },
         }}
         filters={[
           {

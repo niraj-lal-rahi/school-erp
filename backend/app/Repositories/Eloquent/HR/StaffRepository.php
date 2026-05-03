@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent\HR;
 use App\DataTransferObjects\HR\StaffData;
 use App\Models\HR\Staff;
 use App\Repositories\Contracts\HR\StaffRepositoryInterface;
+use App\Support\Pagination\PaginationDefaults;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -12,31 +13,31 @@ class StaffRepository implements StaffRepositoryInterface
 {
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->query()
+        return $this->listQuery()
             ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
-                $query->where(function (Builder $staffQuery) use ($search): void {
-                    $staffQuery->where('employee_code', 'like', "%{$search}%")
-                        ->orWhere('first_name', 'like', "%{$search}%")
-                        ->orWhere('middle_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('full_name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%")
-                        ->orWhere('alternate_phone', 'like', "%{$search}%");
-                });
+                $query->searchAcross($search, [
+                    'staff.employee_code',
+                    'staff.first_name',
+                    'staff.middle_name',
+                    'staff.last_name',
+                    'staff.full_name',
+                    'staff.email',
+                    'staff.phone',
+                    'staff.alternate_phone',
+                ]);
             })
             ->when($filters['department_id'] ?? null, fn (Builder $query, int|string $departmentId) => $query->where('department_id', $departmentId))
             ->when($filters['designation_id'] ?? null, fn (Builder $query, int|string $designationId) => $query->where('designation_id', $designationId))
             ->when($filters['staff_type'] ?? null, fn (Builder $query, string $staffType) => $query->where('staff_type', $staffType))
             ->when($filters['employment_type'] ?? null, fn (Builder $query, string $employmentType) => $query->where('employment_type', $employmentType))
-            ->when($filters['current_status'] ?? null, fn (Builder $query, string $status) => $query->where('current_status', $status))
+            ->whereStatus($filters['current_status'] ?? null, 'current_status')
             ->latest('id')
-            ->paginate($perPage);
+            ->paginate(PaginationDefaults::resolvePerPage($perPage));
     }
 
     public function findOrFail(int $id): Staff
     {
-        return $this->query()->findOrFail($id);
+        return $this->detailQuery()->findOrFail($id);
     }
 
     public function create(StaffData $data): Staff
@@ -56,8 +57,55 @@ class StaffRepository implements StaffRepositoryInterface
         $staff->delete();
     }
 
-    protected function query(): Builder
+    protected function baseQuery(): Builder
     {
-        return Staff::query()->with(['user', 'department', 'designation']);
+        return Staff::query()->select([
+            'staff.id',
+            'staff.school_id',
+            'staff.user_id',
+            'staff.department_id',
+            'staff.designation_id',
+            'staff.employee_code',
+            'staff.first_name',
+            'staff.middle_name',
+            'staff.last_name',
+            'staff.full_name',
+            'staff.gender',
+            'staff.date_of_birth',
+            'staff.email',
+            'staff.phone',
+            'staff.alternate_phone',
+            'staff.photo_path',
+            'staff.staff_type',
+            'staff.employment_type',
+            'staff.joining_date',
+            'staff.leaving_date',
+            'staff.current_status',
+            'staff.qualification_summary',
+            'staff.experience_years',
+            'staff.address_line1',
+            'staff.address_line2',
+            'staff.city',
+            'staff.state',
+            'staff.country',
+            'staff.postal_code',
+            'staff.notes',
+            'staff.created_at',
+            'staff.updated_at',
+        ]);
+    }
+
+    protected function listQuery(): Builder
+    {
+        return $this->baseQuery()->with([
+            'user:id,name,email',
+            'department:id,name,code',
+            'designation:id,name,code',
+        ]);
+    }
+
+    protected function detailQuery(): Builder
+    {
+        return $this->baseQuery()->with(['user', 'department', 'designation']);
     }
 }

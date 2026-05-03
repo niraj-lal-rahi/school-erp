@@ -3,6 +3,7 @@
 namespace App\Models\Workflows;
 
 use App\Models\Concerns\BelongsToSchool;
+use App\Models\Concerns\OptimizesQueryFilters;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class WorkflowInstance extends Model
 {
     use BelongsToSchool;
+    use OptimizesQueryFilters;
     use SoftDeletes;
 
     protected $table = 'workflow_instances';
