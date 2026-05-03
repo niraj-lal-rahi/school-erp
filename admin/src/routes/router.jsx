@@ -185,6 +185,18 @@ const AutomationRulesPage = lazy(() => import('../features/workflows/pages/Autom
 const AutomationRunLogsPage = lazy(() => import('../features/workflows/pages/AutomationRunLogsPage').then((module) => ({ default: module.AutomationRunLogsPage })));
 const ReminderRulesPage = lazy(() => import('../features/workflows/pages/ReminderRulesPage').then((module) => ({ default: module.ReminderRulesPage })));
 const WorkflowReportsPage = lazy(() => import('../features/workflows/pages/WorkflowReportsPage').then((module) => ({ default: module.WorkflowReportsPage })));
+const SettingsLandingPage = lazy(() => import('../features/settings/pages/SettingsLandingPage').then((module) => ({ default: module.SettingsLandingPage })));
+const GeneralSettingsPage = lazy(() => import('../features/settings/pages/GeneralSettingsPage').then((module) => ({ default: module.GeneralSettingsPage })));
+const SchoolProfileBrandingPage = lazy(() => import('../features/settings/pages/SchoolProfileBrandingPage').then((module) => ({ default: module.SchoolProfileBrandingPage })));
+const AcademicSettingsPage = lazy(() => import('../features/settings/pages/AcademicSettingsPage').then((module) => ({ default: module.AcademicSettingsPage })));
+const FinanceSettingsPage = lazy(() => import('../features/settings/pages/FinanceSettingsPage').then((module) => ({ default: module.FinanceSettingsPage })));
+const NotificationSettingsPage = lazy(() => import('../features/settings/pages/NotificationSettingsPage').then((module) => ({ default: module.NotificationSettingsPage })));
+const SecuritySettingsPage = lazy(() => import('../features/settings/pages/SecuritySettingsPage').then((module) => ({ default: module.SecuritySettingsPage })));
+const LocalizationSettingsPage = lazy(() => import('../features/settings/pages/LocalizationSettingsPage').then((module) => ({ default: module.LocalizationSettingsPage })));
+const FeatureFlagsPage = lazy(() => import('../features/settings/pages/FeatureFlagsPage').then((module) => ({ default: module.FeatureFlagsPage })));
+const IntegrationSettingsPage = lazy(() => import('../features/settings/pages/IntegrationSettingsPage').then((module) => ({ default: module.IntegrationSettingsPage })));
+const SettingsAuditLogsPage = lazy(() => import('../features/settings/pages/AuditLogsPage').then((module) => ({ default: module.AuditLogsPage })));
+const PublicConfigPreviewPage = lazy(() => import('../features/settings/pages/PublicConfigPreviewPage').then((module) => ({ default: module.PublicConfigPreviewPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -929,6 +941,54 @@ export const router = createBrowserRouter([
           {
             path: 'workflows/reports',
             element: withSuspense(<WorkflowReportsPage />),
+          },
+          {
+            path: 'settings',
+            element: withSuspense(<SettingsLandingPage />),
+          },
+          {
+            path: 'settings/general',
+            element: withSuspense(<GeneralSettingsPage />),
+          },
+          {
+            path: 'settings/branding',
+            element: withSuspense(<SchoolProfileBrandingPage />),
+          },
+          {
+            path: 'settings/academic',
+            element: withSuspense(<AcademicSettingsPage />),
+          },
+          {
+            path: 'settings/finance',
+            element: withSuspense(<FinanceSettingsPage />),
+          },
+          {
+            path: 'settings/notifications',
+            element: withSuspense(<NotificationSettingsPage />),
+          },
+          {
+            path: 'settings/security',
+            element: withSuspense(<SecuritySettingsPage />),
+          },
+          {
+            path: 'settings/localization',
+            element: withSuspense(<LocalizationSettingsPage />),
+          },
+          {
+            path: 'settings/features',
+            element: withSuspense(<FeatureFlagsPage />),
+          },
+          {
+            path: 'settings/integrations',
+            element: withSuspense(<IntegrationSettingsPage />),
+          },
+          {
+            path: 'settings/audit-logs',
+            element: withSuspense(<SettingsAuditLogsPage />),
+          },
+          {
+            path: 'settings/public-config',
+            element: withSuspense(<PublicConfigPreviewPage />),
           },
         ],
       },

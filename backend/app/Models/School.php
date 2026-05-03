@@ -8,6 +8,11 @@ use App\Models\Saas\TenantDomain;
 use App\Models\Saas\TenantFeatureAccess;
 use App\Models\Saas\TenantSubscription;
 use App\Models\Saas\TenantUsageLimit;
+use App\Models\Settings\BrandingSetting;
+use App\Models\Settings\FeatureFlag;
+use App\Models\Settings\IntegrationSetting;
+use App\Models\Settings\LocalizationSetting;
+use App\Models\Settings\SecuritySetting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -105,5 +110,30 @@ class School extends Model
     public function tenantAuditLogs(): HasMany
     {
         return $this->hasMany(TenantAuditLog::class, 'school_id');
+    }
+
+    public function brandingSetting(): HasOne
+    {
+        return $this->hasOne(BrandingSetting::class, 'school_id');
+    }
+
+    public function localizationSetting(): HasOne
+    {
+        return $this->hasOne(LocalizationSetting::class, 'school_id');
+    }
+
+    public function securitySetting(): HasOne
+    {
+        return $this->hasOne(SecuritySetting::class, 'school_id');
+    }
+
+    public function featureFlags(): HasMany
+    {
+        return $this->hasMany(FeatureFlag::class, 'school_id');
+    }
+
+    public function integrationSettings(): HasMany
+    {
+        return $this->hasMany(IntegrationSetting::class, 'school_id');
     }
 }

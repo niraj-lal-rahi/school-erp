@@ -26,6 +26,12 @@ use Database\Seeders\Saas\DemoTenantSeeder;
 use Database\Seeders\Saas\PlanFeatureSeeder;
 use Database\Seeders\Saas\SubscriptionPlanSeeder;
 use Database\Seeders\SIS\SisSeeder;
+use Database\Seeders\Settings\DefaultBrandingSeeder;
+use Database\Seeders\Settings\DefaultLocalizationSeeder;
+use Database\Seeders\Settings\DefaultSecuritySettingSeeder;
+use Database\Seeders\Settings\DefaultSettingSeeder;
+use Database\Seeders\Settings\FeatureFlagSeeder;
+use Database\Seeders\Settings\SettingGroupSeeder;
 use Database\Seeders\Tenant\TenantSeeder;
 use Database\Seeders\Timetable\TimetableSeeder;
 use Database\Seeders\Transport\TransportSeeder;
@@ -56,6 +62,12 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             DemoTenantSeeder::class,
+            SettingGroupSeeder::class,
+            DefaultSettingSeeder::class,
+            FeatureFlagSeeder::class,
+            DefaultBrandingSeeder::class,
+            DefaultLocalizationSeeder::class,
+            DefaultSecuritySettingSeeder::class,
             HrSeeder::class,
             AcademicManagementSeeder::class,
             TimetableSeeder::class,

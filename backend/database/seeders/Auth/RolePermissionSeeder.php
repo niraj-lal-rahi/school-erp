@@ -36,6 +36,7 @@ class RolePermissionSeeder extends Seeder
                 'documents.view',
                 'documents.manage',
                 'documents.verify',
+                'settings.view',
             ]),
             'teacher' => $this->permissionIdsForCodes([
                 'academic-management.view',
@@ -63,6 +64,7 @@ class RolePermissionSeeder extends Seeder
                 'workflows.approve',
                 'documents.view',
                 'documents.verify',
+                'settings.view',
             ]),
             'receptionist' => $this->permissionIdsForCodes([
                 'students.view',

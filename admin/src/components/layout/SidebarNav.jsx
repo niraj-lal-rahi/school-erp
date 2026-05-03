@@ -47,6 +47,12 @@ import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import SettingsSuggestOutlinedIcon from '@mui/icons-material/SettingsSuggestOutlined';
+import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
+import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
+import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
+import CloudOutlinedIcon from '@mui/icons-material/CloudOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import {
   Collapse,
   Divider,
@@ -284,6 +290,20 @@ const workflowsChildren = [
   { label: 'Workflow Reports', to: '/workflows/reports', icon: <TimelineOutlinedIcon />, permission: 'workflows.view' },
 ];
 
+const settingsChildren = [
+  { label: 'General Settings', to: '/settings/general', icon: <SettingsSuggestOutlinedIcon />, permission: 'settings.view' },
+  { label: 'School Profile & Branding', to: '/settings/branding', icon: <PaletteOutlinedIcon />, permission: 'settings.view' },
+  { label: 'Academic Settings', to: '/settings/academic', icon: <SchoolOutlinedIcon />, permission: 'settings.view' },
+  { label: 'Finance Settings', to: '/settings/finance', icon: <CurrencyRupeeOutlinedIcon />, permission: 'settings.view' },
+  { label: 'Notification Settings', to: '/settings/notifications', icon: <NotificationsActiveOutlinedIcon />, permission: 'settings.view' },
+  { label: 'Security Settings', to: '/settings/security', icon: <SecurityOutlinedIcon />, permission: 'settings.manage' },
+  { label: 'Localization Settings', to: '/settings/localization', icon: <TranslateOutlinedIcon />, permission: 'settings.view' },
+  { label: 'Feature Flags', to: '/settings/features', icon: <FlagOutlinedIcon />, permission: 'settings.manage' },
+  { label: 'Integration Settings', to: '/settings/integrations', icon: <CloudOutlinedIcon />, permission: 'settings.manage' },
+  { label: 'Audit Logs', to: '/settings/audit-logs', icon: <TimelineOutlinedIcon />, permission: 'settings.manage' },
+  { label: 'Public Config Preview', to: '/settings/public-config', icon: <VisibilityOutlinedIcon />, permission: 'settings.view' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -400,6 +420,15 @@ export function SidebarNav() {
     )),
     [isSuperAdmin, isTenantAdmin, permissions],
   );
+  const visibleSettingsChildren = useMemo(
+    () => settingsChildren.filter((item) => (
+      isSuperAdmin
+      || isTenantAdmin
+      || permissions.includes(item.permission)
+      || (item.permission === 'settings.view' && permissions.includes('settings.manage'))
+    )),
+    [isSuperAdmin, isTenantAdmin, permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -427,6 +456,7 @@ export function SidebarNav() {
   const paymentsRouteActive = location.pathname.startsWith('/payments');
   const documentsRouteActive = location.pathname.startsWith('/documents');
   const workflowsRouteActive = location.pathname.startsWith('/workflows');
+  const settingsRouteActive = location.pathname.startsWith('/settings');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
@@ -443,6 +473,7 @@ export function SidebarNav() {
   const [paymentsOpen, setPaymentsOpen] = useState(paymentsRouteActive);
   const [documentsOpen, setDocumentsOpen] = useState(documentsRouteActive);
   const [workflowsOpen, setWorkflowsOpen] = useState(workflowsRouteActive);
+  const [settingsOpen, setSettingsOpen] = useState(settingsRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -540,6 +571,12 @@ export function SidebarNav() {
     }
   }, [workflowsRouteActive]);
 
+  useEffect(() => {
+    if (settingsRouteActive) {
+      setSettingsOpen(true);
+    }
+  }, [settingsRouteActive]);
+
   return (
     <Paper
       elevation={0}
@@ -578,7 +615,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length || visiblePaymentsChildren.length || visibleDocumentsChildren.length || visibleWorkflowsChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length || visiblePaymentsChildren.length || visibleDocumentsChildren.length || visibleWorkflowsChildren.length || visibleSettingsChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -1110,6 +1147,40 @@ export function SidebarNav() {
                 <Collapse in={workflowsOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visibleWorkflowsChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleSettingsChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setSettingsOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: settingsRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <SettingsSuggestOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="System Settings" />
+                  {settingsOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={settingsOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleSettingsChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}

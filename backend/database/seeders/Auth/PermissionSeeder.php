@@ -57,6 +57,8 @@ class PermissionSeeder extends Seeder
             ['name' => 'View Documents', 'code' => 'documents.view', 'module' => 'documents'],
             ['name' => 'Manage Documents', 'code' => 'documents.manage', 'module' => 'documents'],
             ['name' => 'Verify Documents', 'code' => 'documents.verify', 'module' => 'documents'],
+            ['name' => 'View Settings', 'code' => 'settings.view', 'module' => 'settings'],
+            ['name' => 'Manage Settings', 'code' => 'settings.manage', 'module' => 'settings'],
         ]);
 
         $permissions
@@ -93,6 +95,7 @@ class PermissionSeeder extends Seeder
             'rbac' => 'RBAC',
             'workflows' => 'Workflows',
             'documents' => 'Documents',
+            'settings' => 'Settings',
         ];
 
         return collect($modules)->flatMap(

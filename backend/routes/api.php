@@ -126,6 +126,15 @@ use App\Http\Controllers\Api\V1\Saas\TenantSubscriptionController;
 use App\Http\Controllers\Api\V1\Saas\TenantUsageController;
 use App\Http\Controllers\Api\V1\SIS\StudentController;
 use App\Http\Controllers\Api\V1\SIS\StudentNoteController;
+use App\Http\Controllers\Api\V1\Settings\BrandingSettingController;
+use App\Http\Controllers\Api\V1\Settings\FeatureFlagController;
+use App\Http\Controllers\Api\V1\Settings\IntegrationSettingController;
+use App\Http\Controllers\Api\V1\Settings\LocalizationSettingController;
+use App\Http\Controllers\Api\V1\Settings\PublicConfigController;
+use App\Http\Controllers\Api\V1\Settings\SecuritySettingController;
+use App\Http\Controllers\Api\V1\Settings\SettingAuditLogController;
+use App\Http\Controllers\Api\V1\Settings\SettingController;
+use App\Http\Controllers\Api\V1\Settings\SettingGroupController;
 use App\Http\Controllers\Api\V1\Timetable\TimetableEntryController;
 use App\Http\Controllers\Api\V1\Timetable\TimetableOptionsController;
 use App\Http\Controllers\Api\V1\Timetable\TimetablePeriodController;
@@ -1100,6 +1109,40 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/reports/payment-summary', [PaymentTransactionController::class, 'paymentSummary']);
             Route::get('/reports/upipayments', [UpiPaymentController::class, 'report']);
             Route::get('/reports/failed-transactions', [PaymentTransactionController::class, 'failedTransactions']);
+        });
+
+        Route::prefix('settings')->group(function (): void {
+            Route::get('/groups', [SettingGroupController::class, 'index'])->middleware('permission:settings.view');
+            Route::post('/groups', [SettingGroupController::class, 'store'])->middleware('permission:settings.manage');
+            Route::put('/groups/{id}', [SettingGroupController::class, 'update'])->middleware('permission:settings.manage');
+            Route::delete('/groups/{id}', [SettingGroupController::class, 'destroy'])->middleware('permission:settings.manage');
+
+            Route::get('/', [SettingController::class, 'index'])->middleware('permission:settings.view');
+            Route::post('/', [SettingController::class, 'store'])->middleware('permission:settings.manage');
+            Route::get('/by-key/{key}', [SettingController::class, 'showByKey'])->middleware('permission:settings.view');
+
+            Route::get('/features', [FeatureFlagController::class, 'index'])->middleware('permission:settings.view');
+            Route::put('/features/{id}', [FeatureFlagController::class, 'update'])->middleware('permission:settings.manage');
+            Route::post('/features/{id}/enable', [FeatureFlagController::class, 'enable'])->middleware('permission:settings.manage');
+            Route::post('/features/{id}/disable', [FeatureFlagController::class, 'disable'])->middleware('permission:settings.manage');
+
+            Route::get('/branding', [BrandingSettingController::class, 'show'])->middleware('permission:settings.view');
+            Route::put('/branding', [BrandingSettingController::class, 'update'])->middleware('permission:settings.manage');
+
+            Route::get('/localization', [LocalizationSettingController::class, 'show'])->middleware('permission:settings.view');
+            Route::put('/localization', [LocalizationSettingController::class, 'update'])->middleware('permission:settings.manage');
+
+            Route::get('/security', [SecuritySettingController::class, 'show'])->middleware('permission:settings.view');
+            Route::put('/security', [SecuritySettingController::class, 'update'])->middleware('permission:settings.manage');
+
+            Route::get('/integrations', [IntegrationSettingController::class, 'index'])->middleware('permission:settings.view');
+            Route::post('/integrations', [IntegrationSettingController::class, 'store'])->middleware('permission:settings.manage');
+            Route::put('/integrations/{id}', [IntegrationSettingController::class, 'update'])->middleware('permission:settings.manage');
+            Route::delete('/integrations/{id}', [IntegrationSettingController::class, 'destroy'])->middleware('permission:settings.manage');
+
+            Route::get('/audit-logs', [SettingAuditLogController::class, 'index'])->middleware('permission:settings.manage');
+            Route::get('/public-config', [PublicConfigController::class, 'show']);
+            Route::put('/{id}', [SettingController::class, 'update'])->middleware('permission:settings.manage');
         });
     });
 });

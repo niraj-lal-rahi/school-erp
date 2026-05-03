@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant.active' => \App\Http\Middleware\EnsureTenantActive::class,
             'tenant.feature' => \App\Http\Middleware\CheckTenantFeature::class,
             'tenant.limit' => \App\Http\Middleware\CheckTenantUsageLimit::class,
+            'tenant.localization' => \App\Http\Middleware\ApplyTenantLocalization::class,
+            'feature' => \App\Http\Middleware\CheckFeatureFlag::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);

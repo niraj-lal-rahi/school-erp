@@ -15,6 +15,7 @@ import portalReducer from '../features/portal/store/portalSlice';
 import rbacReducer from '../features/rbac/store/rbacSlice';
 import reportsReducer from '../features/reports/store/reportsSlice';
 import saasReducer from '../features/saas/store/saasSlice';
+import settingsReducer from '../features/settings/store/settingsSlice';
 import studentsReducer from '../features/students/store/studentSlice';
 import timetableReducer from '../features/timetable/store/timetableSlice';
 import transportReducer from '../features/transport/store/transportSlice';
@@ -38,6 +39,7 @@ export const store = configureStore({
     rbac: rbacReducer,
     reports: reportsReducer,
     saas: saasReducer,
+    settings: settingsReducer,
     students: studentsReducer,
     timetable: timetableReducer,
     transport: transportReducer,
