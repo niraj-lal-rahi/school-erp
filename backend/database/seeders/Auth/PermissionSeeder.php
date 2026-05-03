@@ -51,6 +51,9 @@ class PermissionSeeder extends Seeder
             ['name' => 'Impersonate Portal', 'code' => 'portal.impersonate', 'module' => 'portal'],
             ['name' => 'View RBAC', 'code' => 'rbac.view', 'module' => 'rbac'],
             ['name' => 'Manage RBAC', 'code' => 'rbac.manage', 'module' => 'rbac'],
+            ['name' => 'View Workflows', 'code' => 'workflows.view', 'module' => 'workflows'],
+            ['name' => 'Manage Workflows', 'code' => 'workflows.manage', 'module' => 'workflows'],
+            ['name' => 'Approve Workflows', 'code' => 'workflows.approve', 'module' => 'workflows'],
         ]);
 
         $permissions
@@ -85,6 +88,7 @@ class PermissionSeeder extends Seeder
             'timetable' => 'Timetable',
             'exams' => 'Examinations',
             'rbac' => 'RBAC',
+            'workflows' => 'Workflows',
         ];
 
         return collect($modules)->flatMap(

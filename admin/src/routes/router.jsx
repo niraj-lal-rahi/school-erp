@@ -165,6 +165,14 @@ const RefundManagementPage = lazy(() => import('../features/payments/pages/Refun
 const WebhookLogsPage = lazy(() => import('../features/payments/pages/WebhookLogsPage').then((module) => ({ default: module.WebhookLogsPage })));
 const ReconciliationPage = lazy(() => import('../features/payments/pages/ReconciliationPage').then((module) => ({ default: module.ReconciliationPage })));
 const PaymentReportsPage = lazy(() => import('../features/payments/pages/PaymentReportsPage').then((module) => ({ default: module.PaymentReportsPage })));
+const WorkflowDefinitionsPage = lazy(() => import('../features/workflows/pages/WorkflowDefinitionsPage').then((module) => ({ default: module.WorkflowDefinitionsPage })));
+const WorkflowBuilderPage = lazy(() => import('../features/workflows/pages/WorkflowBuilderPage').then((module) => ({ default: module.WorkflowBuilderPage })));
+const WorkflowInstancesPage = lazy(() => import('../features/workflows/pages/WorkflowInstancesPage').then((module) => ({ default: module.WorkflowInstancesPage })));
+const PendingApprovalsPage = lazy(() => import('../features/workflows/pages/PendingApprovalsPage').then((module) => ({ default: module.PendingApprovalsPage })));
+const AutomationRulesPage = lazy(() => import('../features/workflows/pages/AutomationRulesPage').then((module) => ({ default: module.AutomationRulesPage })));
+const AutomationRunLogsPage = lazy(() => import('../features/workflows/pages/AutomationRunLogsPage').then((module) => ({ default: module.AutomationRunLogsPage })));
+const ReminderRulesPage = lazy(() => import('../features/workflows/pages/ReminderRulesPage').then((module) => ({ default: module.ReminderRulesPage })));
+const WorkflowReportsPage = lazy(() => import('../features/workflows/pages/WorkflowReportsPage').then((module) => ({ default: module.WorkflowReportsPage })));
 
 function withSuspense(element) {
   return <Suspense fallback={<FullScreenLoader />}>{element}</Suspense>;
@@ -829,6 +837,38 @@ export const router = createBrowserRouter([
           {
             path: 'payments/reports',
             element: withSuspense(<PaymentReportsPage />),
+          },
+          {
+            path: 'workflows/definitions',
+            element: withSuspense(<WorkflowDefinitionsPage />),
+          },
+          {
+            path: 'workflows/builder',
+            element: withSuspense(<WorkflowBuilderPage />),
+          },
+          {
+            path: 'workflows/instances',
+            element: withSuspense(<WorkflowInstancesPage />),
+          },
+          {
+            path: 'workflows/approvals',
+            element: withSuspense(<PendingApprovalsPage />),
+          },
+          {
+            path: 'workflows/automations',
+            element: withSuspense(<AutomationRulesPage />),
+          },
+          {
+            path: 'workflows/automation-runs',
+            element: withSuspense(<AutomationRunLogsPage />),
+          },
+          {
+            path: 'workflows/reminders',
+            element: withSuspense(<ReminderRulesPage />),
+          },
+          {
+            path: 'workflows/reports',
+            element: withSuspense(<WorkflowReportsPage />),
           },
         ],
       },

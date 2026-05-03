@@ -17,6 +17,7 @@ import saasReducer from '../features/saas/store/saasSlice';
 import studentsReducer from '../features/students/store/studentSlice';
 import timetableReducer from '../features/timetable/store/timetableSlice';
 import transportReducer from '../features/transport/store/transportSlice';
+import workflowsReducer from '../features/workflows/store/workflowsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -38,5 +39,6 @@ export const store = configureStore({
     students: studentsReducer,
     timetable: timetableReducer,
     transport: transportReducer,
+    workflows: workflowsReducer,
   },
 });

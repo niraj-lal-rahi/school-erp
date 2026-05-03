@@ -24,6 +24,12 @@ use App\Events\Payments\UpiPaymentPendingVerification;
 use App\Events\Reports\ReportRunCompleted;
 use App\Events\SIS\StudentCreated;
 use App\Events\Timetable\TimetableVersionPublished;
+use App\Events\Workflows\AutomationRuleTriggered;
+use App\Events\Workflows\ReminderDue;
+use App\Events\Workflows\WorkflowCompleted;
+use App\Events\Workflows\WorkflowStarted;
+use App\Events\Workflows\WorkflowStepApproved;
+use App\Events\Workflows\WorkflowStepRejected;
 use App\Listeners\Auth\UpdateLastLoginAt;
 use App\Listeners\Attendance\LogStudentAttendanceSessionLocked;
 use App\Listeners\Attendance\LogStudentAttendanceSessionSubmitted;
@@ -44,6 +50,10 @@ use App\Listeners\Reports\CacheReportResults;
 use App\Listeners\Reports\SendScheduledReport;
 use App\Listeners\SIS\DispatchStudentProvisioningWorkflow;
 use App\Listeners\Timetable\LogTimetableVersionPublished;
+use App\Listeners\Workflows\LogWorkflowActivity;
+use App\Listeners\Workflows\SendWorkflowNotification;
+use App\Listeners\Workflows\StartWorkflowFromEvent;
+use App\Listeners\Workflows\TriggerAutomationFromEvent;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -54,6 +64,8 @@ class EventServiceProvider extends ServiceProvider
         ],
         StudentAttendanceSessionSubmitted::class => [
             LogStudentAttendanceSessionSubmitted::class,
+            StartWorkflowFromEvent::class,
+            TriggerAutomationFromEvent::class,
         ],
         StudentAttendanceSessionLocked::class => [
             LogStudentAttendanceSessionLocked::class,
@@ -66,6 +78,8 @@ class EventServiceProvider extends ServiceProvider
         ],
         AnnouncementPublished::class => [
             QueueAnnouncementNotifications::class,
+            StartWorkflowFromEvent::class,
+            TriggerAutomationFromEvent::class,
         ],
         MessageSent::class => [
             LogMessageSent::class,
@@ -75,6 +89,8 @@ class EventServiceProvider extends ServiceProvider
         ],
         ResultsPublished::class => [
             SendResultNotifications::class,
+            StartWorkflowFromEvent::class,
+            TriggerAutomationFromEvent::class,
         ],
         PaymentSuccessful::class => [
             GenerateReceiptForSuccessfulPayment::class,
@@ -104,6 +120,8 @@ class EventServiceProvider extends ServiceProvider
         ],
         InvoicePaid::class => [
             LogInvoicePaid::class,
+            StartWorkflowFromEvent::class,
+            TriggerAutomationFromEvent::class,
         ],
         ReceiptGenerated::class => [
             LogReceiptGenerated::class,
@@ -117,6 +135,31 @@ class EventServiceProvider extends ServiceProvider
         ],
         StudentCreated::class => [
             DispatchStudentProvisioningWorkflow::class,
+            StartWorkflowFromEvent::class,
+            TriggerAutomationFromEvent::class,
+        ],
+        WorkflowStarted::class => [
+            SendWorkflowNotification::class,
+            LogWorkflowActivity::class,
+        ],
+        WorkflowStepApproved::class => [
+            SendWorkflowNotification::class,
+            LogWorkflowActivity::class,
+        ],
+        WorkflowStepRejected::class => [
+            SendWorkflowNotification::class,
+            LogWorkflowActivity::class,
+        ],
+        WorkflowCompleted::class => [
+            SendWorkflowNotification::class,
+            LogWorkflowActivity::class,
+        ],
+        AutomationRuleTriggered::class => [
+            LogWorkflowActivity::class,
+        ],
+        ReminderDue::class => [
+            SendWorkflowNotification::class,
+            LogWorkflowActivity::class,
         ],
     ];
 }

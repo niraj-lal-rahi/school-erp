@@ -136,6 +136,14 @@ use App\Http\Controllers\Api\V1\Transport\RouteController;
 use App\Http\Controllers\Api\V1\Transport\RouteStopController;
 use App\Http\Controllers\Api\V1\Transport\TripController;
 use App\Http\Controllers\Api\V1\Transport\VehicleController;
+use App\Http\Controllers\Api\V1\Workflows\ApprovalRequestController;
+use App\Http\Controllers\Api\V1\Workflows\AutomationRuleController;
+use App\Http\Controllers\Api\V1\Workflows\AutomationRunController;
+use App\Http\Controllers\Api\V1\Workflows\ReminderRuleController;
+use App\Http\Controllers\Api\V1\Workflows\WorkflowDefinitionController;
+use App\Http\Controllers\Api\V1\Workflows\WorkflowInstanceController;
+use App\Http\Controllers\Api\V1\Workflows\WorkflowReportController;
+use App\Http\Controllers\Api\V1\Workflows\WorkflowStepController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -920,6 +928,47 @@ Route::prefix('v1')->group(function (): void {
             Route::post('/schedules/{reportSchedule}/resume', [ReportScheduleController::class, 'resume'])->middleware('permission:reports.manage');
 
             Route::get('/exports/{reportExport}/download', [ReportExportController::class, 'download'])->middleware('permission:reports.export');
+        });
+
+        Route::prefix('workflows')->group(function (): void {
+            Route::get('/definitions', [WorkflowDefinitionController::class, 'index'])->middleware('permission:workflows.view');
+            Route::post('/definitions', [WorkflowDefinitionController::class, 'store'])->middleware('permission:workflows.manage');
+            Route::get('/definitions/{workflowDefinition}', [WorkflowDefinitionController::class, 'show'])->middleware('permission:workflows.view');
+            Route::put('/definitions/{workflowDefinition}', [WorkflowDefinitionController::class, 'update'])->middleware('permission:workflows.manage');
+            Route::delete('/definitions/{workflowDefinition}', [WorkflowDefinitionController::class, 'destroy'])->middleware('permission:workflows.manage');
+            Route::post('/definitions/{workflowDefinition}/activate', [WorkflowDefinitionController::class, 'activate'])->middleware('permission:workflows.manage');
+            Route::post('/definitions/{workflowDefinition}/deactivate', [WorkflowDefinitionController::class, 'deactivate'])->middleware('permission:workflows.manage');
+            Route::post('/definitions/{workflowDefinition}/steps', [WorkflowStepController::class, 'store'])->middleware('permission:workflows.manage');
+            Route::put('/steps/{workflowStep}', [WorkflowStepController::class, 'update'])->middleware('permission:workflows.manage');
+            Route::delete('/steps/{workflowStep}', [WorkflowStepController::class, 'destroy'])->middleware('permission:workflows.manage');
+
+            Route::post('/start', [WorkflowInstanceController::class, 'start'])->middleware('permission:workflows.manage');
+            Route::get('/instances', [WorkflowInstanceController::class, 'index'])->middleware('permission:workflows.view');
+            Route::get('/instances/{workflowInstance}', [WorkflowInstanceController::class, 'show'])->middleware('permission:workflows.view');
+            Route::post('/instances/{workflowInstance}/cancel', [WorkflowInstanceController::class, 'cancel'])->middleware('permission:workflows.manage');
+
+            Route::get('/approvals', [ApprovalRequestController::class, 'index'])->middleware('permission:workflows.approve');
+            Route::post('/approvals/{approvalRequest}/approve', [ApprovalRequestController::class, 'approve'])->middleware('permission:workflows.approve');
+            Route::post('/approvals/{approvalRequest}/reject', [ApprovalRequestController::class, 'reject'])->middleware('permission:workflows.approve');
+
+            Route::get('/automations', [AutomationRuleController::class, 'index'])->middleware('permission:workflows.view');
+            Route::post('/automations', [AutomationRuleController::class, 'store'])->middleware('permission:workflows.manage');
+            Route::put('/automations/{automationRule}', [AutomationRuleController::class, 'update'])->middleware('permission:workflows.manage');
+            Route::delete('/automations/{automationRule}', [AutomationRuleController::class, 'destroy'])->middleware('permission:workflows.manage');
+            Route::post('/automations/{automationRule}/run', [AutomationRuleController::class, 'run'])->middleware('permission:workflows.manage');
+            Route::post('/automations/{automationRule}/activate', [AutomationRuleController::class, 'activate'])->middleware('permission:workflows.manage');
+            Route::post('/automations/{automationRule}/deactivate', [AutomationRuleController::class, 'deactivate'])->middleware('permission:workflows.manage');
+            Route::get('/automation-runs', [AutomationRunController::class, 'index'])->middleware('permission:workflows.view');
+
+            Route::get('/reminders', [ReminderRuleController::class, 'index'])->middleware('permission:workflows.view');
+            Route::post('/reminders', [ReminderRuleController::class, 'store'])->middleware('permission:workflows.manage');
+            Route::put('/reminders/{reminderRule}', [ReminderRuleController::class, 'update'])->middleware('permission:workflows.manage');
+            Route::delete('/reminders/{reminderRule}', [ReminderRuleController::class, 'destroy'])->middleware('permission:workflows.manage');
+            Route::post('/reminders/process-due', [ReminderRuleController::class, 'processDue'])->middleware('permission:workflows.manage');
+
+            Route::get('/reports/workflow-summary', [WorkflowReportController::class, 'workflowSummary'])->middleware('permission:workflows.view');
+            Route::get('/reports/automation-summary', [WorkflowReportController::class, 'automationSummary'])->middleware('permission:workflows.view');
+            Route::get('/reports/approval-pending', [WorkflowReportController::class, 'approvalPending'])->middleware('permission:workflows.approve');
         });
 
         Route::prefix('portal')->group(function (): void {

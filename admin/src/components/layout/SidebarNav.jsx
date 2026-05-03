@@ -45,6 +45,7 @@ import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettin
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import {
   Collapse,
   Divider,
@@ -258,6 +259,17 @@ const paymentsChildren = [
   { label: 'Payment Reports', to: '/payments/reports', icon: <TimelineOutlinedIcon />, permission: 'finance.view' },
 ];
 
+const workflowsChildren = [
+  { label: 'Workflow Definitions', to: '/workflows/definitions', icon: <AccountTreeOutlinedIcon />, permission: 'workflows.view' },
+  { label: 'Workflow Builder', to: '/workflows/builder', icon: <PlaylistAddCheckOutlinedIcon />, permission: 'workflows.manage' },
+  { label: 'Workflow Instances', to: '/workflows/instances', icon: <TimelineOutlinedIcon />, permission: 'workflows.view' },
+  { label: 'Pending Approvals', to: '/workflows/approvals', icon: <AssignmentTurnedInOutlinedIcon />, permission: 'workflows.approve' },
+  { label: 'Automation Rules', to: '/workflows/automations', icon: <AutorenewOutlinedIcon />, permission: 'workflows.manage' },
+  { label: 'Automation Run Logs', to: '/workflows/automation-runs', icon: <FactCheckOutlinedIcon />, permission: 'workflows.view' },
+  { label: 'Reminder Rules', to: '/workflows/reminders', icon: <NotificationsActiveOutlinedIcon />, permission: 'workflows.manage' },
+  { label: 'Workflow Reports', to: '/workflows/reports', icon: <TimelineOutlinedIcon />, permission: 'workflows.view' },
+];
+
 function itemStyles(isChild = false) {
   return {
     borderRadius: 3,
@@ -354,6 +366,16 @@ export function SidebarNav() {
     )),
     [isSuperAdmin, isTenantAdmin, isAccountant, permissions],
   );
+  const visibleWorkflowsChildren = useMemo(
+    () => workflowsChildren.filter((item) => (
+      isSuperAdmin
+      || isTenantAdmin
+      || permissions.includes(item.permission)
+      || (item.permission === 'workflows.view' && permissions.includes('workflows.manage'))
+      || (item.permission === 'workflows.approve' && permissions.includes('workflows.manage'))
+    )),
+    [isSuperAdmin, isTenantAdmin, permissions],
+  );
 
   const sisRouteActive = [
     '/students',
@@ -379,6 +401,7 @@ export function SidebarNav() {
   const rbacRouteActive = location.pathname.startsWith('/rbac');
   const saasRouteActive = location.pathname.startsWith('/saas');
   const paymentsRouteActive = location.pathname.startsWith('/payments');
+  const workflowsRouteActive = location.pathname.startsWith('/workflows');
   const [studentManagementOpen, setStudentManagementOpen] = useState(sisRouteActive);
   const [academicOpen, setAcademicOpen] = useState(academicRouteActive);
   const [hrOpen, setHrOpen] = useState(hrRouteActive);
@@ -393,6 +416,7 @@ export function SidebarNav() {
   const [rbacOpen, setRbacOpen] = useState(rbacRouteActive);
   const [saasOpen, setSaasOpen] = useState(saasRouteActive);
   const [paymentsOpen, setPaymentsOpen] = useState(paymentsRouteActive);
+  const [workflowsOpen, setWorkflowsOpen] = useState(workflowsRouteActive);
 
   useEffect(() => {
     if (sisRouteActive) {
@@ -478,6 +502,12 @@ export function SidebarNav() {
     }
   }, [paymentsRouteActive]);
 
+  useEffect(() => {
+    if (workflowsRouteActive) {
+      setWorkflowsOpen(true);
+    }
+  }, [workflowsRouteActive]);
+
   return (
     <Paper
       elevation={0}
@@ -516,7 +546,7 @@ export function SidebarNav() {
         </Stack>
       ) : null}
 
-      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length || visiblePaymentsChildren.length ? (
+      {visibleStudentManagementChildren.length || visibleAcademicChildren.length || visibleHrChildren.length || visibleFinanceChildren.length || visibleAttendanceChildren.length || visibleTimetableChildren.length || visibleTransportChildren.length || visibleCommunicationChildren.length || visibleExaminationChildren.length || visibleReportsChildren.length || visiblePortalChildren.length || visibleRbacChildren.length || visibleSaasChildren.length || visiblePaymentsChildren.length || visibleWorkflowsChildren.length ? (
         <Stack spacing={1} sx={{ mt: 3 }}>
           <Divider />
           <Typography variant="overline" color="text.secondary">
@@ -980,6 +1010,40 @@ export function SidebarNav() {
                 <Collapse in={paymentsOpen} timeout="auto" unmountOnExit>
                   <List disablePadding sx={{ mt: 0.5 }}>
                     {visiblePaymentsChildren.map((item) => (
+                      <ListItemButton
+                        key={item.to}
+                        component={NavLink}
+                        to={item.to}
+                        sx={itemStyles(true)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.label} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
+
+            {visibleWorkflowsChildren.length ? (
+              <>
+                <ListItemButton
+                  onClick={() => setWorkflowsOpen((current) => !current)}
+                  sx={{
+                    ...itemStyles(),
+                    backgroundColor: workflowsRouteActive ? 'rgba(11, 110, 79, 0.06)' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <AccountTreeOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Workflow & Automation" />
+                  {workflowsOpen ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />}
+                </ListItemButton>
+
+                <Collapse in={workflowsOpen} timeout="auto" unmountOnExit>
+                  <List disablePadding sx={{ mt: 0.5 }}>
+                    {visibleWorkflowsChildren.map((item) => (
                       <ListItemButton
                         key={item.to}
                         component={NavLink}
