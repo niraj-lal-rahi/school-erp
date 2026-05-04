@@ -1,0 +1,1 @@
+// Tenant frontend routes placeholder.

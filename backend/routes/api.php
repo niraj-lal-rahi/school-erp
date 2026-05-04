@@ -1144,5 +1144,9 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/public-config', [PublicConfigController::class, 'show']);
             Route::put('/{id}', [SettingController::class, 'update'])->middleware('permission:settings.manage');
         });
+
+        if (file_exists(base_path('app/Modules/Tenant/routes.php'))) {
+            Route::group(base_path('app/Modules/Tenant/routes.php'));
+        }
     });
 });

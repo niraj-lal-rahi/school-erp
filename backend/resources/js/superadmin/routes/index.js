@@ -1,0 +1,2 @@
+// SuperAdmin frontend routes placeholder.
+
