@@ -69,6 +69,23 @@ class PlatformTenant extends Model
         return $this->hasOne(TenantSecuritySetting::class, 'tenant_id');
     }
 
+    public function encryptionKeys(): HasMany
+    {
+        return $this->hasMany(TenantEncryptionKey::class, 'tenant_id');
+    }
+
+    public function activeEncryptionKey(): HasOne
+    {
+        return $this->hasOne(TenantEncryptionKey::class, 'tenant_id')
+            ->where('status', 'active')
+            ->latest('key_version');
+    }
+
+    public function keyRotationLogs(): HasMany
+    {
+        return $this->hasMany(TenantKeyRotationLog::class, 'tenant_id');
+    }
+
     public function auditLogs(): HasMany
     {
         return $this->hasMany(PlatformAuditLog::class, 'tenant_id');

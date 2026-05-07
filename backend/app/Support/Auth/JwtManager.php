@@ -9,12 +9,15 @@ use Illuminate\Support\Str;
 
 class JwtManager
 {
-    public function issueAccessToken(User $user): string
+    /**
+     * @param  array<string, mixed>  $extraClaims
+     */
+    public function issueAccessToken(User $user, array $extraClaims = [], ?int $ttlMinutes = null): string
     {
         $now = CarbonImmutable::now();
-        $ttl = (int) config('erp.jwt.ttl', 60);
+        $ttl = $ttlMinutes ?? (int) config('erp.jwt.ttl', 60);
 
-        return $this->encode([
+        return $this->encode(array_merge([
             'iss' => config('erp.jwt.issuer'),
             'sub' => $user->getAuthIdentifier(),
             'school_id' => $user->school_id,
@@ -22,7 +25,7 @@ class JwtManager
             'iat' => $now->timestamp,
             'exp' => $now->addMinutes($ttl)->timestamp,
             'jti' => (string) Str::uuid(),
-        ]);
+        ], $extraClaims));
     }
 
     public function issueRefreshToken(User $user): string

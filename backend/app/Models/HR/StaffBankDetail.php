@@ -2,6 +2,7 @@
 
 namespace App\Models\HR;
 
+use App\Modules\Tenant\Casts\EncryptedStringCast;
 use App\Models\Concerns\BelongsToSchool;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +29,8 @@ class StaffBankDetail extends Model
     {
         return [
             'is_primary' => 'bool',
+            'account_number' => EncryptedStringCast::class,
+            'ifsc_code' => EncryptedStringCast::class,
         ];
     }
 

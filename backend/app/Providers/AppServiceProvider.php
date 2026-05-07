@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Modules\SuperAdmin\Models\PlatformTenant as PlatformTenantModel;
+use App\Modules\SuperAdmin\Services\ImpersonationService;
+use App\Modules\Tenant\Services\TenantConnectionManager as ModuleTenantConnectionManager;
+use App\Modules\Tenant\Services\TenantContext as ModuleTenantContext;
 use App\Models\AcademicManagement\AcademicCalendarEvent;
 use App\Models\AcademicManagement\AcademicTerm;
 use App\Models\AcademicManagement\ClassSubjectAssignment;
@@ -555,8 +559,43 @@ class AppServiceProvider extends ServiceProvider
 
             $payload = app(JwtManager::class)->decode($token);
 
+            $platformTenant = null;
+            $impersonationContext = null;
+
+            if (isset($payload['impersonation_log_id'])) {
+                $log = app(ImpersonationService::class)->validateActiveSession((int) $payload['impersonation_log_id']);
+
+                if (! $log) {
+                    return null;
+                }
+
+                $platformTenant = PlatformTenantModel::query()->find($log->tenant_id);
+
+                if (! $platformTenant) {
+                    return null;
+                }
+
+                app(ModuleTenantConnectionManager::class)->connect($platformTenant);
+                app(ModuleTenantContext::class)->setTenant($platformTenant);
+
+                $request->attributes->set('platformTenant', $platformTenant);
+                $impersonationContext = [
+                    'id' => $log->id,
+                    'tenant_id' => $log->tenant_id,
+                    'platform_admin_user_id' => $log->platform_admin_user_id,
+                    'reason' => $log->reason,
+                    'started_at' => $log->started_at?->toIso8601String(),
+                    'expires_at' => data_get($log->metadata, 'expires_at'),
+                    'emergency_access' => (bool) data_get($log->metadata, 'emergency_access', false),
+                    'emergency_access_log_id' => data_get($log->metadata, 'emergency_access_log_id'),
+                ];
+                $request->attributes->set('impersonationContext', $impersonationContext);
+            }
+
             /** @var User|null $user */
-            $user = User::query()
+            $user = ($platformTenant
+                ? User::on('tenant')
+                : User::query())
                 ->withoutGlobalScopes()
                 ->find($payload['sub'] ?? null);
 
@@ -568,7 +607,15 @@ class AppServiceProvider extends ServiceProvider
                 return null;
             }
 
-            app(TenantContext::class)->set($user->school);
+            $school = $platformTenant
+                ? \App\Models\School::on('tenant')->find($user->school_id)
+                : $user->school;
+
+            app(TenantContext::class)->set($school);
+
+            if ($impersonationContext !== null) {
+                $user->setAttribute('impersonation_context', $impersonationContext);
+            }
 
             return $user;
         });

@@ -2,10 +2,10 @@
 
 namespace App\Models\Payments;
 
+use App\Modules\Tenant\Casts\EncryptedStringCast;
 use App\Models\Concerns\BelongsToSchool;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Crypt;
 
 class PaymentGatewayCredential extends Model
 {
@@ -25,37 +25,12 @@ class PaymentGatewayCredential extends Model
     {
         return [
             'is_encrypted' => 'boolean',
+            'key_value' => EncryptedStringCast::class,
         ];
     }
 
     public function gateway(): BelongsTo
     {
         return $this->belongsTo(PaymentGateway::class, 'payment_gateway_id');
-    }
-
-    public function getKeyValueAttribute(?string $value): ?string
-    {
-        if ($value === null || ! $this->is_encrypted) {
-            return $value;
-        }
-
-        try {
-            return Crypt::decryptString($value);
-        } catch (\Throwable) {
-            return $value;
-        }
-    }
-
-    public function setKeyValueAttribute(?string $value): void
-    {
-        if ($value === null) {
-            $this->attributes['key_value'] = null;
-
-            return;
-        }
-
-        $this->attributes['key_value'] = ($this->attributes['is_encrypted'] ?? true)
-            ? Crypt::encryptString($value)
-            : $value;
     }
 }

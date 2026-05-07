@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Modules\Tenant\Casts\EncryptedStringCast;
 use App\Models\Concerns\BelongsToSchool;
 use App\Models\Concerns\OptimizesQueryFilters;
 use App\Models\Finance\FeeInvoice;
@@ -70,6 +71,8 @@ class Student extends Model
             'admission_date' => 'date',
             'joining_date' => 'date',
             'address' => 'array',
+            'aadhaar_no' => EncryptedStringCast::class,
+            'medical_notes' => EncryptedStringCast::class,
         ];
     }
 

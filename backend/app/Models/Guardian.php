@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Modules\Tenant\Casts\EncryptedPhoneCast;
+use App\Modules\Tenant\Casts\EncryptedStringCast;
 use App\Models\Concerns\BelongsToSchool;
 use App\Models\Concerns\OptimizesQueryFilters;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -57,6 +59,10 @@ class Guardian extends Model
             'can_receive_sms' => 'bool',
             'can_receive_email' => 'bool',
             'can_pickup_student' => 'bool',
+            'email' => EncryptedStringCast::class,
+            'phone' => EncryptedPhoneCast::class,
+            'alternate_phone' => EncryptedPhoneCast::class,
+            'aadhaar_no' => EncryptedStringCast::class,
         ];
     }
 

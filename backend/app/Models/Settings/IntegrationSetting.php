@@ -2,10 +2,10 @@
 
 namespace App\Models\Settings;
 
+use App\Modules\Tenant\Casts\EncryptedArrayCast;
 use App\Models\Concerns\BelongsToSchool;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Crypt;
 
 class IntegrationSetting extends Model
 {
@@ -27,6 +27,7 @@ class IntegrationSetting extends Model
     {
         return [
             'config' => 'array',
+            'encrypted_config' => EncryptedArrayCast::class,
             'deleted_at' => 'datetime',
         ];
     }
@@ -48,14 +49,6 @@ class IntegrationSetting extends Model
 
     public function decryptedSecretConfig(): array
     {
-        if (blank($this->encrypted_config)) {
-            return [];
-        }
-
-        try {
-            return json_decode(Crypt::decryptString($this->encrypted_config), true) ?: [];
-        } catch (\Throwable) {
-            return [];
-        }
+        return $this->encrypted_config ?? [];
     }
 }

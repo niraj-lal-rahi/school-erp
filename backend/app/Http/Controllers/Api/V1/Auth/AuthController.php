@@ -35,8 +35,13 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
+        $user = $request->user()->load('roles.permissions', 'school');
+
         return response()->json([
-            'data' => $request->user()->load('roles.permissions', 'school'),
+            'data' => $user,
+            'meta' => [
+                'impersonation' => $request->attributes->get('impersonationContext'),
+            ],
         ]);
     }
 

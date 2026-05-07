@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Modules\Tenant\Casts\EncryptedArrayCast;
+use App\Modules\Tenant\Casts\EncryptedPhoneCast;
+use App\Modules\Tenant\Casts\EncryptedStringCast;
 use App\Models\Concerns\BelongsToSchool;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +43,13 @@ class StudentMedicalRecord extends Model
         return [
             'height' => 'decimal:2',
             'weight' => 'decimal:2',
+            'allergies' => EncryptedArrayCast::class,
+            'medical_conditions' => EncryptedArrayCast::class,
+            'medications' => EncryptedArrayCast::class,
+            'doctor_phone' => EncryptedPhoneCast::class,
+            'emergency_contact_phone' => EncryptedPhoneCast::class,
+            'insurance_number' => EncryptedStringCast::class,
+            'notes' => EncryptedStringCast::class,
         ];
     }
 
