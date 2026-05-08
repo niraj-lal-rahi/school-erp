@@ -43,6 +43,21 @@ button:hover {
   opacity: 0.92;
 }
 
+input {
+  width: 100%;
+  padding: 0.85rem 0.95rem;
+  border-radius: 12px;
+  border: 1px solid var(--sa-border);
+  background: #fff;
+  color: var(--sa-text);
+  font: inherit;
+}
+
+input:focus {
+  outline: 2px solid rgba(15, 76, 129, 0.18);
+  border-color: var(--sa-primary);
+}
+
 .sa-layout {
   min-height: 100vh;
   padding: 2rem;
@@ -81,6 +96,7 @@ button:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+  align-items: center;
 }
 
 .sa-nav {
@@ -130,6 +146,24 @@ button:hover {
   margin: 0;
   color: var(--sa-muted);
   line-height: 1.6;
+}
+
+.sa-user-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--sa-border);
+  color: var(--sa-text);
+  font-weight: 600;
+}
+
+.sa-button--secondary {
+  background: #fff;
+  color: var(--sa-primary);
+  border: 1px solid var(--sa-border);
 }
 
 .sa-row {
@@ -239,6 +273,49 @@ button:hover {
 .sa-timeline-item__header span {
   color: var(--sa-muted);
   font-size: 0.9rem;
+}
+
+.sa-auth {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at top right, rgba(15, 76, 129, 0.16), transparent 28%),
+    linear-gradient(180deg, #f6f9fc 0%, #edf3f9 100%);
+}
+
+.sa-auth__panel {
+  width: min(100%, 460px);
+  background: var(--sa-surface);
+  border: 1px solid var(--sa-border);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: var(--sa-shadow);
+}
+
+.sa-auth__form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.sa-auth__field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.sa-auth__field span {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.sa-auth__error {
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: rgba(180, 35, 24, 0.08);
+  border: 1px solid rgba(180, 35, 24, 0.18);
+  color: var(--sa-danger);
 }
 
 @media (max-width: 800px) {

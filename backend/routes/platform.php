@@ -24,6 +24,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/platform')->group(function (): void {
     Route::post('/auth/login', [AuthController::class, 'platformLogin'])->middleware('api.rate:login');
+    Route::middleware(['auth:api', 'ensure.platform.admin', 'api.rate:api'])->group(function (): void {
+        Route::get('/auth/me', [AuthController::class, 'me']);
+        Route::post('/auth/logout', [AuthController::class, 'logout']);
+    });
     Route::post('/impersonation/stop', [PlatformImpersonationController::class, 'stop'])->middleware(['auth:api', 'api.rate:api']);
 
     Route::middleware(['auth:api', 'ensure.platform.admin', 'api.rate:api'])->group(function (): void {

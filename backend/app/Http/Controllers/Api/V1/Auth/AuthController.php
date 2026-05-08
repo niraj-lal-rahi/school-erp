@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 use App\DataTransferObjects\Auth\LoginData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\PlatformLoginRequest;
 use App\Http\Requests\Auth\RefreshTokenRequest;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -22,6 +23,17 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login successful.',
             'data' => $this->authService->login(LoginData::fromArray($request->validated())),
+        ]);
+    }
+
+    public function platformLogin(PlatformLoginRequest $request): JsonResponse
+    {
+        return response()->json([
+            'message' => 'Platform login successful.',
+            'data' => $this->authService->platformLogin(
+                $request->validated('email'),
+                $request->validated('password'),
+            ),
         ]);
     }
 

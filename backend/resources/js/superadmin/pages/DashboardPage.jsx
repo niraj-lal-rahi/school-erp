@@ -1,9 +1,10 @@
 import React from 'react';
 import SuperAdminLayout from '../layouts/SuperAdminLayout';
 
-export default function DashboardPage() {
+export default function DashboardPage(props) {
   return (
     <SuperAdminLayout
+      {...props}
       title="Dashboard"
       description="Platform overview across tenant health, billing posture, queue state, and operational alerts."
     >

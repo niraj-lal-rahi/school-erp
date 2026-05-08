@@ -1,9 +1,12 @@
 const API_BASE = '/api/v1/platform';
+const TOKEN_KEY = 'superadmin_access_token';
 
 async function request(path, options = {}) {
+  const token = window.localStorage.getItem(TOKEN_KEY);
   const response = await fetch(`${API_BASE}${path}`, {
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
     credentials: 'include',
@@ -20,6 +23,14 @@ async function request(path, options = {}) {
       ? payload.message
       : 'Platform request failed.';
 
+    if (response.status === 401 && !options.skipAuthRedirect && typeof window !== 'undefined') {
+      window.localStorage.removeItem(TOKEN_KEY);
+
+      if (window.location.pathname !== '/superadmin/login') {
+        window.location.assign('/superadmin/login');
+      }
+    }
+
     throw new Error(message);
   }
 
@@ -27,7 +38,7 @@ async function request(path, options = {}) {
 }
 
 export const platformApi = {
-  get: (path) => request(path),
-  post: (path, body = {}) => request(path, { method: 'POST', body: JSON.stringify(body) }),
-  put: (path, body = {}) => request(path, { method: 'PUT', body: JSON.stringify(body) }),
+  get: (path, options = {}) => request(path, options),
+  post: (path, body = {}, options = {}) => request(path, { method: 'POST', body: JSON.stringify(body), ...options }),
+  put: (path, body = {}, options = {}) => request(path, { method: 'PUT', body: JSON.stringify(body), ...options }),
 };
